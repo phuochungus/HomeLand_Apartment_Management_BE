@@ -1,0 +1,13 @@
+version: "3"
+services:
+  redis:
+    ports:
+      - "6379:6379"
+    image: redis
+  pg:
+    ports:
+      - "5432:5432"
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=db

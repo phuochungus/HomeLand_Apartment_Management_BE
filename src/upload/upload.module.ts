@@ -11,10 +11,22 @@ import { SupabaseClient, createClient } from "@supabase/supabase-js";
         {
             provide: SupabaseClient,
             useFactory: () => {
-                return createClient(
-                    process.env.SUPABASE_URL || "nothing",
-                    process.env.SUPABASE_KEY || "nothing",
-                );
+                if (process.env.IS_PRODUCTION == "true") {
+                    return createClient(
+                        process.env.SUPABASE_URL || "nothing",
+                        process.env.SUPABASE_KEY || "nothing",
+                    );
+                } else {
+                    console.log(process.env.SUPABASE_LOCAL_URL);
+                    return createClient(
+                        process.env.SUPABASE_LOCAL_URL ||
+                            process.env.SUPABASE_URL ||
+                            "nothing",
+                        process.env.SUPABASE_LOCAL_KEY ||
+                            process.env.SUPABASE_KEY ||
+                            "nothing",
+                    );
+                }
             },
         },
     ],

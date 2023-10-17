@@ -7,8 +7,9 @@ import {
     ChildEntity,
     Entity,
     TableInheritance,
+    OneToMany,
 } from "typeorm";
-import { Apartment } from "../../apartment/entities/apartment.entity";
+import { Property } from "../../apartment/entities/apartment.entity";
 import {
     IsDateString,
     IsEmail,
@@ -20,6 +21,7 @@ import {
 import { Exclude } from "class-transformer";
 import { ApiProperty } from "@nestjs/swagger";
 import { IdGeneratorService } from "../../id_generator/id-generator.service";
+import { Contract } from "../../contract/entities/contract.entity";
 
 export enum PersonRole {
     RESIDENT = "resident",
@@ -46,11 +48,14 @@ export class Person {
     @PrimaryColumn()
     id: string;
 
-    @ManyToOne(() => Apartment, (apartment) => apartment.residents, {
+    @ManyToOne(() => Property, (apartment) => apartment.residents, {
         nullable: true,
         eager: true,
     })
-    stay_at?: Apartment;
+    stay_at?: Property;
+
+    @OneToMany(() => Contract, (contract) => contract.president_id)
+    contracts: Contract[];
 
     @IsEnum(PersonRole)
     @Column({

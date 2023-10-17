@@ -11,6 +11,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { createClient } from "redis";
 import { HashModule } from "./hash/hash.module";
 import { PersonFactoryModule } from "./person-factory/person-factory.module";
+import { SeedingModule } from "./seeding/seeding.module";
 
 @Module({
     imports: [
@@ -49,7 +50,7 @@ import { PersonFactoryModule } from "./person-factory/person-factory.module";
                     await client.disconnect();
                     return {
                         type: "postgres",
-                        url: "postgres://postgres@localhost:5432/db",
+                        url: process.env.DB_LOCAL_URL,
                         synchronize: true,
                         entities: ["dist/**/*.entity{.ts,.js}"],
                         duration: 5000,
@@ -57,7 +58,7 @@ import { PersonFactoryModule } from "./person-factory/person-factory.module";
                             type: "redis",
                             ignoreErrors: true,
                             options: {
-                                url: "redis://localhost:6379",
+                                url: process.env.REDIS_LOCAL_URL,
                             },
                         },
                     };
@@ -70,6 +71,7 @@ import { PersonFactoryModule } from "./person-factory/person-factory.module";
         UploadModule,
         HashModule,
         PersonFactoryModule,
+        SeedingModule,
     ],
     controllers: [AppController],
     providers: [AppService],
