@@ -9,10 +9,7 @@ import {
     UseInterceptors,
 } from "@nestjs/common";
 import { AppService } from "./app.service";
-import {
-    PersonRepository,
-    PersonService,
-} from "./person/person.service";
+import { PersonRepository } from "./person/person.service";
 import { CreatePersonDto } from "./person/dto/create-person.dto";
 import {
     ApiConsumes,
@@ -25,8 +22,10 @@ import { FileFieldsInterceptor } from "@nestjs/platform-express";
 import { CreateAccountDto } from "./person/dto/create-account.dto";
 import { ValidateFilePipe } from "./helper/pipe";
 import { MBtoBytes } from "./helper/validation";
+import { Auth } from "./helper/decorator";
+import { PersonRole } from "./person/entities/person.entity";
 
-@ApiTags("demo")
+@ApiTags("DEVELOPMENT ONLY")
 @Controller()
 export class AppController {
     constructor(
@@ -34,9 +33,16 @@ export class AppController {
         private readonly personRepository: PersonRepository,
     ) {}
 
+    @Auth(PersonRole.MANAGER)
     @Get()
     getHello(): string {
         return this.appService.getHello();
+    }
+
+    @Auth()
+    @Get("/token/validate")
+    validateToken() {
+        return "Token is valid";
     }
 
     /**
@@ -103,10 +109,5 @@ export class AppController {
         createPersonDto.back_identify_card_photo =
             files.back_identify_card_photo;
         return this.personRepository.create(createPersonDto);
-    }
-
-    @Get("/me")
-    getMe(@Req() req) {
-        return req.user;
     }
 }

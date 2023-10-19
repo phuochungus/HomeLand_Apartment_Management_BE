@@ -12,6 +12,8 @@ import { createClient } from "redis";
 import { HashModule } from "./hash/hash.module";
 import { PersonFactoryModule } from "./person-factory/person-factory.module";
 import { SeedingModule } from "./seeding/seeding.module";
+import { PropertyModule } from "./property/property.module";
+import { MeModule } from './me/me.module';
 
 @Module({
     imports: [
@@ -19,6 +21,9 @@ import { SeedingModule } from "./seeding/seeding.module";
         JwtModule.register({
             secret: process.env.ACCESS_TOKEN_SECRET,
             global: true,
+            signOptions: {
+                expiresIn: "30d",
+            },
         }),
         TypeOrmModule.forRootAsync({
             useFactory: async () => {
@@ -26,7 +31,7 @@ import { SeedingModule } from "./seeding/seeding.module";
                     return {
                         type: "postgres",
                         url: process.env.DB_URL,
-                        synchronize: false,
+                        synchronize: true,
                         entities: ["dist/**/*.entity{.ts,.js}"],
                         cache: {
                             duration: 5000,
@@ -72,6 +77,8 @@ import { SeedingModule } from "./seeding/seeding.module";
         HashModule,
         PersonFactoryModule,
         SeedingModule,
+        PropertyModule,
+        MeModule,
     ],
     controllers: [AppController],
     providers: [AppService],

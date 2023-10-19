@@ -1,4 +1,5 @@
 import {
+    Column,
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
@@ -7,8 +8,11 @@ import {
     OneToOne,
     PrimaryColumn,
 } from "typeorm";
-import { Person } from "../../person/entities/person.entity";
-import { Property } from "../../apartment/entities/apartment.entity";
+import {
+    Person,
+    Resident,
+} from "../../person/entities/person.entity";
+import { Property } from "../../property/entities/property.entity";
 
 @Entity()
 export class Contract {
@@ -24,9 +28,13 @@ export class Contract {
     next_contract?: Contract;
 
     @ManyToOne(() => Person, (person) => person.contracts)
-    president_id: string;
+    resident: Resident;
 
     @ManyToOne(() => Property, (property) => property.contract)
+    @JoinColumn({ name: "property_id" })
+    property: Property;
+
+    @Column({ nullable: true })
     property_id: string;
 
     @CreateDateColumn()

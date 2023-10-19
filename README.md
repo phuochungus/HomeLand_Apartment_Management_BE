@@ -1,3 +1,55 @@
+## HOW TO BUILD
+```bash
+# clone repository
+$ git clone https://github.com/phuochungus/HomeLand_Apartment_Management_BE.git
+$ cd HomeLand_Apartment_Management_BE
+
+# install dependencies
+$ npm install
+
+# start docker compose
+$ docker compose pull
+
+# rename .env.example to .env
+$ cp .env.example .env
+```
+
+Open  ```http://localhost:54323``` in the browser
+
+On left menu, navigate to ```Storage```
+
+![](./doc/pic1.png)
+
+Create ```New bucket``` with following config
+<div align="center"> 
+<img src="https://github.com/phuochungus/HomeLand_Apartment_Management_BE/blob/7a908fc4e13f83ff9be4eefb910064257dce578d/doc/pic2.png" width="50%" />
+</div>
+
+## HOW TO RUN
+```bash
+# docker compose include redis and postgresql
+# if your local machine have redis or postgresql, please turn off all in order to run properly
+$ docker compose up -d
+
+# start supabase local
+$ npx supabase start
+
+# start nestjs
+$ npm run start:dev
+```
+
+# HOW TO CLOSE
+
+On terminal where Nestjs running press ```Ctrl + C```
+```bash
+# stop docker containers
+$ docker compose stop
+
+# stop supabase
+$ npx supabase stop
+```
+
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>

@@ -17,7 +17,6 @@ import { SupabaseClient, createClient } from "@supabase/supabase-js";
                         process.env.SUPABASE_KEY || "nothing",
                     );
                 } else {
-                    console.log(process.env.SUPABASE_LOCAL_URL);
                     return createClient(
                         process.env.SUPABASE_LOCAL_URL ||
                             process.env.SUPABASE_URL ||

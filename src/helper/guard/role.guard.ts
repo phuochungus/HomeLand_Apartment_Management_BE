@@ -1,4 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
+import {
+    Injectable,
+    CanActivate,
+    ExecutionContext,
+    ForbiddenException,
+} from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { Roles } from "../decorator/roles.decorator";
 
@@ -6,7 +11,7 @@ import { Roles } from "../decorator/roles.decorator";
 export class RolesGuard implements CanActivate {
     constructor(private reflector: Reflector) {}
 
-    canActivate(context: ExecutionContext): boolean {
+    canActivate(context: ExecutionContext) {
         const roles = this.reflector.getAllAndMerge(Roles, [
             context.getHandler(),
             context.getClass(),
@@ -17,6 +22,10 @@ export class RolesGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const user = request.user;
         const hasRole = () => roles.includes(user.role);
-        return user && user.role && hasRole();
+        const hasAuthority = user && user.role && hasRole();
+        if (hasAuthority) return true;
+        throw new ForbiddenException(
+            "Only " + roles.join(", ") + " have permission",
+        );
     }
 }

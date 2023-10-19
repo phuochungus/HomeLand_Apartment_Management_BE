@@ -1,6 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { InjectDataSource } from "@nestjs/typeorm";
-import { DataSource } from "typeorm";
 import { PersonRepository } from "../person/person.service";
 import { Gender, PersonRole } from "../person/entities/person.entity";
 import { readFileSync } from "fs";
@@ -10,7 +8,6 @@ export class SeedingService {
     constructor(private readonly personService: PersonRepository) {}
 
     async startSeeding() {
-        console.log(process.cwd() + "/src/seeding/identify.png");
         const fakeImage = readFileSync(
             process.cwd() + "/src/seeding/identify.png",
         );
@@ -19,7 +16,7 @@ export class SeedingService {
             buffer: fakeImage,
         };
 
-        const admin = await this.personService.create({
+        const demoAdmin = await this.personService.create({
             name: "DEMO ADMIN",
             gender: Gender.FEMALE,
             phone_number: "0811111111",
@@ -28,9 +25,11 @@ export class SeedingService {
             back_identify_card_photo: fakeFile as Express.Multer.File,
             front_identify_card_photo:
                 fakeFile as Express.Multer.File,
+            email: "admin@gmail.com",
+            password: "password",
         });
 
-        const resident = await this.personService.create({
+        const demoResident = await this.personService.create({
             name: "DEMO RESIDENT",
             gender: Gender.MALE,
             phone_number: "0555555555",
@@ -39,9 +38,11 @@ export class SeedingService {
             back_identify_card_photo: fakeFile as Express.Multer.File,
             front_identify_card_photo:
                 fakeFile as Express.Multer.File,
+            email: "resident@gmail.com",
+            password: "password",
         });
 
-        const manager = await this.personService.create({
+        const demoManager = await this.personService.create({
             name: "DEMO MANAGER",
             gender: Gender.FEMALE,
             phone_number: "0808080808",
@@ -50,9 +51,11 @@ export class SeedingService {
             back_identify_card_photo: fakeFile as Express.Multer.File,
             front_identify_card_photo:
                 fakeFile as Express.Multer.File,
+            email: "manager@gmail.com",
+            password: "password",
         });
 
-        const technician = await this.personService.create({
+        const demoTechnician = await this.personService.create({
             name: "DEMO TECHNICIAN",
             gender: Gender.MALE,
             phone_number: "0303030303",
@@ -61,9 +64,11 @@ export class SeedingService {
             back_identify_card_photo: fakeFile as Express.Multer.File,
             front_identify_card_photo:
                 fakeFile as Express.Multer.File,
+            email: "technician@gmail.com",
+            password: "password",
         });
 
-        const employee = await this.personService.create({
+        const demoEmployee = await this.personService.create({
             name: "DEMO EMPLOYEE",
             gender: Gender.FEMALE,
             phone_number: "0956565656",
@@ -72,6 +77,16 @@ export class SeedingService {
             back_identify_card_photo: fakeFile as Express.Multer.File,
             front_identify_card_photo:
                 fakeFile as Express.Multer.File,
+            email: "employee@gmail.com",
+            password: "password",
         });
+
+        return [
+            demoAdmin,
+            demoResident,
+            demoManager,
+            demoTechnician,
+            demoEmployee,
+        ];
     }
 }

@@ -20,14 +20,14 @@ import {
     ApiUnprocessableEntityResponse,
 } from "@nestjs/swagger";
 import { FileFieldsInterceptor } from "@nestjs/platform-express";
-import { Person } from "./entities/person.entity";
+import { Person, PersonRole } from "./entities/person.entity";
 import { JWTAuthGuard } from "../helper/guard";
 import { ValidateFilePipe } from "../helper/pipe";
 import { MBtoBytes } from "../helper/validation";
 import { CreateAccountDto } from "./dto/create-account.dto";
 import { Auth } from "../helper/decorator";
 
-@ApiTags("person")
+@ApiTags("Person")
 @UseGuards(JWTAuthGuard)
 @ApiBearerAuth()
 @Controller("person")
@@ -84,7 +84,6 @@ export class PersonController {
         },
         @Body() createPersonDto: CreatePersonDto,
     ) {
-        console.log(files);
         createPersonDto.front_identify_card_photo =
             files.front_identify_card_photo;
         createPersonDto.back_identify_card_photo =
@@ -98,7 +97,7 @@ export class PersonController {
      * Account must associate with person profile
      */
     @ApiOperation({ summary: "Create account" })
-    @Auth("admin", "manager")
+    @Auth(PersonRole.ADMIN, PersonRole.MANAGER)
     @Patch("/:id/account")
     async createAccount(
         @Param("id") id: string,

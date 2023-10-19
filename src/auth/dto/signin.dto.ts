@@ -1,14 +1,13 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsString } from "class-validator";
+import { ApiProperty, PickType } from "@nestjs/swagger";
+import { Person } from "../../person/entities/person.entity";
 
-export class SignInDto {
-    @ApiProperty({
-        example: "abcxyz@gmail.com",
-    })
-    @IsEmail()
+export class SignInDto extends PickType(Person, [
+    "email",
+    "password",
+] as const) {
+    @ApiProperty({ required: true })
     email: string;
-
-    @ApiProperty({ example: "123123123" })
-    @IsString()
+    
+    @ApiProperty({ required: true })
     password: string;
 }

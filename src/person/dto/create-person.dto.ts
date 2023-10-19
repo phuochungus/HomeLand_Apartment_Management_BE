@@ -1,43 +1,15 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Gender, PersonRole } from "../entities/person.entity";
-import {
-    IsDateString,
-    IsEnum,
-    IsPhoneNumber,
-    IsString,
-} from "class-validator";
+import { ApiProperty, PickType } from "@nestjs/swagger";
+import { Person } from "../entities/person.entity";
 
-export class CreatePersonDto {
-    @ApiProperty({
-        example: "Nguyen Van A",
-    })
-    @IsString()
-    name: string;
-
-    @ApiProperty({
-        default: PersonRole.ADMIN,
-    })
-    @IsEnum(PersonRole)
-    role: PersonRole;
-
-    @ApiProperty({
-        default: "1990-01-01",
-    })
-    @IsDateString()
-    date_of_birth: Date;
-
-    @ApiProperty({
-        default: Gender.MALE,
-    })
-    @IsEnum(Gender)
-    gender: Gender;
-
-    @ApiProperty({
-        default: "0999999999",
-    })
-    @IsPhoneNumber("VN")
-    phone_number: string;
-
+export class CreatePersonDto extends PickType(Person, [
+    "name",
+    "role",
+    "date_of_birth",
+    "gender",
+    "phone_number",
+    "password",
+    "email",
+] as const) {
     @ApiProperty({ type: "file", format: "binary", required: true })
     front_identify_card_photo: Express.Multer.File;
 

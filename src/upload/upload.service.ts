@@ -1,72 +1,72 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, OnModuleInit } from "@nestjs/common";
+import StorageFileApi from "@supabase/storage-js/dist/module/packages/StorageFileApi";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { Person } from "../person/entities/person.entity";
 
+/**
+ * Upload service interface
+ */
 export abstract class UploadService {
-    abstract uploadAndGetURL(
+    /**
+     * Upload a file to remote storage and return the public URL
+     * @param file file must have buffer property
+     * @param path path to upload on remote storage
+     * @param mime MIME type of file
+     */
+    abstract upload(
         file: any,
-        uploadPath: string,
+        path: string,
         mime?: string,
     ): Promise<string>;
-    abstract save(
-        person: Person,
-        frontIdentifyCardPhoto: any,
-        backIdentifyCardPhoto: any,
-    ): Promise<Person>;
+
+    /**
+     * @param paths path to files will be remove on remote storage
+     */
+    abstract remove(paths: string[]);
 }
 
 @Injectable()
-export class SupabaseService extends UploadService {
+export class SupabaseService
+    extends UploadService
+    implements OnModuleInit
+{
     constructor(private readonly supabaseClient: SupabaseClient) {
         super();
     }
 
-    async save(
-        person: Person,
-        frontIdentifyCardPhoto: any,
-        backIdentifyCardPhoto: any,
-    ): Promise<Person> {
-        const [frontURL, backURL] = await Promise.all([
-            this.uploadAndGetURL(
-                frontIdentifyCardPhoto,
-                "/person/" +
-                    person.id +
-                    "/front_identify_card_photo_URL.png",
-                "image/png",
-            ),
+    static readonly BUCKET_NAME = "homeland";
 
-            this.uploadAndGetURL(
-                backIdentifyCardPhoto,
-                "/person/" +
-                    person.id +
-                    "/back_identify_card_photo_URL.png",
-                "image/png",
-            ),
-        ]);
-        person.front_identify_card_photo_URL = frontURL;
-        person.back_identify_card_photo_URL = backURL;
-        return person;
+    private bucket: StorageFileApi;
+
+    onModuleInit() {
+        this.bucket = this.supabaseClient.storage.from(
+            SupabaseService.BUCKET_NAME,
+        );
     }
 
-    private BLOB_STORAGE_URL =
-        (process.env.IS_PRODUCTION == "true"
-            ? process.env.SUPABASE_URL
-            : process.env.SUPABASE_LOCAL_URL ||
-              process.env.SUPABASE_URL) +
-        "/storage/v1/object/public/homeland";
+    async remove(paths: string[]): Promise<boolean> {
+        const { error } = await this.supabaseClient.storage
+            .from(SupabaseService.BUCKET_NAME)
+            .remove(paths);
 
-    async uploadAndGetURL(
+        if (error) throw error;
+        return true;
+    }
+
+    async upload(
         file: any,
         uploadPath: string,
         mime: string = "text/plain;charset=UTF-8",
     ): Promise<string> {
         const { data, error } = await this.supabaseClient.storage
-            .from("homeland")
+            .from(SupabaseService.BUCKET_NAME)
             .upload(uploadPath, file.buffer, {
                 contentType: mime,
             });
 
         if (error) throw error;
-        return this.BLOB_STORAGE_URL + "/" + data.path;
+        const response = this.supabaseClient.storage
+            .from(SupabaseService.BUCKET_NAME)
+            .getPublicUrl(uploadPath);
+        return response.data.publicUrl;
     }
 }

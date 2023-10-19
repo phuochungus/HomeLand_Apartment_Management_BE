@@ -1,13 +1,15 @@
 import { NestFactory, Reflector } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import { ClassSerializerInterceptor, ValidationPipe } from "@nestjs/common";
+import {
+    ClassSerializerInterceptor,
+    ValidationPipe,
+} from "@nestjs/common";
 import {
     DocumentBuilder,
     SwaggerDocumentOptions,
     SwaggerModule,
 } from "@nestjs/swagger";
 import { Person } from "./person/entities/person.entity";
-import { CreatePersonDto } from "./person/dto/create-person.dto";
 import { TypeOrmExceptionFilter } from "./helper/filter/typeorm-exception.filter";
 
 async function bootstrap() {
@@ -17,11 +19,11 @@ async function bootstrap() {
             whitelist: true,
             forbidNonWhitelisted: true,
             transform: true,
-        })
+        }),
     );
     app.enableCors();
     app.useGlobalInterceptors(
-        new ClassSerializerInterceptor(app.get(Reflector))
+        new ClassSerializerInterceptor(app.get(Reflector)),
     );
     app.useGlobalFilters(new TypeOrmExceptionFilter());
 
@@ -34,9 +36,13 @@ async function bootstrap() {
 
     const option: SwaggerDocumentOptions = {
         deepScanRoutes: true,
-        extraModels: [Person, CreatePersonDto],
+        extraModels: [Person],
     };
-    const document = SwaggerModule.createDocument(app, config, option);
+    const document = SwaggerModule.createDocument(
+        app,
+        config,
+        option,
+    );
     SwaggerModule.setup("api", app, document);
 
     await app.listen(process.env.PORT || 3000);

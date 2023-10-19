@@ -7,16 +7,19 @@ import {
 import { CreatePersonDto } from "./dto/create-person.dto";
 import { UpdatePersonDto } from "./dto/update-person.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Repository, TypeORMError } from "typeorm";
 import { Person, PersonRole } from "./entities/person.entity";
 import { hashSync } from "bcrypt";
 import { UploadService } from "../upload/upload.service";
 import { BaseRepository } from "../helper/base/base-repository.abstract";
-import { isAffected } from "../helper/validation";
+import { isQueryAffected } from "../helper/validation";
 import { HashService } from "../hash/hash.service";
 import { CreateAccountDto } from "./dto/create-account.dto";
 import { PersonFactory } from "../person-factory/person-factory.service";
 
+/**
+ * Person repository interface
+ */
 export abstract class PersonRepository extends BaseRepository<
     CreatePersonDto,
     Person
@@ -96,18 +99,49 @@ export class PersonService implements PersonRepository {
             back_identify_card_photo,
             ...rest
         } = createPersonDto;
+        console.log(rest);
 
         let person = PersonFactory.create(rest);
+        console.log(person);
         if (person.password) {
             person.password = this.hashService.hash(person.password);
         }
 
-        person = await this.uploadService.save(
-            person,
-            front_identify_card_photo,
-            back_identify_card_photo,
-        );
-        return await this.personRepository.save(person);
+        try {
+            const frontURL = await this.uploadService.upload(
+                front_identify_card_photo,
+                "person/" +
+                    person.id +
+                    "/front_identify_card_photo_URL.png",
+                "image/png",
+            );
+            const backURL = await this.uploadService.upload(
+                back_identify_card_photo,
+                "person/" +
+                    person.id +
+                    "/back_identify_card_photo_URL.png",
+                "image/png",
+            );
+            person.front_identify_card_photo_URL = frontURL;
+            person.back_identify_card_photo_URL = backURL;
+            return await this.personRepository.save(person);
+        } catch (error) {
+            if (error instanceof TypeORMError) {
+                try {
+                    await this.uploadService.remove([
+                        "/person/" +
+                            person.id +
+                            "/front_identify_card_photo_URL.png",
+                        "/person/" +
+                            person.id +
+                            "/back_identify_card_photo_URL.png",
+                    ]);
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+            throw error;
+        }
     }
 
     async createAccount(
@@ -157,18 +191,18 @@ export class PersonService implements PersonRepository {
             id,
             updatePersonDto,
         );
-        return isAffected(result);
+        return isQueryAffected(result);
     }
 
     async softDelete(id: string): Promise<boolean> {
         const result = await this.personRepository.softDelete({ id });
-        return isAffected(result);
+        return isQueryAffected(result);
     }
 
     async hardDelete?(id: any): Promise<boolean> {
         try {
             const result = await this.personRepository.delete({ id });
-            return isAffected(result);
+            return isQueryAffected(result);
         } catch (error) {
             console.error(error);
             throw error;

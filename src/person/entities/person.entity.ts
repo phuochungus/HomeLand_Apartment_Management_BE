@@ -8,8 +8,9 @@ import {
     Entity,
     TableInheritance,
     OneToMany,
+    JoinColumn,
 } from "typeorm";
-import { Property } from "../../apartment/entities/apartment.entity";
+import { Property } from "../../property/entities/property.entity";
 import {
     IsDateString,
     IsEmail,
@@ -52,17 +53,11 @@ export class Person {
         nullable: true,
         eager: true,
     })
+    @JoinColumn()
     stay_at?: Property;
 
-    @OneToMany(() => Contract, (contract) => contract.president_id)
+    @OneToMany(() => Contract, (contract) => contract.resident)
     contracts: Contract[];
-
-    @IsEnum(PersonRole)
-    @Column({
-        type: "enum",
-        enum: PersonRole,
-    })
-    role: PersonRole;
 
     @ApiProperty({
         example: "Nguyen Van A",
@@ -72,12 +67,29 @@ export class Person {
     name: string;
 
     @ApiProperty({
-        example: "1999-01-01",
+        default: PersonRole.ADMIN,
+        type: "enum",
+        enum: PersonRole,
+    })
+    @IsEnum(PersonRole)
+    @Column({
+        type: "enum",
+        enum: PersonRole,
+    })
+    role: PersonRole;
+
+    @ApiProperty({
+        default: "1990-01-01",
     })
     @IsDateString()
     @Column()
     date_of_birth: Date;
 
+    @ApiProperty({
+        default: Gender.MALE,
+        type: "enum",
+        enum: Gender,
+    })
     @IsEnum(Gender)
     @Column({
         type: "enum",
@@ -91,26 +103,34 @@ export class Person {
     @Column()
     back_identify_card_photo_URL: string;
 
+    @ApiProperty({
+        default: "0999999999",
+    })
     @IsPhoneNumber("VN")
     @Column({ unique: true })
     phone_number: string;
 
+    @ApiProperty({ required: false })
     @Column({ nullable: true })
     activated_at?: Date;
 
-    @Exclude()
-    @IsOptional()
-    @Column({ nullable: true })
-    password?: string;
-
+    @ApiProperty({ required: false, default: "admin@gmail.com" })
     @IsOptional()
     @IsEmail()
     @Column({ nullable: true, unique: true })
     email?: string;
 
+    @ApiProperty({ required: false, default: "password" })
+    @IsOptional()
+    @Exclude({ toPlainOnly: true })
+    @Column({ nullable: true })
+    password?: string;
+
+    @ApiProperty()
     @CreateDateColumn()
     created_at: Date;
 
+    @ApiProperty({ required: false })
     @DeleteDateColumn()
     deleted_at?: Date;
 }
