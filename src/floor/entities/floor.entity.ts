@@ -6,7 +6,7 @@ import {
     PrimaryColumn,
 } from "typeorm";
 import { Building } from "../../building/entities/building.entity";
-import { Property } from "../../property/entities/property.entity";
+import { Apartment } from "../../apartment/entities/apartment.entity";
 
 @Entity()
 export class Floor {
@@ -19,6 +19,6 @@ export class Floor {
     @ManyToOne(() => Building, (building) => building.floors)
     building: Building;
 
-    @OneToMany(() => Property, (property) => property.floor)
-    properties: Property[];
+    @OneToMany(() => Apartment, (property) => property.floor)
+    apartments: Apartment[];
 }

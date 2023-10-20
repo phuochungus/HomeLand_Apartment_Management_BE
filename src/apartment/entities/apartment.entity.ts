@@ -15,10 +15,10 @@ import { Floor } from "../../floor/entities/floor.entity";
 import { ApiProperty } from "@nestjs/swagger";
 
 @Entity()
-export class Property {
+export class Apartment {
     @ApiProperty()
     @PrimaryColumn()
-    property_id: string;
+    apartment_id: string;
 
     @ApiProperty()
     @Column()
@@ -28,7 +28,7 @@ export class Property {
     @Column()
     length: number;
 
-    @ManyToOne(() => Floor, (floor) => floor.properties)
+    @ManyToOne(() => Floor, (floor) => floor.apartments)
     @JoinColumn({ name: "floor_id" })
     floor: Floor;
 
@@ -38,10 +38,10 @@ export class Property {
     @OneToMany(() => Person, (person) => person.stay_at)
     residents: Person[];
 
-    @OneToMany(() => Contract, (contract) => contract.property)
+    @OneToMany(() => Contract, (contract) => contract.apartment)
     contract: Contract[];
 
-    @OneToMany(() => Image, (image) => image.property)
+    @OneToMany(() => Image, (image) => image.apartment)
     images: Image[];
 
     @CreateDateColumn()

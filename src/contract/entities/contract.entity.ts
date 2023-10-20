@@ -12,7 +12,7 @@ import {
     Person,
     Resident,
 } from "../../person/entities/person.entity";
-import { Property } from "../../property/entities/property.entity";
+import { Apartment } from "../../apartment/entities/apartment.entity";
 
 @Entity()
 export class Contract {
@@ -30,9 +30,9 @@ export class Contract {
     @ManyToOne(() => Person, (person) => person.contracts)
     resident: Resident;
 
-    @ManyToOne(() => Property, (property) => property.contract)
+    @ManyToOne(() => Apartment, (property) => property.contract)
     @JoinColumn({ name: "property_id" })
-    property: Property;
+    apartment: Apartment;
 
     @Column({ nullable: true })
     property_id: string;

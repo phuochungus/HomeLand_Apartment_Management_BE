@@ -1,11 +1,11 @@
 import { Entity, ManyToOne, PrimaryColumn } from "typeorm";
-import { Property } from "../../property/entities/property.entity";
+import { Apartment } from "../../apartment/entities/apartment.entity";
 
 @Entity()
 export class Image {
     @PrimaryColumn()
     image_URL: string;
 
-    @ManyToOne(() => Property, (property) => property.images)
-    property: Property;
+    @ManyToOne(() => Apartment, (property) => property.images)
+    apartment: Apartment;
 }
