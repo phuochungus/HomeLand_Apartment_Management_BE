@@ -8,6 +8,9 @@ import {
     UploadedFiles,
     Param,
     Patch,
+    Delete,
+    Req,
+    Put
 } from "@nestjs/common";
 import { PersonRepository } from "./person.service";
 import { CreatePersonDto } from "./dto/create-person.dto";
@@ -108,12 +111,29 @@ export class PersonController {
             createAccountDto,
         );
     }
+    @ApiOperation({ summary: "delete account" })
+    @Auth(PersonRole.ADMIN)
+    @Delete("/:id/account")
+    async deleteAcount(
+        @Param("id") id: string,
+    ) : Promise<boolean> {
+        const result = await this.personRepository.softDelete(
+            id,
+        );
+        return result;
+    }
 
     @ApiOperation({
         summary: "Get all person profile",
     })
     @Get()
     findAll(): Promise<Person[]> {
+    
         return this.personRepository.findAll();
+    }
+    @ApiOperation({ summary: "get person by id" })
+    @Get('/:id') 
+    findOne(@Param('id') id:string): Promise<Person |null> {
+        return this.personRepository.findOne(id)
     }
 }

@@ -20,6 +20,7 @@ import { HashModule } from "../hash/hash.module";
         {
             provide: PersonRepository,
             useClass: PersonService,
+        
         },
     ],
     exports: [PersonRepository],

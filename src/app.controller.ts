@@ -24,6 +24,7 @@ import { ValidateFilePipe } from "./helper/pipe";
 import { MBtoBytes } from "./helper/validation";
 import { Auth } from "./helper/decorator";
 import { PersonRole } from "./person/entities/person.entity";
+import { get } from "http";
 
 @ApiTags("DEVELOPMENT ONLY")
 @Controller()
@@ -32,6 +33,7 @@ export class AppController {
         private readonly appService: AppService,
         private readonly personRepository: PersonRepository,
     ) {}
+
 
     @Auth(PersonRole.MANAGER)
     @Get()

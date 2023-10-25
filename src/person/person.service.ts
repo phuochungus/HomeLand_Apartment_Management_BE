@@ -1,3 +1,4 @@
+
 import {
     ConflictException,
     Injectable,
@@ -16,6 +17,7 @@ import { isQueryAffected } from "../helper/validation";
 import { HashService } from "../hash/hash.service";
 import { CreateAccountDto } from "./dto/create-account.dto";
 import { PersonFactory } from "../person-factory/person-factory.service";
+import { async } from 'rxjs';
 
 /**
  * Person repository interface
@@ -35,6 +37,7 @@ export abstract class PersonRepository extends BaseRepository<
     ): Promise<Person>;
 }
 
+
 @Injectable()
 export class PersonService implements PersonRepository {
     constructor(
@@ -43,7 +46,8 @@ export class PersonService implements PersonRepository {
         private readonly uploadService: UploadService,
         private readonly hashService: HashService,
     ) {}
-
+    //get person by id
+    //create person
     async create(
         createPersonDto: CreatePersonDto,
         creatorRole?: PersonRole,
@@ -100,7 +104,6 @@ export class PersonService implements PersonRepository {
             ...rest
         } = createPersonDto;
         console.log(rest);
-
         let person = PersonFactory.create(rest);
         console.log(person);
         if (person.password) {
