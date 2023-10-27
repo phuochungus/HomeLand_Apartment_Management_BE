@@ -1,3 +1,5 @@
+import { UpdateApartmentDto } from './../apartment/dto/update-apartment.dto';
+import { UpdatePersonDto } from './dto/update-person.dto';
 import {
     Controller,
     Post,
@@ -71,15 +73,16 @@ export class PersonController {
             new ValidateFilePipe([
                 {
                     name: "front_identify_card_photo",
-                    limit: MBtoBytes(15),
+                    // limit: MBtoBytes(15),
                     mimetypes: ["image/jpeg", "image/png"],
                 },
                 {
                     name: "back_identify_card_photo",
-                    limit: MBtoBytes(15),
+                    // limit: MBtoBytes(15),
                     mimetypes: ["image/jpeg", "image/png"],
                 },
             ]),
+            
         )
         files: {
             front_identify_card_photo: Express.Multer.File;
@@ -87,6 +90,7 @@ export class PersonController {
         },
         @Body() createPersonDto: CreatePersonDto,
     ) {
+        console.log(files)
         createPersonDto.front_identify_card_photo =
             files.front_identify_card_photo;
         createPersonDto.back_identify_card_photo =
@@ -110,6 +114,16 @@ export class PersonController {
             id,
             createAccountDto,
         );
+    }
+    @ApiOperation({ summary: "update person" })
+    @Auth(PersonRole.ADMIN, PersonRole.MANAGER)
+    @Patch("/:id/person")
+    async updatePerson(
+        @Param("id") id: string,
+        @Body() updatePersonDto: UpdatePersonDto,
+    ): Promise<Person> {
+        return await this.personRepository.updatePerson(id, updatePersonDto)
+       
     }
     @ApiOperation({ summary: "delete account" })
     @Auth(PersonRole.ADMIN)

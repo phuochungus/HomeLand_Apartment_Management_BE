@@ -35,8 +35,12 @@ export abstract class PersonRepository extends BaseRepository<
         id: string,
         createAccountDto: CreateAccountDto,
     ): Promise<Person>;
+    abstract updatePerson(
+        id: string,
+        updatePersonDto: UpdatePersonDto,
+    ): Promise<Person>;
 }
-
+    
 
 @Injectable()
 export class PersonService implements PersonRepository {
@@ -113,6 +117,7 @@ export class PersonService implements PersonRepository {
         try {
             const frontURL = await this.uploadService.upload(
                 front_identify_card_photo,
+
                 "person/" +
                     person.id +
                     "/front_identify_card_photo_URL.png",
@@ -155,12 +160,31 @@ export class PersonService implements PersonRepository {
             where: { id },
         });
         if (!person) throw new NotFoundException();
-        if (person.password)
-            throw new ConflictException(
-                "Person profile already has account",
-            );
+        // if (person.password)
+        //     throw new ConflictException(
+        //         "Person profile already has account",
+        //     );
         person.email = createAccountDto.email;
-        person.password = hashSync(createAccountDto.password, 10);
+        person.phone_number = createAccountDto.email;
+        //person.password = hashSync(createAccountDto.password, 10);
+
+        return await this.personRepository.save(person);
+    }
+    async updatePerson(
+        id: string,
+        updatePersonDto: UpdatePersonDto,
+    ): Promise<Person> {
+        let person = await this.personRepository.findOne({
+            where: { id },
+        });
+        if (!person) throw new NotFoundException();
+        // if (person.password)
+        //     throw new ConflictException(
+        //         "Person profile already has account",
+        //     );
+        person.email = updatePersonDto.email;
+        person.phone_number = updatePersonDto.phone_number as string;
+        //person.password = hashSync(createAccountDto.password, 10);
 
         return await this.personRepository.save(person);
     }

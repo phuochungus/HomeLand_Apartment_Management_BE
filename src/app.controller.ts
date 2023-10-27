@@ -90,12 +90,12 @@ export class AppController {
             new ValidateFilePipe([
                 {
                     name: "front_identify_card_photo",
-                    limit: MBtoBytes(15),
+                    //limit: MBtoBytes(15),
                     mimetypes: ["image/jpeg", "image/png"],
                 },
                 {
                     name: "back_identify_card_photo",
-                    limit: MBtoBytes(15),
+                    //limit: MBtoBytes(15),
                     mimetypes: ["image/jpeg", "image/png"],
                 },
             ]),
