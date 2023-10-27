@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
-import { IdGenerator, IdGeneratorService } from "./id-generator.service";
+import { IdGenerator, DatetimeGenerator } from "./id-generator.service";
 
 @Module({
     providers: [
         {
             provide: IdGenerator,
-            useClass: IdGeneratorService,
+            useClass: DatetimeGenerator,
         },
     ],
     exports: [IdGenerator],

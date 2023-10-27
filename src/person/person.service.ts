@@ -11,25 +11,28 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, TypeORMError } from "typeorm";
 import { Person, PersonRole } from "./entities/person.entity";
 import { hashSync } from "bcrypt";
-import { UploadService } from "../upload/upload.service";
-import { BaseRepository } from "../helper/base/base-repository.abstract";
+import { StorageManager } from "../storage/storage.service";
 import { isQueryAffected } from "../helper/validation";
 import { HashService } from "../hash/hash.service";
 import { CreateAccountDto } from "./dto/create-account.dto";
 import { PersonFactory } from "../person-factory/person-factory.service";
 import { async } from 'rxjs';
+import { IRepository } from "../helper/interface/IRepository.interface";
+import { AvatarGenerator } from "../avatar-generator/avatar-generator.service";
+import { MemoryStoredFile } from "nestjs-form-data";
 
 /**
  * Person repository interface
  */
-export abstract class PersonRepository extends BaseRepository<
-    CreatePersonDto,
-    Person
-> {
+export abstract class PersonRepository implements IRepository<Person> {
+    abstract findOne(id: string): Promise<Person | null>;
+    abstract update(id: string, updateEntityDto: any): Promise<boolean>;
+    abstract delete(id: string): Promise<boolean>;
     abstract findOneByEmail(email: string): Promise<Person | null>;
     abstract create(
         createPersonDto: CreatePersonDto,
         creatorRole?: PersonRole,
+        id?: string,
     ): Promise<Person>;
     abstract createAccount(
         id: string,
@@ -39,6 +42,7 @@ export abstract class PersonRepository extends BaseRepository<
         id: string,
         updatePersonDto: UpdatePersonDto,
     ): Promise<Person>;
+    abstract findAll(role?: PersonRole): Promise<Person[]>;
 }
     
 
@@ -47,14 +51,27 @@ export class PersonService implements PersonRepository {
     constructor(
         @InjectRepository(Person)
         private readonly personRepository: Repository<Person>,
-        private readonly uploadService: UploadService,
+        private readonly storageManager: StorageManager,
         private readonly hashService: HashService,
+        private readonly personFactory: PersonFactory,
+        private readonly avatarGenerator: AvatarGenerator,
     ) {}
     //get person by id
     //create person
+
+    /**
+     * Create a person and insert into database
+     * @param createPersonDto JSON object to create person
+     * @param creatorRole role of who evoke this function
+     * @default creatorRole undefined
+     * @param id set the id of person, if not set, id will be generated
+     * @default id undefined
+     * @returns inserted person
+     */
     async create(
         createPersonDto: CreatePersonDto,
         creatorRole?: PersonRole,
+        id?: string,
     ): Promise<Person> {
         if (creatorRole) {
             switch (createPersonDto.role) {
@@ -105,38 +122,67 @@ export class PersonService implements PersonRepository {
         const {
             front_identify_card_photo,
             back_identify_card_photo,
+            avatar_photo,
             ...rest
         } = createPersonDto;
-        console.log(rest);
-        let person = PersonFactory.create(rest);
-        console.log(person);
+
+        let person = this.personFactory.create(rest);
         if (person.password) {
             person.password = this.hashService.hash(person.password);
         }
 
-        try {
-            const frontURL = await this.uploadService.upload(
-                front_identify_card_photo,
+        if (id) person.id = id;
 
+        try {
+            const frontPhoto = front_identify_card_photo as MemoryStoredFile;
+            const backPhoto = front_identify_card_photo as MemoryStoredFile;
+            const frontURL = await this.storageManager.upload(
+                frontPhoto,
                 "person/" +
                     person.id +
-                    "/front_identify_card_photo_URL.png",
-                "image/png",
+                    "/front_identify_card_photo_URL." +
+                    (frontPhoto.extension || "png"),
+                frontPhoto.mimetype || "image/png",
             );
-            const backURL = await this.uploadService.upload(
+            const backURL = await this.storageManager.upload(
                 back_identify_card_photo,
                 "person/" +
                     person.id +
-                    "/back_identify_card_photo_URL.png",
-                "image/png",
+                    "/back_identify_card_photo_URL." +
+                    (backPhoto.extension || "png"),
+                backPhoto.mimetype || "image/png",
             );
+            let avatarURL: string | undefined = undefined;
+            if (person.role !== PersonRole.EMPLOYEE)
+                if (avatar_photo) {
+                    const avatarPhoto =
+                        createPersonDto.avatar_photo as MemoryStoredFile;
+                    avatarURL = await this.storageManager.upload(
+                        avatar_photo,
+                        "person/" +
+                            person.id +
+                            "/avatarURL." +
+                            (avatarPhoto.extension || "png"),
+                        avatarPhoto.mimetype || "image/png",
+                    );
+                } else {
+                    const avatar = await this.avatarGenerator.generateAvatar(
+                        person.name,
+                    );
+                    avatarURL = await this.storageManager.upload(
+                        { buffer: avatar },
+                        "person/" + person.id + "/avatarURL.svg",
+                        "image/svg+xml",
+                    );
+                }
+            person.avatarURL = avatarURL;
             person.front_identify_card_photo_URL = frontURL;
             person.back_identify_card_photo_URL = backURL;
             return await this.personRepository.save(person);
         } catch (error) {
             if (error instanceof TypeORMError) {
                 try {
-                    await this.uploadService.remove([
+                    await this.storageManager.remove([
                         "/person/" +
                             person.id +
                             "/front_identify_card_photo_URL.png",
@@ -207,21 +253,19 @@ export class PersonService implements PersonRepository {
         });
     }
 
-    findAll(): Promise<Person[]> {
+    findAll(role?: PersonRole): Promise<Person[]> {
         return this.personRepository.find({
+            where: role ? { role } : {},
             cache: true,
         });
     }
 
     async update(id: string, updatePersonDto: UpdatePersonDto) {
-        let result = await this.personRepository.update(
-            id,
-            updatePersonDto,
-        );
+        let result = await this.personRepository.update(id, updatePersonDto);
         return isQueryAffected(result);
     }
 
-    async softDelete(id: string): Promise<boolean> {
+    async delete(id: string): Promise<boolean> {
         const result = await this.personRepository.softDelete({ id });
         return isQueryAffected(result);
     }

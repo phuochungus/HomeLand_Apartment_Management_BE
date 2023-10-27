@@ -4,15 +4,15 @@ import {
     Controller,
     Post,
     Body,
-    UseInterceptors,
     UseGuards,
     Get,
-    UploadedFiles,
     Param,
     Patch,
     Delete,
     Req,
     Put
+    Query,
+    ParseEnumPipe,
 } from "@nestjs/common";
 import { PersonRepository } from "./person.service";
 import { CreatePersonDto } from "./dto/create-person.dto";
@@ -21,29 +21,26 @@ import {
     ApiConsumes,
     ApiCreatedResponse,
     ApiOperation,
+    ApiQuery,
     ApiTags,
     ApiUnprocessableEntityResponse,
 } from "@nestjs/swagger";
-import { FileFieldsInterceptor } from "@nestjs/platform-express";
 import { Person, PersonRole } from "./entities/person.entity";
-import { JWTAuthGuard } from "../helper/guard";
-import { ValidateFilePipe } from "../helper/pipe";
-import { MBtoBytes } from "../helper/validation";
 import { CreateAccountDto } from "./dto/create-account.dto";
-import { Auth } from "../helper/decorator";
+import { Auth } from "../helper/decorator/auth.decorator";
+import { JWTAuthGuard } from "../helper/guard/jwt.guard";
+import { FormDataRequest } from "nestjs-form-data";
 
 @ApiTags("Person")
 @UseGuards(JWTAuthGuard)
 @ApiBearerAuth()
 @Controller("person")
 export class PersonController {
-    constructor(
-        private readonly personRepository: PersonRepository,
-    ) {}
+    constructor(private readonly personRepository: PersonRepository) {}
 
     /**
      * Create person profile, only token from admin or manager can access this API
-     * - Admin can create manager, manager, resident and techinician
+     * - Admin can create manager, resident and techinician
      * - Manager can create resident and technician
      *
      * Other role can not create person profile */
@@ -56,46 +53,9 @@ export class PersonController {
         description: "Create person profile successfully",
     })
     @Post()
-    @UseInterceptors(
-        FileFieldsInterceptor([
-            {
-                name: "front_identify_card_photo",
-                maxCount: 1,
-            },
-            {
-                name: "back_identify_card_photo",
-                maxCount: 1,
-            },
-        ]),
-    )
-    create(
-        @UploadedFiles(
-            new ValidateFilePipe([
-                {
-                    name: "front_identify_card_photo",
-                    // limit: MBtoBytes(15),
-                    mimetypes: ["image/jpeg", "image/png"],
-                },
-                {
-                    name: "back_identify_card_photo",
-                    // limit: MBtoBytes(15),
-                    mimetypes: ["image/jpeg", "image/png"],
-                },
-            ]),
-            
-        )
-        files: {
-            front_identify_card_photo: Express.Multer.File;
-            back_identify_card_photo: Express.Multer.File;
-        },
-        @Body() createPersonDto: CreatePersonDto,
-    ) {
-        console.log(files)
-        createPersonDto.front_identify_card_photo =
-            files.front_identify_card_photo;
-        createPersonDto.back_identify_card_photo =
-            files.back_identify_card_photo;
-        return this.personRepository.create(createPersonDto);
+    @FormDataRequest()
+    async create(@Body() createPersonDto: CreatePersonDto) {
+        return await this.personRepository.create(createPersonDto);
     }
 
     /**
@@ -110,10 +70,7 @@ export class PersonController {
         @Param("id") id: string,
         @Body() createAccountDto: CreateAccountDto,
     ): Promise<Person> {
-        return await this.personRepository.createAccount(
-            id,
-            createAccountDto,
-        );
+        return await this.personRepository.createAccount(id, createAccountDto);
     }
     @ApiOperation({ summary: "update person" })
     @Auth(PersonRole.ADMIN, PersonRole.MANAGER)
@@ -140,9 +97,13 @@ export class PersonController {
     @ApiOperation({
         summary: "Get all person profile",
     })
+    @ApiQuery({ name: "role", enum: PersonRole, required: false })
     @Get()
-    findAll(): Promise<Person[]> {
-    
+    findAll(
+        @Query("role", new ParseEnumPipe(PersonRole, { optional: true }))
+        role?: PersonRole,
+    ): Promise<Person[]> {
+        if (role) return this.personRepository.findAll(role);
         return this.personRepository.findAll();
     }
     @ApiOperation({ summary: "get person by id" })

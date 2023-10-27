@@ -7,7 +7,7 @@ export class SignInDto extends PickType(Person, [
 ] as const) {
     @ApiProperty({ required: true })
     email: string;
-    
+
     @ApiProperty({ required: true })
     password: string;
 }

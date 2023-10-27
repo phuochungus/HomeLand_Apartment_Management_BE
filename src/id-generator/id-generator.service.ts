@@ -5,11 +5,8 @@ export abstract class IdGenerator {
 }
 
 @Injectable()
-export class IdGeneratorService extends IdGenerator {
+export class DatetimeGenerator extends IdGenerator {
     public generateId() {
-        return Date.now();
-    }
-    static generateId() {
         return Date.now();
     }
 }

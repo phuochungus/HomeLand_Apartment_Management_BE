@@ -11,26 +11,42 @@ import {
     Technician,
 } from "../person/entities/person.entity";
 import { plainToInstance } from "class-transformer";
+import { IdGenerator } from "../id-generator/id-generator.service";
 
 export class PersonInfo extends OmitType(CreatePersonDto, [
     "back_identify_card_photo",
     "front_identify_card_photo",
 ]) {}
 
+/**
+ * Factory Pattern
+ * Factory create person by role
+ */
 @Injectable()
 export class PersonFactory {
-    static create(personInfo: PersonInfo): Person {
+    constructor(private readonly idGenerator: IdGenerator) {}
+    create(personInfo: PersonInfo): Person {
         switch (personInfo.role) {
             case PersonRole.ADMIN:
-                return plainToInstance(Admin, personInfo);
+                const admin = plainToInstance(Admin, personInfo);
+                admin.id = "ADM" + this.idGenerator.generateId();
+                return admin;
             case PersonRole.EMPLOYEE:
-                return plainToInstance(Employee, personInfo);
+                const employee = plainToInstance(Employee, personInfo);
+                employee.id = "EMP" + this.idGenerator.generateId();
+                return employee;
             case PersonRole.MANAGER:
-                return plainToInstance(Manager, personInfo);
+                const manager = plainToInstance(Manager, personInfo);
+                manager.id = "MNG" + this.idGenerator.generateId();
+                return manager;
             case PersonRole.RESIDENT:
-                return plainToInstance(Resident, personInfo);
+                const resident = plainToInstance(Resident, personInfo);
+                resident.id = "RES" + this.idGenerator.generateId();
+                return resident;
             case PersonRole.TECHINICIAN:
-                return plainToInstance(Technician, personInfo);
+                const technician = plainToInstance(Technician, personInfo);
+                technician.id = "TEC" + this.idGenerator.generateId();
+                return technician;
             default:
                 throw new Error("Factory unable to create");
         }

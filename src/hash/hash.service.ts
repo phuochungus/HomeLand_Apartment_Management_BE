@@ -8,7 +8,7 @@ export abstract class HashService {
      * @param value value to be hashed
      */
     abstract hash(value: string): string;
-    
+
     /**
      * compare a string value with a hashed string
      * @param value value to be compared
@@ -18,7 +18,7 @@ export abstract class HashService {
 }
 
 @Injectable()
-export class BcryptHash extends HashService {
+export class BcryptHashService extends HashService {
     hash(value: string): string {
         return hashSync(value, hashRounds);
     }

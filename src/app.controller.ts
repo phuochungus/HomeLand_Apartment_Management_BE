@@ -4,7 +4,6 @@ import {
     Get,
     Param,
     Post,
-    Req,
     UploadedFiles,
     UseInterceptors,
 } from "@nestjs/common";
@@ -20,11 +19,9 @@ import {
 } from "@nestjs/swagger";
 import { FileFieldsInterceptor } from "@nestjs/platform-express";
 import { CreateAccountDto } from "./person/dto/create-account.dto";
-import { ValidateFilePipe } from "./helper/pipe";
 import { MBtoBytes } from "./helper/validation";
-import { Auth } from "./helper/decorator";
 import { PersonRole } from "./person/entities/person.entity";
-import { get } from "http";
+import { Auth } from "./helper/decorator/auth.decorator";
 
 @ApiTags("DEVELOPMENT ONLY")
 @Controller()
@@ -41,12 +38,6 @@ export class AppController {
         return this.appService.getHello();
     }
 
-    @Auth()
-    @Get("/token/validate")
-    validateToken() {
-        return "Token is valid";
-    }
-
     /**
      * Create account without need send token in header
      */
@@ -55,10 +46,7 @@ export class AppController {
         @Param("id") id: string,
         @Body() createAccountDto: CreateAccountDto,
     ) {
-        return this.personRepository.createAccount(
-            id,
-            createAccountDto,
-        );
+        return this.personRepository.createAccount(id, createAccountDto);
     }
 
     /**
@@ -86,30 +74,27 @@ export class AppController {
         ]),
     )
     createPerson(
-        @UploadedFiles(
-            new ValidateFilePipe([
-                {
-                    name: "front_identify_card_photo",
-                    //limit: MBtoBytes(15),
-                    mimetypes: ["image/jpeg", "image/png"],
-                },
-                {
-                    name: "back_identify_card_photo",
-                    //limit: MBtoBytes(15),
-                    mimetypes: ["image/jpeg", "image/png"],
-                },
-            ]),
-        )
+        @UploadedFiles()
+        // new ValidateImagePipe([
+        //     {
+        //         name: "front_identify_card_photo",
+        //         limit: MBtoBytes(15),
+        //     },
+        //     {
+        //         name: "back_identify_card_photo",
+        //         limit: MBtoBytes(15),
+        //     },
+        // ]),
         files: {
-            front_identify_card_photo: Express.Multer.File;
-            back_identify_card_photo: Express.Multer.File;
+            front_identify_card_photo: Express.Multer.File[];
+            back_identify_card_photo: Express.Multer.File[];
         },
         @Body() createPersonDto: CreatePersonDto,
     ) {
         createPersonDto.front_identify_card_photo =
-            files.front_identify_card_photo;
+            files.front_identify_card_photo[0];
         createPersonDto.back_identify_card_photo =
-            files.back_identify_card_photo;
+            files.back_identify_card_photo[0];
         return this.personRepository.create(createPersonDto);
     }
 }

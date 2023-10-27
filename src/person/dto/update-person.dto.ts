@@ -5,5 +5,5 @@ export class UpdatePersonDto extends PartialType(
     OmitType(CreatePersonDto, [
         "back_identify_card_photo",
         "front_identify_card_photo",
-    ] as const)
+    ] as const),
 ) {}

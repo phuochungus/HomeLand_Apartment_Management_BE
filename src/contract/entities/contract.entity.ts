@@ -8,10 +8,7 @@ import {
     OneToOne,
     PrimaryColumn,
 } from "typeorm";
-import {
-    Person,
-    Resident,
-} from "../../person/entities/person.entity";
+import { Person, Resident } from "../../person/entities/person.entity";
 import { Apartment } from "../../apartment/entities/apartment.entity";
 
 @Entity()

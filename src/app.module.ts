@@ -4,16 +4,18 @@ import { AppService } from "./app.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "./auth/auth.module";
 import { PersonModule } from "./person/person.module";
-import { IdGeneratorModule } from "./id_generator/id-generator.module";
-import { UploadModule } from "./upload/upload.module";
+import { IdGeneratorModule } from "./id-generator/id-generator.module";
+import { StorageModule } from "./storage/storage.module";
 import { ConfigModule } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
-import { createClient } from "redis";
 import { HashModule } from "./hash/hash.module";
 import { PersonFactoryModule } from "./person-factory/person-factory.module";
-import { SeedingModule } from "./seeding/seeding.module";
+import { SeedModule } from "./seed/seed.module";
 import { MeModule } from "./me/me.module";
 import { ApartmentModule } from "./apartment/apartment.module";
+import { TokenModule } from "./token/token.module";
+import { AvatarGeneratorModule } from "./avatar-generator/avatar-generator.module";
+import { NestjsFormDataModule } from "nestjs-form-data";
 
 @Module({
     imports: [
@@ -21,9 +23,6 @@ import { ApartmentModule } from "./apartment/apartment.module";
         JwtModule.register({
             secret: process.env.ACCESS_TOKEN_SECRET,
             global: true,
-            signOptions: {
-                expiresIn: "30d",
-            },
         }),
         TypeOrmModule.forRootAsync({
             useFactory: async () => {
@@ -36,24 +35,14 @@ import { ApartmentModule } from "./apartment/apartment.module";
                         cache: {
                             duration: 5000,
                             type: "redis",
-                            ignoreErrors: false,
                             options: {
                                 url: process.env.REDIS_URL,
                             },
                         },
                     };
                 } else {
-                    // const client = createClient();
-
-                    // client.on("error", (error) => {
-                    //     console.error(error);
-                    // });
-                    // client.on("connect", async () => {
-                    //     console.log("Connected to redis");
-                    // });
-                    // await client.connect();
-                    // await client.disconnect();
                     return {
+                        logging: false,
                         type: "postgres",
                         url: process.env.DB_LOCAL_URL,
                         synchronize: true,
@@ -61,7 +50,6 @@ import { ApartmentModule } from "./apartment/apartment.module";
                         duration: 5000,
                         cache: {
                             type: "redis",
-                            ignoreErrors: false,
                             options: {
                                 url: process.env.REDIS_LOCAL_URL,
                             },
@@ -73,12 +61,17 @@ import { ApartmentModule } from "./apartment/apartment.module";
         AuthModule,
         PersonModule,
         IdGeneratorModule,
-        UploadModule,
+        StorageModule,
         HashModule,
         PersonFactoryModule,
-        SeedingModule,
+        SeedModule,
         ApartmentModule,
         MeModule,
+        TokenModule,
+        AvatarGeneratorModule,
+        NestjsFormDataModule.config({
+            isGlobal: true,
+        }),
     ],
     controllers: [AppController],
     providers: [AppService],

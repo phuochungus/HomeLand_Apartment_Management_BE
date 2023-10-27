@@ -48,8 +48,7 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
                 break;
             case CannotCreateEntityIdMapError: // and another
                 status = HttpStatus.UNPROCESSABLE_ENTITY;
-                message = (exception as CannotCreateEntityIdMapError)
-                    .message;
+                message = (exception as CannotCreateEntityIdMapError).message;
                 code = (exception as any).code;
                 break;
             default:
@@ -57,9 +56,7 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
         }
         response
             .status(status)
-            .json(
-                GlobalResponseError(status, message, code, request),
-            );
+            .json(GlobalResponseError(status, message, code, request));
     }
 }
 

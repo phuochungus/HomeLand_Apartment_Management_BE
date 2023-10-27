@@ -1,9 +1,6 @@
 import { NestFactory, Reflector } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import {
-    ClassSerializerInterceptor,
-    ValidationPipe,
-} from "@nestjs/common";
+import { ClassSerializerInterceptor, ValidationPipe } from "@nestjs/common";
 import {
     DocumentBuilder,
     SwaggerDocumentOptions,
@@ -11,9 +8,11 @@ import {
 } from "@nestjs/swagger";
 import { Person } from "./person/entities/person.entity";
 import { TypeOrmExceptionFilter } from "./helper/filter/typeorm-exception.filter";
+import { NestExpressApplication } from "@nestjs/platform-express";
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule);
+    app.useStaticAssets("static");
     app.useGlobalPipes(
         new ValidationPipe({
             whitelist: true,
@@ -38,12 +37,14 @@ async function bootstrap() {
         deepScanRoutes: true,
         extraModels: [Person],
     };
-    const document = SwaggerModule.createDocument(
-        app,
-        config,
-        option,
-    );
-    SwaggerModule.setup("api", app, document);
+    const document = SwaggerModule.createDocument(app, config, option);
+
+    SwaggerModule.setup("api", app, document, {
+        customCssUrl: "/style.css",
+        swaggerOptions: {
+            useUnsafeMarkdown: true,
+        },
+    });
 
     await app.listen(process.env.PORT || 3000);
 }

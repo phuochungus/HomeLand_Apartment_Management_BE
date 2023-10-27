@@ -1,36 +1,44 @@
 import {
     Controller,
     Get,
-    Post,
     Body,
     Patch,
     Param,
-    Delete,
     NotFoundException,
+    Query,
 } from "@nestjs/common";
 import { ApartmentService } from "./apartment.service";
 import { CreateApartmentDto } from "./dto/create-apartment.dto";
 import { UpdateApartmentDto } from "./dto/update-apartment.dto";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiConsumes, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { FormDataRequest } from "nestjs-form-data";
 
 @ApiTags("Apartment")
 @Controller("apartment")
 export class ApartmentController {
-    constructor(private readonly apartmentService: ApartmentService) {}
+    constructor(private readonly apartmentRepository: ApartmentService) {}
 
-    @Post()
+    @ApiConsumes("multipart/form-data")
+    @FormDataRequest()
     create(@Body() createApartmentDto: CreateApartmentDto) {
-        return this.apartmentService.create(createApartmentDto);
+        return this.apartmentRepository.create(createApartmentDto);
     }
 
+    @ApiQuery({
+        name: "page",
+        required: false,
+        description:
+            "Page number: Page indexed from 1, each page contain 30 items, if null then return all.",
+    })
     @Get()
-    findAll() {
-        return this.apartmentService.findAll();
+    findAll(@Query("page") page: number) {
+        if (Number.isNaN(page)) return this.apartmentRepository.findAll();
+        else return this.apartmentRepository.findAll(page);
     }
 
     @Get(":id")
     async findOne(@Param("id") id: string) {
-        const apartment = await this.apartmentService.findOne(id);
+        const apartment = await this.apartmentRepository.findOne(id);
         if (apartment) return apartment;
         throw new NotFoundException("Apartment not found");
     }
@@ -40,18 +48,11 @@ export class ApartmentController {
         @Param("id") id: string,
         @Body() updateApartmentDto: UpdateApartmentDto,
     ) {
-        const result = await this.apartmentService.update(
+        const result = await this.apartmentRepository.update(
             id,
             updateApartmentDto,
         );
         if (result) return { msg: "Apartment updated" };
-        throw new NotFoundException("Apartment not found");
-    }
-
-    @Delete(":id")
-    async remove(@Param("id") id: string) {
-        const result = await this.apartmentService.softDelete(id);
-        if (result) return { msg: "Apartment deleted" };
         throw new NotFoundException("Apartment not found");
     }
 }
