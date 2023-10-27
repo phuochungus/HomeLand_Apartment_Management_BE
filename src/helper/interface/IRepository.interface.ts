@@ -7,4 +7,5 @@ export interface IRepository<Entity> {
     findAll(): Promise<Entity[]>;
     update(id: string, updateEntityDto: any): Promise<boolean>;
     delete(id: string): Promise<boolean>;
+   
 }

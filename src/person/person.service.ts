@@ -1,4 +1,5 @@
 
+
 import {
     ConflictException,
     Injectable,
@@ -17,7 +18,7 @@ import { HashService } from "../hash/hash.service";
 import { CreateAccountDto } from "./dto/create-account.dto";
 import { PersonFactory } from "../person-factory/person-factory.service";
 import { async } from 'rxjs';
-import { IRepository } from "../helper/interface/IRepository.interface";
+import { IRepository } from 'src/helper/interface/IRepository.interface';
 import { AvatarGenerator } from "../avatar-generator/avatar-generator.service";
 import { MemoryStoredFile } from "nestjs-form-data";
 
@@ -279,4 +280,5 @@ export class PersonService implements PersonRepository {
             throw error;
         }
     }
+   
 }

@@ -10,7 +10,7 @@ import {
     Patch,
     Delete,
     Req,
-    Put
+    Put,
     Query,
     ParseEnumPipe,
 } from "@nestjs/common";
@@ -88,7 +88,7 @@ export class PersonController {
     async deleteAcount(
         @Param("id") id: string,
     ) : Promise<boolean> {
-        const result = await this.personRepository.softDelete(
+        const result = await this.personRepository.delete(
             id,
         );
         return result;
