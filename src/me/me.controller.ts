@@ -1,6 +1,5 @@
 import { Controller, Get, Req } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { Person } from "../person/entities/person.entity";
 import { Auth } from "../helper/decorator/auth.decorator";
 
 @Auth()
@@ -8,7 +7,7 @@ import { Auth } from "../helper/decorator/auth.decorator";
 @Controller("me")
 export class MeController {
     @Get()
-    getPersonalInfo(@Req() req: any): Person {
+    getPersonalInfo(@Req() req: any) {
         return req.user;
     }
 }

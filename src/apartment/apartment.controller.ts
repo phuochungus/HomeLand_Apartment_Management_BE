@@ -6,6 +6,7 @@ import {
     Param,
     NotFoundException,
     Query,
+    Post,
 } from "@nestjs/common";
 import { ApartmentService } from "./apartment.service";
 import { CreateApartmentDto } from "./dto/create-apartment.dto";
@@ -18,6 +19,7 @@ import { FormDataRequest } from "nestjs-form-data";
 export class ApartmentController {
     constructor(private readonly apartmentRepository: ApartmentService) {}
 
+    @Post()
     @ApiConsumes("multipart/form-data")
     @FormDataRequest()
     create(@Body() createApartmentDto: CreateApartmentDto) {

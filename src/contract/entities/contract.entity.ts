@@ -8,8 +8,8 @@ import {
     OneToOne,
     PrimaryColumn,
 } from "typeorm";
-import { Person, Resident } from "../../person/entities/person.entity";
 import { Apartment } from "../../apartment/entities/apartment.entity";
+import { Resident } from "../../resident/entities/resident.entity";
 
 @Entity()
 export class Contract {
@@ -24,7 +24,7 @@ export class Contract {
     @JoinColumn()
     next_contract?: Contract;
 
-    @ManyToOne(() => Person, (person) => person.contracts)
+    @ManyToOne(() => Resident, (resident) => resident.contracts)
     resident: Resident;
 
     @ManyToOne(() => Apartment, (property) => property.contract)

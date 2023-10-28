@@ -5,9 +5,9 @@ import { DataSource, In, Repository } from "typeorm";
 import { Apartment } from "./entities/apartment.entity";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { StorageManager } from "../storage/storage.service";
-import { Resident } from "../person/entities/person.entity";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { IRepository } from "../helper/interface/IRepository.interface";
+import { Resident } from "../resident/entities/resident.entity";
 
 export abstract class ApartmentService implements IRepository<Apartment> {
     abstract findOne(id: string): Promise<Apartment | null>;

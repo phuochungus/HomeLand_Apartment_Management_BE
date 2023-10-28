@@ -25,11 +25,12 @@ import {
     ApiTags,
     ApiUnprocessableEntityResponse,
 } from "@nestjs/swagger";
-import { Person, PersonRole } from "./entities/person.entity";
+import { Person } from "./entities/person.entity";
 import { CreateAccountDto } from "./dto/create-account.dto";
 import { Auth } from "../helper/decorator/auth.decorator";
-import { JWTAuthGuard } from "../helper/guard/jwt.guard";
 import { FormDataRequest } from "nestjs-form-data";
+import { PersonRole } from "../helper/class/profile.entity";
+import { JWTAuthGuard } from "../auth/guard/jwt.guard";
 
 @ApiTags("Person")
 @UseGuards(JWTAuthGuard)
@@ -39,6 +40,7 @@ export class PersonController {
     constructor(private readonly personRepository: PersonRepository) {}
 
     /**
+     * @deprecated
      * Create person profile, only token from admin or manager can access this API
      * - Admin can create manager, resident and techinician
      * - Manager can create resident and technician
@@ -59,6 +61,7 @@ export class PersonController {
     }
 
     /**
+     * @deprecated
      * Create account, only token from admin or manager can access this API
      *
      * Account must associate with person profile
@@ -96,6 +99,7 @@ export class PersonController {
 
     @ApiOperation({
         summary: "Get all person profile",
+        deprecated: true,
     })
     @ApiQuery({ name: "role", enum: PersonRole, required: false })
     @Get()

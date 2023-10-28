@@ -6,7 +6,6 @@ import {
     SwaggerDocumentOptions,
     SwaggerModule,
 } from "@nestjs/swagger";
-import { Person } from "./person/entities/person.entity";
 import { TypeOrmExceptionFilter } from "./helper/filter/typeorm-exception.filter";
 import { NestExpressApplication } from "@nestjs/platform-express";
 
@@ -35,7 +34,6 @@ async function bootstrap() {
 
     const option: SwaggerDocumentOptions = {
         deepScanRoutes: true,
-        extraModels: [Person],
     };
     const document = SwaggerModule.createDocument(app, config, option);
 

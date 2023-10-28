@@ -6,16 +6,16 @@ import {
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Observable } from "rxjs";
-import { PersonRepository } from "../../person/person.service";
-import { TokenPayload } from "../../auth/auth.controller";
 import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
+import { AuthService, TokenPayload } from "../auth.service";
 
 @Injectable()
 export class JWTAuthGuard implements CanActivate {
     constructor(
+        private readonly authService: AuthService,
         private readonly jwtService: JwtService,
-        private readonly personRepository: PersonRepository,
     ) {}
+
     canActivate(
         context: ExecutionContext,
     ): boolean | Promise<boolean> | Observable<boolean> {
@@ -29,7 +29,7 @@ export class JWTAuthGuard implements CanActivate {
             if (token) {
                 try {
                     const payload: TokenPayload = this.jwtService.verify(token);
-                    const user = await this.personRepository.findOne(
+                    const user = await this.authService.findAccountOwnerById(
                         payload.id,
                     );
                     if (!user) throw new UnauthorizedException("Token invalid");

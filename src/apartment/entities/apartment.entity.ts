@@ -8,12 +8,12 @@ import {
     OneToMany,
     PrimaryColumn,
 } from "typeorm";
-import { Resident } from "../../person/entities/person.entity";
 import { Contract } from "../../contract/entities/contract.entity";
 import { Floor } from "../../floor/entities/floor.entity";
 import { Building } from "../../building/entities/building.entity";
-import { IsNumberString, IsOptional, IsString } from "class-validator";
+import { IsNumberString, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { Resident } from "../../resident/entities/resident.entity";
 
 export enum ApartmentStatus {
     ACTIVE = "active",

@@ -2,7 +2,12 @@ import { ApiProperty, PickType } from "@nestjs/swagger";
 import { Apartment } from "../entities/apartment.entity";
 import { IsOptional, IsString } from "class-validator";
 import { Transform } from "class-transformer";
-import { HasMimeType, IsFiles, MaxFileSize } from "nestjs-form-data";
+import {
+    HasMimeType,
+    IsFiles,
+    MaxFileSize,
+    MemoryStoredFile,
+} from "nestjs-form-data";
 import { commonImageMIMETypes } from "../../helper/constant";
 
 export class CreateApartmentDto extends PickType(Apartment, [
@@ -18,14 +23,13 @@ export class CreateApartmentDto extends PickType(Apartment, [
 ] as const) {
     @ApiProperty({
         type: "file",
-        format: "binary",
         required: true,
         isArray: true,
     })
     @IsFiles()
     @MaxFileSize(10e6)
     @HasMimeType(commonImageMIMETypes)
-    images: { buffer: Buffer | ArrayBuffer }[];
+    images: MemoryStoredFile[];
 
     @ApiProperty({
         type: "string",

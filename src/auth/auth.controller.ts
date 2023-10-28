@@ -1,7 +1,5 @@
-import { Controller, Post, Body, UnauthorizedException } from "@nestjs/common";
+import { Controller, Post, Body } from "@nestjs/common";
 import { SignInDto } from "./dto/signin.dto";
-import { PersonRepository } from "../person/person.service";
-import { JwtService } from "@nestjs/jwt";
 import { ApiCreatedResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
 
@@ -9,6 +7,7 @@ import { AuthService } from "./auth.service";
 @Controller("auth")
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
+
     @ApiOperation({
         summary: "Sign in to get access token and account role",
     })
@@ -40,8 +39,4 @@ export class AuthController {
     async login(@Body() signInDto: SignInDto) {
         return await this.authService.signIn(signInDto);
     }
-}
-
-export interface TokenPayload {
-    id: string;
 }

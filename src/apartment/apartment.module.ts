@@ -5,7 +5,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Apartment } from "./entities/apartment.entity";
 import { IdGeneratorModule } from "../id-generator/id-generator.module";
 import { StorageModule } from "../storage/storage.module";
-import { Resident } from "../person/entities/person.entity";
+import { Resident } from "../resident/entities/resident.entity";
 
 @Module({
     imports: [

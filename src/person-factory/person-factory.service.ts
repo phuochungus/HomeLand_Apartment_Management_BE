@@ -6,12 +6,12 @@ import {
     Employee,
     Manager,
     Person,
-    PersonRole,
     Resident,
     Technician,
 } from "../person/entities/person.entity";
 import { plainToInstance } from "class-transformer";
 import { IdGenerator } from "../id-generator/id-generator.service";
+import { PersonRole } from "../helper/class/profile.entity";
 
 export class PersonInfo extends OmitType(CreatePersonDto, [
     "back_identify_card_photo",
@@ -43,7 +43,7 @@ export class PersonFactory {
                 const resident = plainToInstance(Resident, personInfo);
                 resident.id = "RES" + this.idGenerator.generateId();
                 return resident;
-            case PersonRole.TECHINICIAN:
+            case PersonRole.TECHNICIAN:
                 const technician = plainToInstance(Technician, personInfo);
                 technician.id = "TEC" + this.idGenerator.generateId();
                 return technician;
