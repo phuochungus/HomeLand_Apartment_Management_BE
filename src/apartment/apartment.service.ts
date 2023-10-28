@@ -47,7 +47,7 @@ export class TypeORMApartmentService extends ApartmentService {
 
         const queryRunnder = this.dataSource.createQueryRunner();
         try {
-            await queryRunnder.connect();
+             await queryRunnder.connect();
             await queryRunnder.startTransaction();
             const imageURLS = await Promise.all(
                 images.map((image, index) =>

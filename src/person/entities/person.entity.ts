@@ -147,6 +147,8 @@ export class Resident extends Person {
         default: String(PersonRole.RESIDENT),
     })
     role: PersonRole = PersonRole.RESIDENT;
+    @Column({nullable: true})
+    payment_info: string
 }
 
 @ChildEntity(PersonRole.ADMIN)
