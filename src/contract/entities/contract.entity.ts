@@ -7,36 +7,79 @@ import {
     ManyToOne,
     OneToOne,
     PrimaryColumn,
+    PrimaryGeneratedColumn,
+    TableInheritance,
 } from "typeorm";
 import { Apartment } from "../../apartment/entities/apartment.entity";
 import { Resident } from "../../resident/entities/resident.entity";
+import {
+    ContractRole,
+    ContractStatusRole,
+} from "src/helper/enums/contractEnum";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsEnum } from "class-validator";
 
 @Entity()
 export class Contract {
     @PrimaryColumn()
     contract_id: string;
 
-    @OneToOne(() => Contract, (contract) => contract.contract_id)
+    @OneToOne(() => Contract, (contract) => contract.contract_id, {
+        nullable: true,
+    })
     @JoinColumn()
-    previos_contract?: Contract;
+    previous_contract?: Contract | null;
 
-    @OneToOne(() => Contract, (contract) => contract.contract_id)
+    @OneToOne(() => Contract, (contract) => contract.contract_id, {
+        nullable: true,
+    })
     @JoinColumn()
-    next_contract?: Contract;
+    next_contract?: Contract | null;
 
     @ManyToOne(() => Resident, (resident) => resident.contracts)
+    @JoinColumn({ name: "resident_id" })
     resident: Resident;
+    @Column({ nullable: true })
+    resident_id: string;
 
-    @ManyToOne(() => Apartment, (property) => property.contract)
-    @JoinColumn({ name: "property_id" })
+    @ManyToOne(() => Apartment, (apartment) => apartment.contract)
+    @JoinColumn({ name: "apartment_id" })
     apartment: Apartment;
 
     @Column({ nullable: true })
-    property_id: string;
+    apartment_id: string;
+    @ApiProperty({
+        default: ContractRole.RENT,
+        type: "enum",
+        enum: ContractRole,
+    })
+    @IsEnum(ContractRole)
+    @Column({
+        type: "enum",
+        enum: ContractRole,
+    })
+    role: ContractRole;
+    @ApiProperty({
+        default: ContractStatusRole.INACTIVE,
+        type: "enum",
+        enum: ContractStatusRole,
+    })
+    @IsEnum(ContractStatusRole)
+    @Column({
+        type: "enum",
+        enum: ContractStatusRole,
+    })
+    status: ContractStatusRole;
 
     @CreateDateColumn()
     created_at: Date;
 
+    @Column()
+    expire_at?: Date;
+
     @DeleteDateColumn()
     deleted_at?: Date;
+
+    @Column({ nullable: true })
+    contract_with_signature_photo_URL?: string;
 }

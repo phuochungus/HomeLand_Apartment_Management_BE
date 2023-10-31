@@ -12,10 +12,12 @@ import { SeedModule } from "./seed/seed.module";
 import { MeModule } from "./me/me.module";
 import { ApartmentModule } from "./apartment/apartment.module";
 import { TokenModule } from "./token/token.module";
+import { ContractModule } from './contract/contract.module';
 import { AvatarGeneratorModule } from "./avatar-generator/avatar-generator.module";
 import { NestjsFormDataModule } from "nestjs-form-data";
 import { BuildingModule } from "./building/building.module";
-import { AccountModule } from './account/account.module';
+import { AccountModule } from "./account/account.module";
+import { AdminModule } from "./admin/admin.module";
 import { ResidentModule } from "./resident/resident.module";
 
 @Module({
@@ -69,11 +71,13 @@ import { ResidentModule } from "./resident/resident.module";
         ResidentModule,
         MeModule,
         TokenModule,
+        ContractModule,
         AvatarGeneratorModule,
         NestjsFormDataModule.config({
             isGlobal: true,
         }),
         AccountModule,
+        AdminModule,
     ],
     controllers: [AppController],
     providers: [AppService],

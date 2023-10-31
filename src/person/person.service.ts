@@ -139,7 +139,7 @@ export class PersonService implements PersonRepository {
             const frontPhoto = front_identify_card_photo as MemoryStoredFile;
             const backPhoto = front_identify_card_photo as MemoryStoredFile;
             const frontURL = await this.storageManager.upload(
-                frontPhoto,
+                frontPhoto.buffer,
                 "person/" +
                     person.id +
                     "/front_identify_card_photo_URL." +
@@ -147,7 +147,7 @@ export class PersonService implements PersonRepository {
                 frontPhoto.mimetype || "image/png",
             );
             const backURL = await this.storageManager.upload(
-                back_identify_card_photo,
+                back_identify_card_photo.buffer,
                 "person/" +
                     person.id +
                     "/back_identify_card_photo_URL." +
@@ -159,7 +159,7 @@ export class PersonService implements PersonRepository {
             if (person.role !== PersonRole.EMPLOYEE)
                 if (avatarPhoto) {
                     avatarURL = await this.storageManager.upload(
-                        avatarPhoto,
+                        avatarPhoto.buffer,
                         "person/" +
                             person.id +
                             "/avatarURL." +
@@ -171,7 +171,7 @@ export class PersonService implements PersonRepository {
                         person.name,
                     );
                     avatarURL = await this.storageManager.upload(
-                        { buffer: avatar },
+                        avatar,
                         "person/" + person.id + "/avatarURL.svg",
                         "image/svg+xml",
                     );

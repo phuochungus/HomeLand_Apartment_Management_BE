@@ -4,22 +4,26 @@ import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 import { Floor } from "../floor/entities/floor.entity";
 import { Building } from "../building/entities/building.entity";
-import { ApartmentService } from "../apartment/apartment.service";
 import { StorageManager } from "../storage/storage.service";
-import { faker, ro } from "@faker-js/faker";
-import { Gender, PersonRole } from "../helper/class/profile.entity";
-import { PersonService } from "../person/person.service";
-import { Resident } from "../resident/entities/resident.entity";
-import { Account } from "../helper/class/account.entity";
+import { faker } from "@faker-js/faker";
+import { Gender } from "../helper/class/profile.entity";
 import { MemoryStoredFile } from "nestjs-form-data";
+import { Admin } from "../admin/entities/admin.entity";
+import { IdGenerator } from "../id-generator/id-generator.service";
+import { HashService } from "../hash/hash.service";
+import { AvatarGenerator } from "../avatar-generator/avatar-generator.service";
+import { ApartmentService } from "../apartment/apartment.service";
 
 @Injectable()
 export class SeedService {
     constructor(
         @InjectDataSource()
         private readonly dataSource: DataSource,
-        private readonly apartmentRepository: ApartmentService,
         private readonly storageManager: StorageManager,
+        private readonly idGenerator: IdGenerator,
+        private readonly hashService: HashService,
+        private readonly avatarGenerator: AvatarGenerator,
+        private readonly apartmentService: ApartmentService,
     ) {}
 
     async dropDB() {
@@ -49,33 +53,34 @@ export class SeedService {
     private readonly NUMBER_OF_TECHNICIAN = 10;
     private readonly NUMBER_OF_ADMIN = 2;
 
+    private readonly frontIdentity = {
+        buffer: readFileSync(process.cwd() + "/src/seed/front.jpg"),
+    } as MemoryStoredFile;
+
+    private readonly backIdentity = {
+        buffer: readFileSync(process.cwd() + "/src/seed/back.jpg"),
+    } as MemoryStoredFile;
+
+    private readonly images = [
+        {
+            buffer: readFileSync(process.cwd() + "/src/seed/room.jpg"),
+        } as MemoryStoredFile,
+        {
+            buffer: readFileSync(process.cwd() + "/src/seed/room (2).jpg"),
+        } as MemoryStoredFile,
+        {
+            buffer: readFileSync(process.cwd() + "/src/seed/room (3).jpg"),
+        } as MemoryStoredFile,
+        {
+            buffer: readFileSync(process.cwd() + "/src/seed/room (4).jpg"),
+        } as MemoryStoredFile,
+        {
+            buffer: readFileSync(process.cwd() + "/src/seed/room (5).jpg"),
+        } as MemoryStoredFile,
+    ];
+
     async startSeeding() {
-        const frontIdentity = {
-            buffer: readFileSync(process.cwd() + "/src/seed/front.jpg"),
-        } as MemoryStoredFile;
-
-        const backIdentity = {
-            buffer: readFileSync(process.cwd() + "/src/seed/back.jpg"),
-        } as MemoryStoredFile;
-
-        const images = [
-            {
-                buffer: readFileSync(process.cwd() + "/src/seed/room.jpg"),
-            } as MemoryStoredFile,
-            {
-                buffer: readFileSync(process.cwd() + "/src/seed/room (2).jpg"),
-            } as MemoryStoredFile,
-            {
-                buffer: readFileSync(process.cwd() + "/src/seed/room (3).jpg"),
-            } as MemoryStoredFile,
-            {
-                buffer: readFileSync(process.cwd() + "/src/seed/room (4).jpg"),
-            } as MemoryStoredFile,
-            {
-                buffer: readFileSync(process.cwd() + "/src/seed/room (5).jpg"),
-            } as MemoryStoredFile,
-        ];
-
+        // Create demo building
         let buildingInfo: any[] = [];
         for (let i = 0; i < this.NUMBER_OF_BUILDING; i++) {
             buildingInfo.push({
@@ -91,6 +96,7 @@ export class SeedService {
             .values(buildingInfo)
             .execute();
 
+        // Create demo floors
         let floorInfo: any[] = [];
         for (let building of buildingInfo) {
             for (let i = 0; i < this.NUMBER_OF_FLOOR_PER_BUILDING; i++) {
@@ -108,28 +114,15 @@ export class SeedService {
             .values(floorInfo)
             .execute();
 
-        const avatars = [
-            {
-                buffer: readFileSync(process.cwd() + "/src/seed/avatar1.jpg"),
-            } as MemoryStoredFile,
-            {
-                buffer: readFileSync(process.cwd() + "/src/seed/avatar2.jpg"),
-            } as MemoryStoredFile,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-        ];
-
+        // Create demo apartments
         let apartmentIds: any[] = [];
         for (let floor of floorInfo) {
             for (let i = 0; i < this.NUMBER_OF_APARTMENT_PER_FLOOR; i++) {
                 apartmentIds.push(
                     (
-                        await this.apartmentRepository.create({
+                        await this.apartmentService.create({
                             name: "St. Crytal",
-                            images: images,
+                            images: this.images,
                             length: 20,
                             building_id: floor.building_id,
                             floor_id: floor.floor_id,
@@ -147,129 +140,47 @@ export class SeedService {
             }
         }
 
-        await this.createRandomPerson({
-            role: PersonRole.RESIDENT,
-            stay_at_apartment_id: faker.helpers.arrayElement(apartmentIds),
-            front_identify_card_photo: frontIdentity,
-            back_identify_card_photo: backIdentity,
-            email: "resident@gmail.com",
-            avatar_photo: faker.helpers.arrayElement(avatars),
-        });
-
-        await this.createRandomPerson({
-            role: PersonRole.ADMIN,
-            front_identify_card_photo: frontIdentity,
-            back_identify_card_photo: backIdentity,
-            email: "admin@gmail.com",
-            avatar_photo: faker.helpers.arrayElement(avatars),
-        });
-
-        await this.createRandomPerson({
-            role: PersonRole.MANAGER,
-            front_identify_card_photo: frontIdentity,
-            back_identify_card_photo: backIdentity,
-            email: "manager@gmail.com",
-            avatar_photo: faker.helpers.arrayElement(avatars),
-        });
-
-        await this.createRandomPerson({
-            role: PersonRole.TECHNICIAN,
-            front_identify_card_photo: frontIdentity,
-            back_identify_card_photo: backIdentity,
-            email: "technician@gmail.com",
-            avatar_photo: faker.helpers.arrayElement(avatars),
-        });
-
-        await this.createRandomPerson({
-            role: PersonRole.EMPLOYEE,
-            front_identify_card_photo: frontIdentity,
-            back_identify_card_photo: backIdentity,
-        });
-
-        for (let i = 0; i < this.NUMBER_OF_RESIDENT - 1; i++) {
-            await this.createRandomPerson({
-                role: PersonRole.RESIDENT,
-                front_identify_card_photo: frontIdentity,
-                back_identify_card_photo: backIdentity,
-                stay_at_apartment_id: faker.helpers.arrayElement(apartmentIds),
-                avatar_photo: faker.helpers.arrayElement(avatars),
-            });
-        }
-
-        for (let i = 0; i < this.NUMBER_OF_EMPLOYEE - 1; i++) {
-            await this.createRandomPerson({
-                role: PersonRole.EMPLOYEE,
-                front_identify_card_photo: frontIdentity,
-                back_identify_card_photo: backIdentity,
-            });
-        }
-
-        for (let i = 0; i < this.NUMBER_OF_ADMIN - 1; i++) {
-            await this.createRandomPerson({
-                role: PersonRole.ADMIN,
-                front_identify_card_photo: frontIdentity,
-                back_identify_card_photo: backIdentity,
-                avatar_photo: faker.helpers.arrayElement(avatars),
-            });
-        }
-
-        for (let i = 0; i < this.NUMBER_OF_TECHNICIAN - 1; i++) {
-            await this.createRandomPerson({
-                role: PersonRole.TECHNICIAN,
-                front_identify_card_photo: frontIdentity,
-                back_identify_card_photo: backIdentity,
-                avatar_photo: faker.helpers.arrayElement(avatars),
-            });
-        }
-
-        for (let i = 0; i < this.NUMBER_OF_MANAGER - 1; i++) {
-            await this.createRandomPerson({
-                role: PersonRole.MANAGER,
-                front_identify_card_photo: frontIdentity,
-                back_identify_card_photo: backIdentity,
-                avatar_photo: faker.helpers.arrayElement(avatars),
-            });
-        }
+        // Create demo admin
+        await this.createDemoAdmin();
     }
 
-    private async createRandomPerson(partialCreatePersonDto: {
-        role: PersonRole;
-        front_identify_card_photo: MemoryStoredFile;
-        back_identify_card_photo: MemoryStoredFile;
-        avatar_photo?: MemoryStoredFile;
-        email?: string;
-        stay_at_apartment_id?: string;
-    }) {
-        // const { role, email } = partialCreatePersonDto;
-        // const gender = faker.helpers.arrayElement([Gender.FEMALE, Gender.MALE]);
-        // const account = {
-        //     email:
-        //         role == PersonRole.EMPLOYEE
-        //             ? undefined
-        //             : email || faker.internet.email(),
-        //     password: role == PersonRole.EMPLOYEE ? undefined : "password",
-        //     activate_at: role == PersonRole.EMPLOYEE ? null : new Date(),
-        //     avatar_photo:
-        //         role == PersonRole.EMPLOYEE
-        //             ? undefined
-        //             : partialCreatePersonDto.avatar_photo,
-        // };
-        // let account: Account | undefined;
-        // if (role == PersonRole.EMPLOYEE) {
-        //     account = undefined;
-        // } else {
-        //     account = {
-        //         avatarURL: await this.storageManager.upload(avatar_photo,role+"/"+)
-        //     };
-        // }
-        // await this.dataSource
-        //     .createQueryBuilder()
-        //     .insert()
-        //     .into(Resident)
-        //     .values([
-        //         {
-        //             account,
-        //         },
-        //     ]);
+    async createDemoAdmin() {
+        let admin = this.dataSource.getRepository(Admin).create();
+        admin.id = "ADM" + this.idGenerator.generateId();
+        admin.profile = {
+            date_of_birth: new Date("1999-01-01"),
+            name: "Admin",
+            gender: Gender.FEMALE,
+            phone_number: "0888888888",
+            front_identify_card_photo_URL: await this.storageManager.upload(
+                this.frontIdentity.buffer,
+                "admin/" + admin.id + "/frontIdentifyPhoto.jpg",
+                "image/jpeg",
+            ),
+            back_identify_card_photo_URL: await this.storageManager.upload(
+                this.backIdentity.buffer,
+                "admin/" + admin.id + "/backIdentifyPhoto.jpg",
+                "image/jpeg",
+            ),
+        };
+
+        const randomAvatar = await this.avatarGenerator.generateAvatar(
+            admin.profile.name,
+        );
+        let account = {
+            account_id: "ACC" + this.idGenerator.generateId(),
+            email: "admin@gmail.com",
+            password: this.hashService.hash("password"),
+            avatarURL: await this.storageManager.upload(
+                randomAvatar,
+                "admin/" + admin.id + "/avatar.svg",
+                "image/svg+xml",
+            ),
+        };
+
+        await this.dataSource.getRepository(Admin).save({
+            account,
+            ...admin,
+        });
     }
 }

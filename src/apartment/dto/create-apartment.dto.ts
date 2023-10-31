@@ -27,8 +27,8 @@ export class CreateApartmentDto extends PickType(Apartment, [
         isArray: true,
     })
     @IsFiles()
-    @MaxFileSize(10e6)
-    @HasMimeType(commonImageMIMETypes)
+    @MaxFileSize(10e6, { each: true })
+    @HasMimeType(commonImageMIMETypes, { each: true })
     images: MemoryStoredFile[];
 
     @ApiProperty({

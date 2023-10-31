@@ -7,12 +7,12 @@ import { SupabaseClient } from "@supabase/supabase-js";
 export abstract class StorageManager {
     /**
      * Upload a file to storage and return the URL
-     * @param file file must have buffer property
+     * @param buffer file must have buffer property
      * @param path path to upload on remote storage
      * @param mime MIME type of file
      */
     abstract upload(
-        file: { buffer: Buffer | ArrayBuffer },
+        buffer: Buffer | ArrayBuffer,
         path: string,
         mime?: string,
     ): Promise<string>;
@@ -51,24 +51,46 @@ export class SupabaseStorageManager extends StorageManager {
 
     private readonly BUCKET_NAME = "homeland";
 
-    async remove(paths: string[]): Promise<boolean> {
+    async remove(pathsOrURLs: string[]): Promise<boolean> {
+        if (pathsOrURLs.length === 0) return true;
         const { error } = await this.supabaseClient.storage
             .from(this.BUCKET_NAME)
-            .remove(paths);
+            .remove(
+                pathsOrURLs.map(
+                    (path) => this.extractPathFromUrl(path) || path,
+                ),
+            );
 
         if (error) throw error;
         return true;
     }
 
+    /**
+     *
+     * @param url public url of file in supabase storage
+     * @returns path of file, undefined if url is not valid
+     */
+    private extractPathFromUrl(url: string): string | undefined {
+        if (!url.startsWith("http://")) {
+            return undefined;
+        }
+        const prefix = `http://localhost:54321/storage/v1/object/public/${this.BUCKET_NAME}/`;
+        if (url.indexOf(prefix) !== 0) {
+            return undefined;
+        }
+        const restOfPath = url.slice(prefix.length);
+        return restOfPath;
+    }
+
     async upload(
-        file: { buffer: Buffer },
+        file: Buffer | ArrayBuffer,
         uploadPath: string,
         mime: string = "text/plain;charset=UTF-8",
     ): Promise<string> {
-        if (!file.buffer) throw new Error("File must have buffer property");
+        if (!file) throw new Error("File must have buffer property");
         const { error } = await this.supabaseClient.storage
             .from(this.BUCKET_NAME)
-            .upload(uploadPath, file.buffer, {
+            .upload(uploadPath, file, {
                 contentType: mime,
                 upsert: true,
             });

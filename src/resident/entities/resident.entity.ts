@@ -22,7 +22,7 @@ export class Resident {
     @Column(() => Profile)
     profile: Profile;
 
-    @OneToOne(() => Account, (account) => account.resident, { nullable: true })
+    @OneToOne(() => Account, { nullable: true, cascade: true })
     @JoinColumn({ name: "account_id" })
     account?: Account;
 
@@ -83,5 +83,5 @@ export class Resident {
     // })
     // gender: Gender;
 
-    role: PersonRole = PersonRole.RESIDENT;
+    role = PersonRole.RESIDENT;
 }

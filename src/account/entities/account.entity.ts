@@ -1,28 +1,40 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
-import { IsOptional, IsEmail, IsString } from "class-validator";
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { IsEmail, IsString } from "class-validator";
+import {
+    Column,
+    Entity,
+    PrimaryColumn,
+    CreateDateColumn,
+    DeleteDateColumn,
+} from "typeorm";
 
 @Entity()
 export class Account {
     @PrimaryColumn()
-    id: string;
-
-    @Column({ nullable: true })
-    activated_at?: Date;
+    account_id: string;
 
     @ApiProperty({ required: false, default: "admin@gmail.com" })
-    @IsOptional()
     @IsEmail()
-    @Column({ nullable: true, unique: true })
+    @Column({ unique: true })
     email: string;
 
     @ApiProperty({ required: false, default: "password" })
-    @IsOptional()
+    @IsString()
     @Exclude({ toPlainOnly: true })
-    @Column({ nullable: true })
+    @Column()
     password: string;
 
     @IsString()
+    @Column()
     avatarURL: string;
+
+    @CreateDateColumn()
+    created_at: Date;
+
+    @DeleteDateColumn()
+    deleted_at?: Date;
+
+    @Column({ nullable: true })
+    activated_at?: Date;
 }

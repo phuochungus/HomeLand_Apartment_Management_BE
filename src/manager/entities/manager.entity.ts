@@ -8,7 +8,7 @@ import {
     CreateDateColumn,
 } from "typeorm";
 import { PersonRole, Profile } from "../../helper/class/profile.entity";
-import { Account } from "../../helper/class/account.entity";
+import { Account } from "../../account/entities/account.entity";
 
 @Entity()
 export class Manager {
@@ -18,7 +18,7 @@ export class Manager {
     @Column(() => Profile)
     profile: Profile;
 
-    @OneToOne(() => Account, (Account) => Account.manager, { nullable: true })
+    @OneToOne(() => Account, { nullable: true, cascade: true })
     @JoinColumn({ name: "account_id" })
     account?: Account;
 
@@ -31,5 +31,5 @@ export class Manager {
     @DeleteDateColumn()
     deleted_at?: Date;
 
-    role: PersonRole = PersonRole.MANAGER;
+    role = PersonRole.MANAGER;
 }

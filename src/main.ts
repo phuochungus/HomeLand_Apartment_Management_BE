@@ -8,6 +8,11 @@ import {
 } from "@nestjs/swagger";
 import { TypeOrmExceptionFilter } from "./helper/filter/typeorm-exception.filter";
 import { NestExpressApplication } from "@nestjs/platform-express";
+import { Admin } from "./admin/entities/admin.entity";
+import { Technician } from "./technician/entities/technician.entity";
+import { Manager } from "./manager/entities/manager.entity";
+import { Resident } from "./resident/entities/resident.entity";
+import { Employee } from "./employee/entities/employee.entity";
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -34,6 +39,7 @@ async function bootstrap() {
 
     const option: SwaggerDocumentOptions = {
         deepScanRoutes: true,
+        extraModels: [Admin, Technician, Manager, Resident, Employee],
     };
     const document = SwaggerModule.createDocument(app, config, option);
 
