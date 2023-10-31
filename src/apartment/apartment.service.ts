@@ -105,7 +105,8 @@ export class ApartmentServiceImp extends ApartmentService {
 
     async findOne(id: string) {
         return await this.apartmentRepository.findOne({
-            where: { apartment_id: id },
+      
+      
         });
     }
 

@@ -24,10 +24,10 @@ export class CreateResidentDto extends PickType(Profile, [
     @Column()
     payment_info: string
 
-    @ApiProperty({required: true})
+    @ApiProperty({required: false})
     @IsString()
     @Column()
-    email: string
+    email?: string
 
     @ApiProperty({ type: "file", required: true })
     @IsFile()

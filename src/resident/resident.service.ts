@@ -72,7 +72,7 @@ export class ResidentService implements ResidentRepository {
             back_identify_card_photo,
             avatar_photo,
             payment_info,
-
+            email,
             ...rest
         } = createResidentDto;
         const profile = plainToInstance(Profile, rest);
@@ -127,15 +127,18 @@ export class ResidentService implements ResidentRepository {
             profile.front_identify_card_photo_URL = frontURL;
             profile.back_identify_card_photo_URL = backURL;
             resident.profile = profile;
-            resident.account_id = resident.id;
             //set account
-            let account = new Account();
-            account.account_id = resident.account_id;
-            account.email = rest.email;
-            account.password = this.hashService.hash(profile.phone_number);
-            account.avatarURL = avatarURL;
-            resident.account = account;
-            await this.accountRepository.save(account);
+            if(email) {
+            resident.account_id = resident.id;
+
+                let account = new Account();
+                account.account_id = resident.account_id;
+                account.email = email;
+                account.password = this.hashService.hash(profile.phone_number);
+                account.avatarURL = avatarURL;
+                resident.account = account;
+                await this.accountRepository.save(account);
+            }
             return await this.residentRepository.save(resident);
         } catch (error) {
             if (error instanceof TypeORMError) {
