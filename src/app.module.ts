@@ -16,6 +16,7 @@ import { AvatarGeneratorModule } from "./avatar-generator/avatar-generator.modul
 import { NestjsFormDataModule } from "nestjs-form-data";
 import { BuildingModule } from "./building/building.module";
 import { AccountModule } from './account/account.module';
+import { ResidentModule } from "./resident/resident.module";
 
 @Module({
     imports: [
@@ -65,6 +66,7 @@ import { AccountModule } from './account/account.module';
         SeedModule,
         ApartmentModule,
         BuildingModule,
+        ResidentModule,
         MeModule,
         TokenModule,
         AvatarGeneratorModule,

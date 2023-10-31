@@ -7,12 +7,13 @@ import {
     OneToOne,
     PrimaryColumn,
 } from "typeorm";
-import { PersonRole, Profile } from "../../helper/class/profile.entity";
+import { Gender, PersonRole, Profile } from "../../helper/class/profile.entity";
 import { Account } from "../../helper/class/account.entity";
 import { Contract } from "../../contract/entities/contract.entity";
 import { ManyToOne, JoinColumn } from "typeorm";
 import { Apartment } from "../../apartment/entities/apartment.entity";
-
+import { ApiProperty } from "@nestjs/swagger";
+import { IsPhoneNumber, IsEnum, IsDateString, IsString } from "class-validator";
 @Entity()
 export class Resident {
     @PrimaryColumn()
@@ -27,6 +28,12 @@ export class Resident {
 
     @Column({ nullable: true })
     account_id?: string;
+    
+    @Column({ nullable: true })
+    payment_info?: string;
+
+    
+   
 
     @OneToMany(() => Contract, (contract) => contract.resident)
     contracts: Contract[];
@@ -43,6 +50,38 @@ export class Resident {
 
     @DeleteDateColumn()
     deleted_at?: Date;
+
+    // @Column()
+    // front_identify_card_photo_URL: string;
+
+    // @Column()
+    // back_identify_card_photo_URL: string;
+
+    // @ApiProperty({
+    //     default: "0999999999",
+    // })
+    // @IsPhoneNumber("VN")
+    // @Column({ unique: true })
+    // phone_number: string;
+
+    // @ApiProperty({
+    //     default: "1990-01-01",
+    // })
+    // @IsDateString()
+    // @Column()
+    // date_of_birth: Date;
+
+    // @ApiProperty({
+    //     default: Gender.MALE,
+    //     type: "enum",
+    //     enum: Gender,
+    // })
+    // @IsEnum(Gender)
+    // @Column({
+    //     type: "enum",
+    //     enum: Gender,
+    // })
+    // gender: Gender;
 
     role: PersonRole = PersonRole.RESIDENT;
 }

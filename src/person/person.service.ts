@@ -231,7 +231,7 @@ export class PersonService implements PersonRepository {
         //     );
         person.email = updatePersonDto.email;
         person.phone_number = updatePersonDto.phone_number as string;
-        //person.password = hashSync(createAccountDto.password, 10);
+        // person.password = hashSync(createAccountDto.password, 10);
 
         return await this.personRepository.save(person);
     }

@@ -47,6 +47,8 @@ export class Profile {
 
     @Column()
     back_identify_card_photo_URL: string;
+    @Column()
+    avatar_photo?: string;
 
     @ApiProperty({
         default: "0999999999",
