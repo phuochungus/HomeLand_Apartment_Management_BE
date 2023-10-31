@@ -19,6 +19,8 @@ import { BuildingModule } from "./building/building.module";
 import { AccountModule } from "./account/account.module";
 import { AdminModule } from "./admin/admin.module";
 import { ResidentModule } from "./resident/resident.module";
+import { JWTAuthGuard } from "./auth/guard/jwt-auth.guard";
+
 
 @Module({
     imports: [
@@ -64,6 +66,8 @@ import { ResidentModule } from "./resident/resident.module";
         AuthModule,
         IdGeneratorModule,
         StorageModule,
+        AccountModule,
+        AdminModule,
         HashModule,
         SeedModule,
         ApartmentModule,
@@ -76,8 +80,7 @@ import { ResidentModule } from "./resident/resident.module";
         NestjsFormDataModule.config({
             isGlobal: true,
         }),
-        AccountModule,
-        AdminModule,
+        
     ],
     controllers: [AppController],
     providers: [AppService],

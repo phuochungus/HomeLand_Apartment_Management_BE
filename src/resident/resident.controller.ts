@@ -28,7 +28,7 @@ import {
 
 import { FormDataRequest } from "nestjs-form-data";
 import { PersonRole } from "../helper/class/profile.entity";
-import { JWTAuthGuard } from "src/auth/guard/jwt.guard";
+import { JWTAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { CreateResidentDto } from './dto/create-resident.dto';
 import { Resident } from './entities/resident.entity';
 import { UpdateResidentDto } from './dto/update-resident.dto';
@@ -51,7 +51,7 @@ export class ResidentController {
     @ApiConsumes("multipart/form-data")
     @ApiUnprocessableEntityResponse({
         description: "Email or phone number already exists",
-    })
+    })  
     @ApiCreatedResponse({
         description: "Create person profile successfully",
     })
@@ -77,13 +77,15 @@ export class ResidentController {
     //     return await this.personRepository.createAccount(id, createAccountDto);
     // }
     @ApiOperation({ summary: "update resident" })
+    
     @Patch("/:id")
     async updateResident(
         @Param("id") id: string,
         @Body() updateResidentDto: UpdateResidentDto,
     ): Promise<Resident> {
+        
         const resident = await this.residentRepository.updateResident(id, updateResidentDto)
-        return resident;
+         return resident;
        
     }
 

@@ -1,26 +1,20 @@
+import { UpdateResidentDto } from "./dto/update-resident.dto";
+import { Resident } from "./entities/resident.entity";
 
-import { UpdateResidentDto } from './dto/update-resident.dto';
-import { Resident } from './entities/resident.entity';
-
-import {
-    
-    Injectable,
-    NotFoundException,
-} from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, TypeORMError } from "typeorm";
-import { StorageManager } from 'src/storage/storage.service';
+import { StorageManager } from "src/storage/storage.service";
 import { isQueryAffected } from "../helper/validation";
-import { IRepository } from 'src/helper/interface/IRepository.interface';
+import { IRepository } from "src/helper/interface/IRepository.interface";
 import { AvatarGenerator } from "../avatar-generator/avatar-generator.service";
 import { MemoryStoredFile } from "nestjs-form-data";
-import {  Profile } from "../helper/class/profile.entity";
+import { Profile } from "../helper/class/profile.entity";
 import { CreateResidentDto } from "./dto/create-resident.dto";
-import { IdGenerator } from 'src/id-generator/id-generator.service';
-import { plainToInstance } from 'class-transformer';
-import { Account } from 'src/helper/class/account.entity';
-import { HashService } from 'src/hash/hash.service';
-
+import { IdGenerator } from "src/id-generator/id-generator.service";
+import { plainToInstance } from "class-transformer";
+import { Account } from "src/account/entities/account.entity";
+import { HashService } from "src/hash/hash.service";
 
 /**
  * Person repository interface
@@ -44,7 +38,6 @@ export abstract class ResidentRepository implements IRepository<Resident> {
     ): Promise<Resident>;
     abstract findAll(): Promise<Resident[]>;
 }
-    
 
 @Injectable()
 export class ResidentService implements ResidentRepository {
@@ -82,16 +75,16 @@ export class ResidentService implements ResidentRepository {
 
             ...rest
         } = createResidentDto;
-        const profile = plainToInstance(Profile, rest)
+        const profile = plainToInstance(Profile, rest);
         let resident = new Resident();
         resident.payment_info = payment_info;
         if (id) resident.id = id;
-        else   resident.id = "RES" + this.idGenerate.generateId();
+        else resident.id = "RES" + this.idGenerate.generateId();
         try {
             const frontPhoto = front_identify_card_photo as MemoryStoredFile;
             const backPhoto = front_identify_card_photo as MemoryStoredFile;
             const frontURL = await this.storageManager.upload(
-                frontPhoto,
+                frontPhoto.buffer,
                 "resident/" +
                     resident.id +
                     "/front_identify_card_photo_URL." +
@@ -99,30 +92,51 @@ export class ResidentService implements ResidentRepository {
                 frontPhoto.mimetype || "image/png",
             );
             const backURL = await this.storageManager.upload(
-                backPhoto,
+                backPhoto.buffer,
                 "resident/" +
                     resident.id +
                     "/back_identify_card_photo_URL." +
                     (backPhoto.extension || "png"),
                 backPhoto.mimetype || "image/png",
             );
-             
-        
+            let avatarURL: string | undefined;
+            // const avatarPhoto = avatar_photo as MemoryStoredFile;
+
+            if (avatar_photo) {
+                const avataPhoto = avatar_photo as MemoryStoredFile;
+                avatarURL = await this.storageManager.upload(
+                    avataPhoto.buffer,
+                    "resident/" +
+                        resident.id +
+                        "/avatarURL." +
+                        (avataPhoto.extension || "png"),
+                    avataPhoto.mimetype || "image/png",
+                );
+            } else {
+                const avatar = await this.avatarGenerator.generateAvatar(
+                    profile.name,
+                );
+                avatarURL = await this.storageManager.upload(
+                    avatar,
+                    "resident/" + resident.id + "/avatarURL.svg",
+                    "image/svg+xml",
+                );
+            }
+            // profile.avatar_photo = avatarURL;
+
             profile.front_identify_card_photo_URL = frontURL;
             profile.back_identify_card_photo_URL = backURL;
             resident.profile = profile;
             resident.account_id = resident.id;
             //set account
-            let account = new Account()
-            account.id = resident.account_id;
+            let account = new Account();
+            account.account_id = resident.account_id;
             account.email = rest.email;
-            account.password =  this.hashService.hash(profile.phone_number);
+            account.password = this.hashService.hash(profile.phone_number);
+            account.avatarURL = avatarURL;
             resident.account = account;
-            await this.accountRepository.save(account)
+            await this.accountRepository.save(account);
             return await this.residentRepository.save(resident);
-            
-             
-
         } catch (error) {
             if (error instanceof TypeORMError) {
                 try {
@@ -167,50 +181,56 @@ export class ResidentService implements ResidentRepository {
         let resident = await this.residentRepository.findOne({
             where: { id },
         });
-        const {payment_info, avatar_photo, email, ...rest} = updateResidentDto;
+        console.log(updateResidentDto)
+        const { payment_info, avatar_photo, email, ...rest } =
+            updateResidentDto;
         if (!resident) throw new NotFoundException();
         // if (person.password)
         //     throw new ConflictException(
         //         "Person profile already has account",
         //     );
-       // resident.account?.email = updateResidentDto.email as string;
-      const account = await this.accountRepository.findOne({where: {id}})
-       if(account !== null) {
-        console.log(account)
-       account.email = email as string;
-       await this.accountRepository.save(account);
-       }
-       resident.payment_info = payment_info
-       let profile = plainToInstance(Profile, rest)
-       let avatarURL: string | undefined;
-           // const avatarPhoto = avatar_photo as MemoryStoredFile;
-                
-                if (avatar_photo) {
-                    const avataPhoto = avatar_photo as MemoryStoredFile;
-                    avatarURL = await this.storageManager.upload(
-                    avataPhoto,
-                        "resident/" +
-                            resident.id +
-                            "/avatarURL." +
-                            (avataPhoto.extension || "png"),
-                            avataPhoto.mimetype || "image/png",
-                    );
-                } else {
-                    const avatar = await this.avatarGenerator.generateAvatar(
-                        profile.name,
-                    );
-                    avatarURL = await this.storageManager.upload(
-                        { buffer: avatar },
-                        "resident/" + resident.id + "/avatarURL.svg",
-                        "image/svg+xml",
-                    );
-                }
-                profile.avatar_photo = avatarURL;
-       resident.profile = profile
+        // resident.account?.email = updateResidentDto.email as string;
+        const account = await this.accountRepository.findOne({
+            where: { account_id: id },
+        });
+
+        resident.payment_info = payment_info;
+        let profile = plainToInstance(Profile, rest);
+        let avatarURL: string | undefined;
+        // const avatarPhoto = avatar_photo as MemoryStoredFile;
+
+        if (avatar_photo) {
+            const avataPhoto = avatar_photo as MemoryStoredFile;
+            avatarURL = await this.storageManager.upload(
+                avataPhoto.buffer,
+                "resident/" +
+                    resident.id +
+                    "/avatarURL." +
+                    (avataPhoto.extension || "png"),
+                avataPhoto.mimetype || "image/png",
+            );
+        } else {
+            const avatar = await this.avatarGenerator.generateAvatar(
+                profile.name,
+            );
+            avatarURL = await this.storageManager.upload(
+                avatar,
+                "resident/" + resident.id + "/avatarURL.svg",
+                "image/svg+xml",
+            );
+        }
+        if (account !== null) {
+            console.log(email, avatarURL)
+            account.email = email as string;
+            account.avatarURL = avatarURL;
+            await this.accountRepository.save(account);
+        }
+
+        resident.profile = profile;
         // resident.payment_info = updateResidentDto.payment_info as string;
         // resident.email = updateResidentDto.email as string;
         // resident.phone_number = updateResidentDto.phone_number as string;
-        
+
         //person.password = hashSync(createAccountDto.password, 10);
         return await this.residentRepository.save(resident);
     }
@@ -218,10 +238,9 @@ export class ResidentService implements ResidentRepository {
         return this.residentRepository.findOne({
             where: {
                 id,
-
             },
             cache: true,
-            relations:['account']
+            relations: ["account"],
         });
     }
 
@@ -235,7 +254,10 @@ export class ResidentService implements ResidentRepository {
     // }
 
     async update(id: string, UpdateResidentDto: UpdateResidentDto) {
-        let result = await this.residentRepository.update(id, UpdateResidentDto);
+        let result = await this.residentRepository.update(
+            id,
+            UpdateResidentDto,
+        );
         return isQueryAffected(result);
     }
 
@@ -255,9 +277,8 @@ export class ResidentService implements ResidentRepository {
     // }
     async findAll(): Promise<Resident[]> {
         const residents = await this.residentRepository.find({
-            relations: ['account'],
-        })
+            relations: ["account"],
+        });
         return residents;
-        
     }
 }

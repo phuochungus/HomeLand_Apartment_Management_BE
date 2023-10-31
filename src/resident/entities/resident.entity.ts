@@ -8,7 +8,7 @@ import {
     PrimaryColumn,
 } from "typeorm";
 import { Gender, PersonRole, Profile } from "../../helper/class/profile.entity";
-import { Account } from "../../helper/class/account.entity";
+import { Account } from "src/account/entities/account.entity";
 import { Contract } from "../../contract/entities/contract.entity";
 import { ManyToOne, JoinColumn } from "typeorm";
 import { Apartment } from "../../apartment/entities/apartment.entity";
