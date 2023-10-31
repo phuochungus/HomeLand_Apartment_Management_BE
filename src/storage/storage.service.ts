@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { isURL } from "class-validator";
 
 /**
  * Upload service interface
@@ -71,6 +72,7 @@ export class SupabaseStorageManager extends StorageManager {
      * @returns path of file, undefined if url is not valid
      */
     private extractPathFromUrl(url: string): string | undefined {
+        if (!isURL(url)) return undefined;
         if (!url.startsWith("http://")) {
             return undefined;
         }
