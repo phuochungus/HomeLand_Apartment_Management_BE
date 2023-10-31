@@ -3,11 +3,13 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { isURL } from "class-validator";
 
 /**
- * Upload service interface
+ * @classdesc Upload service interface
+ * @abstract
  */
 export abstract class StorageManager {
     /**
      * Upload a file to storage and return the URL
+     * @throws {UploadError} if upload fail
      * @param buffer file must have buffer property
      * @param path path to upload on remote storage
      * @param mime MIME type of file
@@ -19,6 +21,8 @@ export abstract class StorageManager {
     ): Promise<string>;
 
     /**
+     * Remove files on storage
+     * @throws {RemoveError} if remove fail
      * @param paths path to files will be remove on bucket
      */
     abstract remove(paths: string[]): Promise<boolean>;
@@ -32,6 +36,22 @@ export abstract class StorageManager {
      * Destroy storage if exist
      */
     abstract destroyStorage(): Promise<void>;
+}
+
+export type StorageError = UploadError | RemoveError;
+export class UploadError extends Error {
+    constructor(obj: Partial<UploadError>) {
+        super(obj.message);
+        Object.assign(this, obj);
+        Object.setPrototypeOf(this, UploadError.prototype);
+    }
+}
+export class RemoveError extends Error {
+    constructor(obj: Partial<RemoveError>) {
+        super(obj.message);
+        Object.assign(this, obj);
+        Object.setPrototypeOf(this, RemoveError.prototype);
+    }
 }
 
 @Injectable()
@@ -62,7 +82,7 @@ export class SupabaseStorageManager extends StorageManager {
                 ),
             );
 
-        if (error) throw error;
+        if (error) throw new RemoveError(error);
         return true;
     }
 
@@ -97,7 +117,7 @@ export class SupabaseStorageManager extends StorageManager {
                 upsert: true,
             });
 
-        if (error) throw error;
+        if (error) throw new UploadError(error);
         const response = this.supabaseClient.storage
             .from(this.BUCKET_NAME)
             .getPublicUrl(uploadPath);

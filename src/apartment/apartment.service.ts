@@ -4,15 +4,41 @@ import { UpdateApartmentDto } from "./dto/update-apartment.dto";
 import { DataSource, In, Repository, TypeORMError } from "typeorm";
 import { Apartment } from "./entities/apartment.entity";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
-import { StorageManager } from "../storage/storage.service";
+import { StorageManager, UploadError } from "../storage/storage.service";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { IRepository } from "../helper/interface/IRepository.interface";
 import { Resident } from "../resident/entities/resident.entity";
+import { isQueryAffected } from "../helper/validation";
+import { MemoryStoredFile } from "nestjs-form-data";
 
+/**
+ * @classdesc Represent the service that manage the apartment
+ * @abstract
+ */
 export abstract class ApartmentService implements IRepository<Apartment> {
+    /**
+     * @param id id of the apartment
+     */
     abstract findOne(id: string): Promise<Apartment | null>;
-    abstract update(id: string, updateEntityDto: any): Promise<boolean>;
+
+    /**
+     * @param id id of the apartment
+     */
+    abstract update(
+        id: string,
+        updateEntityDto: UpdateApartmentDto,
+    ): Promise<Apartment>;
+
+    /**
+     * @abstract
+     * @param id id of the apartment
+     */
     abstract delete(id: string): Promise<boolean>;
+    /**
+     *
+     * @param createPropertyDto
+     * @param id optional id of the apartment
+     */
     abstract create(
         createPropertyDto: CreateApartmentDto,
         id?: string,
@@ -112,8 +138,51 @@ export class ApartmentServiceImp extends ApartmentService {
     async update(
         id: string,
         updateApartmentDto: UpdateApartmentDto,
-    ): Promise<boolean> {
-        throw new Error("Method not implemented.");
+    ): Promise<Apartment> {
+        const { images, ...rest } = updateApartmentDto;
+        const queryRunnder = this.dataSource.createQueryRunner();
+        let uploadedImageURLs: string[] = [];
+        try {
+            queryRunnder.startTransaction();
+            let result = await this.apartmentRepository.update(id, rest);
+            let apartment = await this.apartmentRepository.findOne({
+                where: { apartment_id: id },
+            });
+
+            if (!apartment || !isQueryAffected(result))
+                throw new NotFoundException("Apartment not found");
+            let imageFiles = this.filterImageFiles(images);
+            uploadedImageURLs = await Promise.all(
+                imageFiles.map((image, index) =>
+                    this.storageManager.upload(
+                        image.buffer,
+                        `apartment/${apartment!.apartment_id}/${
+                            index + Date.now() + ".png"
+                        }`,
+                        "image/png",
+                    ),
+                ),
+            );
+            return apartment;
+        } catch (error) {
+            await queryRunnder.rollbackTransaction();
+            if (error instanceof UploadError) console.error(error);
+            if (error instanceof TypeORMError) {
+                await this.storageManager.remove(uploadedImageURLs);
+            }
+            throw error;
+        } finally {
+            await queryRunnder.release();
+        }
+    }
+
+    private filterImageFiles(
+        array: (string | MemoryStoredFile)[],
+    ): MemoryStoredFile[] {
+        return array.filter(
+            (element): element is MemoryStoredFile =>
+                element instanceof MemoryStoredFile,
+        );
     }
 
     delete(id: string): Promise<boolean> {

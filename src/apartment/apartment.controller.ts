@@ -6,12 +6,14 @@ import {
     NotFoundException,
     Query,
     Post,
+    Patch,
 } from "@nestjs/common";
 import { ApartmentService } from "./apartment.service";
 import { CreateApartmentDto } from "./dto/create-apartment.dto";
 // import { UpdateApartmentDto } from "./dto/update-apartment.dto";
 import { ApiConsumes, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { FormDataRequest } from "nestjs-form-data";
+import { UpdateApartmentDto } from "./dto/update-apartment.dto";
 
 @ApiTags("Apartment")
 @Controller("apartment")
@@ -44,16 +46,19 @@ export class ApartmentController {
         throw new NotFoundException("Apartment not found");
     }
 
-    // @Patch(":id")
-    // async update(
-    //     @Param("id") id: string,
-    //     @Body() updateApartmentDto: UpdateApartmentDto,
-    // ) {
-    //     const result = await this.apartmentRepository.update(
-    //         id,
-    //         updateApartmentDto,
-    //     );
-    //     if (result) return { msg: "Apartment updated" };
-    //     throw new NotFoundException("Apartment not found");
-    // }
+    /**
+     *
+     * @param id apartment id
+     * @param updateApartmentDto
+     * @returns
+     */
+    @ApiConsumes("multipart/form-data")
+    @Patch(":id/imageURLs")
+    @FormDataRequest()
+    async update(
+        @Param("id") id: string,
+        @Body() updateApartmentDto: UpdateApartmentDto,
+    ) {
+        return await this.apartmentRepository.update(id, updateApartmentDto);
+    }
 }
