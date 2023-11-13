@@ -1,8 +1,17 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import {
+    BeforeInsert,
+    BeforeUpdate,
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryColumn,
+} from "typeorm";
 import { Apartment } from "../../apartment/entities/apartment.entity";
 import { Floor } from "../../floor/entities/floor.entity";
 import { Building } from "../../building/entities/building.entity";
 import { IsEnum, IsOptional, IsString } from "class-validator";
+import { BadRequestException } from "@nestjs/common";
 
 export enum EquipmentStatus {
     AVAILABLE = "AVAILABLE",
@@ -60,4 +69,19 @@ export class Equipment {
     @IsString()
     @Column({ nullable: true })
     building_id?: string;
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    checkFK() {
+        let array = [this.apartment_id, this.floor_id, this.building_id];
+        let count = 0;
+        array.forEach((element) => {
+            if (element) count++;
+        });
+        if (count != 1) {
+            throw new BadRequestException(
+                "Equipment must have exactly one of apartment_id, floor_id, building_id",
+            );
+        }
+    }
 }
