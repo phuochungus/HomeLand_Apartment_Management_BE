@@ -21,7 +21,7 @@ export abstract class StorageManager {
     ): Promise<string>;
 
     /**
-     * Remove files on storage
+     * Remove files on storage, if path is a directory, all files in that directory will be remove
      * @throws {StorageError} if remove fail
      * @param paths path to files will be remove on bucket
      */
@@ -101,22 +101,18 @@ export class SupabaseStorageManager
 
     async remove(pathsOrURLs: string[]): Promise<boolean> {
         if (pathsOrURLs.length === 0) return true;
-        console.log(
-            pathsOrURLs.map(
-                (path) => this.extractFilePathFromPublicUrl(path) || path,
-            ),
+        const paths = pathsOrURLs.map(
+            (path) => this.extractFilePathFromPublicUrl(path) || path,
         );
+
+        let fileToDelete = await Promise.all(
+            paths.map((path) => this.listAllFiles(path)),
+        );
+        console.log(fileToDelete.flat());
+
         const { data, error } = await this.supabaseClient.storage
             .from(this.BUCKET_NAME)
-            .remove(
-                await Promise.all(
-                    pathsOrURLs.map(
-                        async (path) =>
-                            (await this.extractFilePathFromPublicUrl(path)) ||
-                            path,
-                    ),
-                ),
-            );
+            .remove(fileToDelete.flat());
 
         if (error) throw new StorageError(error);
         if (data && data.length > 0) return true;
@@ -128,14 +124,31 @@ export class SupabaseStorageManager
      * @param url public url of file in supabase storage
      * @returns path of file, undefined if url is not valid
      */
-    private async extractFilePathFromPublicUrl(
-        url: string,
-    ): Promise<string | undefined> {
+    private extractFilePathFromPublicUrl(url: string): string | undefined {
         if (url.indexOf(this.BUCKET_URL_PREFIX) !== 0) {
             return undefined;
         }
         const restOfPath = url.slice(this.BUCKET_URL_PREFIX.length);
         return restOfPath;
+    }
+
+    private async listAllFiles(path: string): Promise<string[]> {
+        let { data: list, error } = await this.supabaseClient.storage
+            .from(this.BUCKET_NAME)
+            .list(path);
+        if (error) throw new StorageError(error);
+        if (!list) return [];
+        if (list.length == 0) return [path];
+
+        let files = list?.map((item) => `${path}/${item.name}`);
+        if (!files) return [];
+
+        let paths: string[] = [];
+        for (let file of files) {
+            let temp = await this.listAllFiles(file);
+            paths = paths.concat(temp);
+        }
+        return paths;
     }
 
     async upload(
