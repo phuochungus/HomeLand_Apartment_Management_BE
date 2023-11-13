@@ -4,6 +4,7 @@ import { UpdateEquipmentDto } from "./dto/update-equipment.dto";
 import { Equipment } from "./entities/equipment.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { IdGenerator } from "../id-generator/id-generator.service";
 
 export abstract class EquipmentService {
     abstract create(createEquipmentDto: CreateEquipmentDto): Promise<Equipment>;
@@ -15,18 +16,27 @@ export abstract class EquipmentService {
     ): Promise<Equipment>;
     abstract remove(id: string): void;
 }
+
 @Injectable()
 export class EquipmentServiceImp extends EquipmentService {
     constructor(
         @InjectRepository(Equipment)
-        private equipmentRepository: Repository<Equipment>,
+        private readonly equipmentRepository: Repository<Equipment>,
+        private readonly idGenerate: IdGenerator,
     ) {
         super();
     }
 
-    create(createEquipmentDto: CreateEquipmentDto): Promise<Equipment> {
-        let equipment = this.equipmentRepository.create(createEquipmentDto);
-        throw new NotImplementedException();
+    async create(
+        createEquipmentDto: CreateEquipmentDto,
+        id?: string,
+    ): Promise<Equipment> {
+        const { images, ...rest } = createEquipmentDto;
+        let equipment = this.equipmentRepository.create(rest);
+        if (id) equipment.id = id;
+        else equipment.id = "EQM" + this.idGenerate.generateId();
+
+        return await this.equipmentRepository.save(equipment);
     }
 
     findAll(): Promise<Equipment[]> {
