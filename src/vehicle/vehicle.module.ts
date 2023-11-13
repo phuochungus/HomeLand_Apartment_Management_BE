@@ -9,7 +9,7 @@ import { AuthModule } from "../auth/auth.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Vehicle } from "./entities/vehicle.entity";
 import { HttpModule } from "@nestjs/axios";
-import { StorageModule } from "../storage/storage.module";
+import { StorageManagerModule } from "../storage/storage.module";
 import { Resident } from "../resident/entities/resident.entity";
 
 @Module({
@@ -17,7 +17,7 @@ import { Resident } from "../resident/entities/resident.entity";
         AuthModule,
         TypeOrmModule.forFeature([Vehicle, Resident]),
         HttpModule,
-        StorageModule,
+        StorageManagerModule,
     ],
     providers: [
         {

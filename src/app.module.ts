@@ -4,7 +4,7 @@ import { AppService } from "./app.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "./auth/auth.module";
 import { IdGeneratorModule } from "./id-generator/id-generator.module";
-import { StorageModule } from "./storage/storage.module";
+import { StorageManagerModule } from "./storage/storage.module";
 import { ConfigModule } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { HashModule } from "./hash/hash.module";
@@ -22,11 +22,11 @@ import { BuildingModule } from "./building/building.module";
 import { ResidentModule } from "./resident/resident.module";
 import { VehicleModule } from "./vehicle/vehicle.module";
 
-import { ServiceModule } from './service/service.module';
-import { ServicePackageModule } from './service-package/service-package.module';
+import { ServiceModule } from "./service/service.module";
+import { ServicePackageModule } from "./service-package/service-package.module";
 import { ManagerModule } from "./manager/manager.module";
 import { TechnicianModule } from "./technician/technician.module";
-import { EquipmentModule } from './equipment/equipment.module';
+import { EquipmentModule } from "./equipment/equipment.module";
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
@@ -70,7 +70,7 @@ import { EquipmentModule } from './equipment/equipment.module';
         }),
         AuthModule,
         IdGeneratorModule,
-        StorageModule,
+        StorageManagerModule,
         HashModule,
         SeedModule,
         ApartmentModule,

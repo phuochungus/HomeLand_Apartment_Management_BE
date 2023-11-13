@@ -1,7 +1,7 @@
 import { Global, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { IdGeneratorModule } from "../id-generator/id-generator.module";
-import { StorageModule } from "../storage/storage.module";
+import { StorageManagerModule } from "../storage/storage.module";
 import { HashModule } from "../hash/hash.module";
 import { AvatarGeneratorModule } from "src/avatar-generator/avatar-generator.module";
 import { Account } from "src/account/entities/account.entity";
@@ -15,15 +15,12 @@ import { ManagerService } from "./manager.service";
         TypeOrmModule.forFeature([Manager, Account]),
         IdGeneratorModule,
         AuthModule,
-        StorageModule,
+        StorageManagerModule,
         HashModule,
         AvatarGeneratorModule,
     ],
     controllers: [ManagerController],
-    providers: [
-       ManagerService
-    ],
+    providers: [ManagerService],
     exports: [ManagerService],
-
 })
 export class ManagerModule {}

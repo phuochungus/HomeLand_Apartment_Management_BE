@@ -27,4 +27,4 @@ import { SupabaseClient, createClient } from "@supabase/supabase-js";
     ],
     exports: [StorageManager, SupabaseClient],
 })
-export class StorageModule {}
+export class StorageManagerModule {}
