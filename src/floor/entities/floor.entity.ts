@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { Building } from "../../building/entities/building.entity";
 import { Apartment } from "../../apartment/entities/apartment.entity";
+import { Equipment } from "../../equipment/entities/equipment.entity";
 
 @Entity()
 export class Floor {
@@ -26,4 +27,7 @@ export class Floor {
 
     @OneToMany(() => Apartment, (property) => property.floor)
     apartments: Apartment[];
+
+    @OneToMany(() => Equipment, (equipment) => equipment.floor)
+    equipments: Equipment[];
 }

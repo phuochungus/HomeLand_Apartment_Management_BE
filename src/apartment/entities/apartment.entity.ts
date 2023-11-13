@@ -15,6 +15,7 @@ import { IsEnum, IsInt, IsNumber, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { Resident } from "../../resident/entities/resident.entity";
 import { Type } from "class-transformer";
+import { Equipment } from "../../equipment/entities/equipment.entity";
 
 export enum ApartmentStatus {
     ACTIVE = "active",
@@ -107,6 +108,9 @@ export class Apartment {
 
     @Column("simple-array")
     imageURLs: string[];
+
+    @OneToMany(() => Equipment, (equipment) => equipment.apartment)
+    equipments: Equipment[];
 
     @CreateDateColumn()
     created_at: Date;
