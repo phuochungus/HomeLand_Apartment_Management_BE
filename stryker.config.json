@@ -1,17 +1,24 @@
 {
-  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
-  "_comment": "This config was generated using 'stryker init'. Please take a look at: https://stryker-mutator.io/docs/stryker-js/configuration/ for more information.",
-  "packageManager": "npm",
-  "reporters": [
-    "html",
-    "clear-text",
-    "progress"
-  ],
+    "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+    "_comment": "This config was generated using 'stryker init'. Please take a look at: https://stryker-mutator.io/docs/stryker-js/configuration/ for more information.",
+    "packageManager": "npm",
+    "reporters": ["html", "clear-text", "progress"],
+    "mutator": {
+        "plugins": ["@stryker-mutator/typescript"]
+    },
 
-  "mutate": ["src/**/*.ts","!src/**/*.controller.spec.ts","!src/**/*.service.spec.ts","!src/**/*.module.ts"],
-  "testRunner": "jest",
-  "testRunner_comment": "Take a look at (missing 'homepage' URL in package.json) for information about the jest plugin.",
-  "coverageAnalysis": "off",
-  "timeoutMS":30000
-  
+    "mutate": [
+        "!src/**/*.module.ts",
+        "!src/**/*.entity.ts",
+        "!src/**/*.guard.ts",
+        "!src/**/*.filter.ts",
+        "!src/**/*.sub.ts"
+    ],
+    "testRunner": "jest",
+    "testRunner_comment": "Take a look at (missing 'homepage' URL in package.json) for information about the jest plugin.",
+    "coverageAnalysis": "perTest",
+    "timeoutMS": 200000,
+    "logLevel": "debug",
+    "checkers": ["typescript"],
+    "tsconfigFile": "tsconfig.json"
 }

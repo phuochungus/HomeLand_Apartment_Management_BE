@@ -1,4 +1,7 @@
 // @ts-check
+
+import { debug } from 'console';
+
 /** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 const config = {
     _comment:
@@ -13,8 +16,11 @@ const config = {
     tsconfigFile: "tsconfig.json",
 
     mutator: {
-        plugins: [],
+        plugins: [
+             '@stryker-mutator/typescript'
+        ],
     },
+
     mutate: [
         "!src/**/*.module.ts",
         "!src/**/*.entity.ts",
@@ -22,5 +28,7 @@ const config = {
         "!src/**/*.filter.ts",
         "!src/**/*.sub.ts",
     ],
+    timeoutMS: 200000
+    
 };
 export default config;
