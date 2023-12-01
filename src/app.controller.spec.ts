@@ -11,7 +11,7 @@ import { ApartmentModule } from './apartment/apartment.module';
 import { AvatarGeneratorModule } from './avatar-generator/avatar-generator.module';
 import { BuildingModule } from './building/building.module';
 import { ContractModule } from './contract/contract.module';
-import { EmployeeModule } from './employee/employee.module';
+// import { EmployeeModule } from './employee/employee.module';
 import { HashModule } from './hash/hash.module';
 import { MeModule } from './me/me.module';
 import { ResidentModule } from './resident/resident.module';
@@ -74,7 +74,7 @@ const mockAppService = {
         HashModule,
         SeedModule,
         ApartmentModule,
-        EmployeeModule,
+        // EmployeeModule,
         MeModule,
         TokenModule,
         ResidentModule,

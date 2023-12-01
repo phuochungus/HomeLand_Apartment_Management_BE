@@ -62,36 +62,36 @@ export class ContractService {
 
         const queryRunner = this.dataSource.createQueryRunner();
 
-        if (imageUpdate) {
-            try {
-                await queryRunner.connect();
-                await queryRunner.startTransaction();
-                const imageURL = await this.storageManager.upload(
-                    imageUpdate.buffer,
-                    `contract/${id}/${Date.now()}.png`,
-                    "image/png",
-                );
-                contract.contract_id = id;
-                contract.contract_with_signature_photo_URL = imageURL;
-                contract = await this.contractRepository.save(contract);
-                await queryRunner.commitTransaction();
-            } catch (error) {
-                if (error instanceof TypeORMError) {
-                    try {
-                        await this.storageManager.remove([
-                            `contract/${id}/${Date.now()}.` +
-                                (imageUpdate.extension || "png"),
-                            imageUpdate.mimetype || "image/png",
-                        ]);
-                    } catch (error) {
-                        console.error(error);
-                    }
-                }
-                throw error;
-            } finally {
-                await queryRunner.release();
-            }
-        }
+        // if (imageUpdate) {
+        //     try {
+        //         await queryRunner.connect();
+        //         await queryRunner.startTransaction();
+        //         const imageURL = await this.storageManager.upload(
+        //             imageUpdate.buffer,
+        //             `contract/${id}/${Date.now()}.png`,
+        //             "image/png",
+        //         );
+        //         contract.contract_id = id;
+        //         contract.contract_with_signature_photo_URL = imageURL;
+        //         contract = await this.contractRepository.save(contract);
+        //         await queryRunner.commitTransaction();
+        //     } catch (error) {
+        //         if (error instanceof TypeORMError) {
+        //             try {
+        //                 await this.storageManager.remove([
+        //                     `contract/${id}/${Date.now()}.` +
+        //                         (imageUpdate.extension || "png"),
+        //                     imageUpdate.mimetype || "image/png",
+        //                 ]);
+        //             } catch (error) {
+        //                 console.error(error);
+        //             }
+        //         }
+        //         throw error;
+        //     } finally {
+        //         await queryRunner.release();
+        //     }
+        // }
         let result = await this.contractRepository.update(
             { contract_id: id },
             { ...contract },

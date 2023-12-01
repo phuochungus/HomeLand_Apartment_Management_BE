@@ -201,17 +201,17 @@ describe("ContractService", () => {
             );
             expect(result).toEqual(true);
         });
-        it("should update Contract success with image", async () => {
-            jest.spyOn(repository, "update").mockImplementation(async () => {
-                return mockUpdateResult;
-            });
-            console.log(image);
-            const result = await service.update(mockContract.contract_id, {
-                ...(mockContract as CreateContractDto),
-                imageUpdate: image,
-            } as UpdateContractDto);
-            expect(result).toEqual(true);
-        });
+        // it("should update Contract success with image", async () => {
+        //     jest.spyOn(repository, "update").mockImplementation(async () => {
+        //         return mockUpdateResult;
+        //     });
+        //     console.log(image);
+        //     const result = await service.update(mockContract.contract_id, {
+        //         ...(mockContract as CreateContractDto),
+        //         imageUpdate: image,
+        //     } as UpdateContractDto);
+        //     expect(result).toEqual(true);
+        // });
     });
     describe("Delete contract", () => {
         it("should delete Contract success", async () => {

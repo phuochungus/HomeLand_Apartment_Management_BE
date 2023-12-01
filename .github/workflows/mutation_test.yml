@@ -1,0 +1,29 @@
+name: Mutation testing
+on: 
+  pull_request:
+    branches: [test/main]
+    types: [opened, synchronize, closed]          
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4.1.1
+    - name: Install modules
+      run: npm i
+    - uses: docker-practice/actions-setup-docker@master
+      timeout-minutes: 12
+    - run: |
+        set -x
+        docker version
+        docker run --rm hello-world
+        
+        docker compose pull
+        docker compose up -d
+        npx supabase start
+    
+    - name: Run stryker
+      run: |
+         npm install -g stryker-cli
+         stryker run --logLevel trace
+
+    

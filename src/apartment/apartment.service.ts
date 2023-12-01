@@ -120,7 +120,7 @@ export class ApartmentServiceImp extends ApartmentService {
                     .map((r) => r.value),
             );
 
-            console.error(error);
+            // console.error(error);
             throw error;
         } finally {
             await queryRunnder.release();
@@ -150,57 +150,12 @@ export class ApartmentServiceImp extends ApartmentService {
     ): Promise<boolean> {
         let uploadPaths: string[] = [];
         const queryRunnder = this.dataSource.createQueryRunner();
-        try {
-            queryRunnder.startTransaction();
-            let { images, ...rest } = updateApartmentDto;
-            let apartment = await this.apartmentRepository.preload({
-                apartment_id: id,
-                ...rest,
-            });
-
-            if (!apartment) throw new NotFoundException("Apartment Not found");
-
-            if (images) {
-                if (this.newImageHaveStrangeURL(images, apartment.imageURLs))
-                    throw new BadRequestException("Detect strange URL");
-
-                const newImages = await Promise.allSettled(
-                    images.map((element, index) => {
-                        if (isString(element)) return element;
-                        const uploadPath = `apartment/${id}/${
-                            index + Date.now() + (element.extension || ".png")
-                        }`;
-                        uploadPaths.push(uploadPath);
-                        return this.storageManager.upload(
-                            element.buffer,
-                            uploadPath,
-                            `image/${element.extension}` || ".png",
-                        );
-                    }),
-                );
-
-                if (!this.isPromiseFulfilledResultArray(newImages))
-                    throw new StorageError("Some image upload failed");
-
-                const newImageURLS = newImages.map((result) => result.value);
-                // this task can be done in parallel, will enhance later
-                console.log(difference(apartment.imageURLs, newImageURLS));
-                await this.storageManager.remove(
-                    difference(apartment.imageURLs, newImageURLS),
-                );
-                apartment.imageURLs = newImageURLS;
-            }
-           const result=  await this.apartmentRepository.update(apartment.apartment_id,apartment);
+        let { images, ...rest } = updateApartmentDto;
+        const result = await this.apartmentRepository.update(
+            id,
+            rest,
+        );
         return isQueryAffected(result);
-        } catch (error) {
-            await queryRunnder.rollbackTransaction();
-            if (uploadPaths.length > 0)
-                await this.storageManager.remove(uploadPaths);
-            console.error(error);
-            throw error;
-        } finally {
-            await queryRunnder.release();
-        }
         
     }
 

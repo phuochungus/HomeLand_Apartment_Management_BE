@@ -13,7 +13,6 @@ import { ApartmentModule } from "../apartment/apartment.module";
 import { ResidentModule } from "../resident/resident.module";
 import { HashModule } from "../hash/hash.module";
 import { AvatarGeneratorModule } from "../avatar-generator/avatar-generator.module";
-import { EmployeeModule } from "../employee/employee.module";
 import { JWTAuthGuard } from "../auth/guard/jwt-auth.guard";
 
 describe("SeedService", () => {
@@ -72,7 +71,6 @@ describe("SeedService", () => {
                 IdGeneratorModule,
                 HashModule,
                 AvatarGeneratorModule,
-                EmployeeModule,
                 AuthModule,
                 StorageModule,
                 JwtModule,

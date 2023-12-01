@@ -18,8 +18,6 @@ import { Resident } from "../resident/entities/resident.entity";
 import { Manager } from "../manager/entities/manager.entity";
 import { Technician } from "../technician/entities/technician.entity";
 import { ResidentRepository, ResidentService } from "../resident/resident.service";
-import { Employee } from "src/employee/entities/employee.entity";
-import { EmployeeRepository, EmployeeService } from "src/employee/employee.service";
 import { random } from "lodash";
 import { Contract } from "src/contract/entities/contract.entity";
 

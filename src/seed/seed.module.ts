@@ -6,7 +6,6 @@ import { StorageModule } from "../storage/storage.module";
 import { IdGeneratorModule } from "../id-generator/id-generator.module";
 import { HashModule } from "../hash/hash.module";
 import { AvatarGeneratorModule } from "../avatar-generator/avatar-generator.module";
-import { EmployeeModule } from "../employee/employee.module";
 import { ResidentModule } from "../resident/resident.module";
 @Module({
     imports: [
@@ -16,7 +15,6 @@ import { ResidentModule } from "../resident/resident.module";
         IdGeneratorModule,
         HashModule,
         AvatarGeneratorModule,
-        EmployeeModule,
     ],
     controllers: [Seed],
     providers: [SeedService],

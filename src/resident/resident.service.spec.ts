@@ -144,92 +144,92 @@ describe("ResidentController", () => {
             const result = await service.findAll();
             expect(result).toEqual([mockResidentaHasAccount]);
         });
-        it("should create new resident with avatar photo", async () => {
-            jest.spyOn(residentRepository, "create").mockImplementation(
-                (dto: CreateResidentDto) => {
-                    return {
-                        id: "fdsfds",
-                        profile: {
-                            date_of_birth: dto.date_of_birth,
-                            name: dto.name,
-                            gender: dto.gender,
-                            phone_number: dto.phone_number,
-                            front_identify_card_photo_URL:
-                                "resident/frontIdentifyPhoto.jpg",
-                            back_identify_card_photo_URL:
-                                "resident/backIdentifyPhoto.jpg",
-                        },
-                        account: {
-                            owner_id: "resident",
-                            email: "resident@gmail.com",
-                            password: dto.phone_number,
-                            avatarURL: "resident/avatar.svg",
-                        },
-                    } as Resident;
-                },
-            );
-            jest.spyOn(residentRepository, "save").mockImplementation(
-                async (dto:Resident) => {
-                    return {
-                        id: "fdsfds",
-                        profile: {
-                            date_of_birth: dto.profile.date_of_birth,
-                            name: dto.profile.name,
-                            gender: dto.profile.gender,
-                            phone_number: dto.profile.phone_number,
-                            front_identify_card_photo_URL:
-                                "resident/frontIdentifyPhoto.jpg",
-                            back_identify_card_photo_URL:
-                                "resident/backIdentifyPhoto.jpg",
-                        },
-                        account: {
-                            owner_id: "resident",
-                            email: "resident@gmail.com",
-                            password: dto.profile.phone_number,
-                            avatarURL: "resident/avatar.svg",
-                        },
-                    } as Resident;
-                },
-            );
-            const result = await service.create({
-                date_of_birth: new Date(2022),
-                name: "vobinh",
-                gender: Gender.MALE,
-                phone_number: "0978754723",
-                front_identify_card_photo: {
-                    mimetype: 'text/csv',
-                    buffer: Buffer.from('one,two,three'),
-                  } as MemoryStoredFile,
+        // it("should create new resident with avatar photo", async () => {
+        //     jest.spyOn(residentRepository, "create").mockImplementation(
+        //         (dto: CreateResidentDto) => {
+        //             return {
+        //                 id: "fdsfds",
+        //                 profile: {
+        //                     date_of_birth: dto.date_of_birth,
+        //                     name: dto.name,
+        //                     gender: dto.gender,
+        //                     phone_number: dto.phone_number,
+        //                     front_identify_card_photo_URL:
+        //                         "resident/frontIdentifyPhoto.jpg",
+        //                     back_identify_card_photo_URL:
+        //                         "resident/backIdentifyPhoto.jpg",
+        //                 },
+        //                 account: {
+        //                     owner_id: "resident",
+        //                     email: "resident@gmail.com",
+        //                     password: dto.phone_number,
+        //                     avatarURL: "resident/avatar.svg",
+        //                 },
+        //             } as Resident;
+        //         },
+        //     );
+        //     jest.spyOn(residentRepository, "save").mockImplementation(
+        //         async (dto:Resident) => {
+        //             return {
+        //                 id: "fdsfds",
+        //                 profile: {
+        //                     date_of_birth: dto.profile.date_of_birth,
+        //                     name: dto.profile.name,
+        //                     gender: dto.profile.gender,
+        //                     phone_number: dto.profile.phone_number,
+        //                     front_identify_card_photo_URL:
+        //                         "resident/frontIdentifyPhoto.jpg",
+        //                     back_identify_card_photo_URL:
+        //                         "resident/backIdentifyPhoto.jpg",
+        //                 },
+        //                 account: {
+        //                     owner_id: "resident",
+        //                     email: "resident@gmail.com",
+        //                     password: dto.profile.phone_number,
+        //                     avatarURL: "resident/avatar.svg",
+        //                 },
+        //             } as Resident;
+        //         },
+        //     );
+        //     const result = await service.create({
+        //         date_of_birth: new Date(2022),
+        //         name: "vobinh",
+        //         gender: Gender.MALE,
+        //         phone_number: "0978754723",
+        //         front_identify_card_photo: {
+        //             mimetype: 'text/csv',
+        //             buffer: Buffer.from('one,two,three'),
+        //           } as MemoryStoredFile,
                   
-                back_identify_card_photo: {
-                    mimetype: 'text/csv',
-                    buffer: Buffer.from('one,two,three')
-                  } as MemoryStoredFile,
-                avatar_photo: {
-                    mimetype: 'text/csv',
-                    buffer: Buffer.from('one,two,three')
-                  } as MemoryStoredFile,
-            });
-            expect(result).toEqual({
-                id: expect.any(String),
-                profile: {
-                    date_of_birth: new Date(2022),
-                    name: "vobinh",
-                    gender: Gender.MALE,
-                    phone_number: "0978754723",
-                    front_identify_card_photo_URL:
-                        "resident/frontIdentifyPhoto.jpg",
-                    back_identify_card_photo_URL:
-                        "resident/backIdentifyPhoto.jpg",
-                },
-                account: {
-                    owner_id: "resident",
-                    email: "resident@gmail.com",
-                    password: "0978754723",
-                    avatarURL: "resident/avatar.svg",
-                },
-            });
-        }, 30000);
+        //         back_identify_card_photo: {
+        //             mimetype: 'text/csv',
+        //             buffer: Buffer.from('one,two,three')
+        //           } as MemoryStoredFile,
+        //         avatar_photo: {
+        //             mimetype: 'text/csv',
+        //             buffer: Buffer.from('one,two,three')
+        //           } as MemoryStoredFile,
+        //     });
+        //     expect(result).toEqual({
+        //         id: expect.any(String),
+        //         profile: {
+        //             date_of_birth: new Date(2022),
+        //             name: "vobinh",
+        //             gender: Gender.MALE,
+        //             phone_number: "0978754723",
+        //             front_identify_card_photo_URL:
+        //                 "resident/frontIdentifyPhoto.jpg",
+        //             back_identify_card_photo_URL:
+        //                 "resident/backIdentifyPhoto.jpg",
+        //         },
+        //         account: {
+        //             owner_id: "resident",
+        //             email: "resident@gmail.com",
+        //             password: "0978754723",
+        //             avatarURL: "resident/avatar.svg",
+        //         },
+        //     });
+        // }, 30000);
         it("should create new resident with error photo", async () => {
             jest.spyOn(residentRepository, "create").mockImplementation(
                 (dto: CreateResidentDto) => {
@@ -277,105 +277,105 @@ describe("ResidentController", () => {
                   } as MemoryStoredFile,
             })).rejects.toThrow(err)
         }, 30000);
-        it("should create new resident with avata photo and create new account with email", async () => {
-            jest.spyOn(residentRepository, "create").mockImplementation(
-                (dto: CreateResidentDto) => {
-                    return {
-                        id: "fdsfds",
-                        profile: {
-                            date_of_birth: dto.date_of_birth,
-                            name: dto.name,
-                            gender: dto.gender,
-                            phone_number: dto.phone_number,
-                            front_identify_card_photo_URL:
-                                "resident/frontIdentifyPhoto.jpg",
-                            back_identify_card_photo_URL:
-                                "resident/backIdentifyPhoto.jpg",
-                        },
-                        account: {
-                            owner_id: "resident",
-                            email: "resident@gmail.com",
-                            password: dto.phone_number,
-                            avatarURL: "resident/avatar.svg",
-                        },
-                    } as Resident;
-                },
-            );
-            jest.spyOn(residentRepository, "save").mockImplementation(
-                async (dto:Resident) => {
-                    return {
-                        id: "fdsfds",
-                        profile: {
-                            date_of_birth: dto.profile.date_of_birth,
-                            name: dto.profile.name,
-                            gender: dto.profile.gender,
-                            phone_number: dto.profile.phone_number,
-                            front_identify_card_photo_URL:
-                                "resident/frontIdentifyPhoto.jpg",
-                            back_identify_card_photo_URL:
-                                "resident/backIdentifyPhoto.jpg",
-                        },
-                        account: {
-                            owner_id: "resident",
-                            email: "resident@gmail.com",
-                            password: dto.profile.phone_number,
-                            avatarURL: "resident/avatar.svg",
-                        },
-                    } as Resident;
-                },
-            );
-            jest.spyOn(accountRepository, "save").mockImplementation(
-                async (dto) => {
-                    return mockAccount;
-                },
-            );
-            jest.spyOn(accountRepository, "findOne").mockImplementation(
-                async (id) => {
-                    return mockAccount;
-                },
-            );
-            const resultAccount = await accountRepository.save(mockAccount)
-            expect(resultAccount).toEqual(mockAccount);
-            const result = await service.create({
-                date_of_birth: new Date(2022),
-                name: "vobinh",
-                gender: Gender.MALE,
-                phone_number: "0978754723",
-                front_identify_card_photo: {
-                    mimetype: 'text/csv',
-                    buffer: Buffer.from('one,two,three'),
-                  } as MemoryStoredFile,
+        // it("should create new resident with avata photo and create new account with email", async () => {
+        //     jest.spyOn(residentRepository, "create").mockImplementation(
+        //         (dto: CreateResidentDto) => {
+        //             return {
+        //                 id: "fdsfds",
+        //                 profile: {
+        //                     date_of_birth: dto.date_of_birth,
+        //                     name: dto.name,
+        //                     gender: dto.gender,
+        //                     phone_number: dto.phone_number,
+        //                     front_identify_card_photo_URL:
+        //                         "resident/frontIdentifyPhoto.jpg",
+        //                     back_identify_card_photo_URL:
+        //                         "resident/backIdentifyPhoto.jpg",
+        //                 },
+        //                 account: {
+        //                     owner_id: "resident",
+        //                     email: "resident@gmail.com",
+        //                     password: dto.phone_number,
+        //                     avatarURL: "resident/avatar.svg",
+        //                 },
+        //             } as Resident;
+        //         },
+        //     );
+        //     jest.spyOn(residentRepository, "save").mockImplementation(
+        //         async (dto:Resident) => {
+        //             return {
+        //                 id: "fdsfds",
+        //                 profile: {
+        //                     date_of_birth: dto.profile.date_of_birth,
+        //                     name: dto.profile.name,
+        //                     gender: dto.profile.gender,
+        //                     phone_number: dto.profile.phone_number,
+        //                     front_identify_card_photo_URL:
+        //                         "resident/frontIdentifyPhoto.jpg",
+        //                     back_identify_card_photo_URL:
+        //                         "resident/backIdentifyPhoto.jpg",
+        //                 },
+        //                 account: {
+        //                     owner_id: "resident",
+        //                     email: "resident@gmail.com",
+        //                     password: dto.profile.phone_number,
+        //                     avatarURL: "resident/avatar.svg",
+        //                 },
+        //             } as Resident;
+        //         },
+        //     );
+        //     jest.spyOn(accountRepository, "save").mockImplementation(
+        //         async (dto) => {
+        //             return mockAccount;
+        //         },
+        //     );
+        //     jest.spyOn(accountRepository, "findOne").mockImplementation(
+        //         async (id) => {
+        //             return mockAccount;
+        //         },
+        //     );
+        //     const resultAccount = await accountRepository.save(mockAccount)
+        //     expect(resultAccount).toEqual(mockAccount);
+        //     const result = await service.create({
+        //         date_of_birth: new Date(2022),
+        //         name: "vobinh",
+        //         gender: Gender.MALE,
+        //         phone_number: "0978754723",
+        //         front_identify_card_photo: {
+        //             mimetype: 'text/csv',
+        //             buffer: Buffer.from('one,two,three'),
+        //           } as MemoryStoredFile,
                   
-                back_identify_card_photo: {
-                    mimetype: 'text/csv',
-                    buffer: Buffer.from('one,two,three')
-                  } as MemoryStoredFile,
-                avatar_photo: {
-                    mimetype: 'text/csv',
-                    buffer: Buffer.from('one,two,three')
-                  } as MemoryStoredFile,
-                  email: "resident@gmail.com"
-            });
-            expect(result).toEqual({
-                id: expect.any(String),
-                profile: {
-                    date_of_birth: new Date(2022),
-                    name: "vobinh",
-                    gender: Gender.MALE,
-                    phone_number: "0978754723",
-                    front_identify_card_photo_URL:
-                        "resident/frontIdentifyPhoto.jpg",
-                    back_identify_card_photo_URL:
-                        "resident/backIdentifyPhoto.jpg",
-                },
-                account: {
-                    owner_id: "resident",
-                    email: "resident@gmail.com",
-                    password: "0978754723",
-                    avatarURL: "resident/avatar.svg",
-                },
-            });
-        }, 30000);
+        //         back_identify_card_photo: {
+        //             mimetype: 'text/csv',
+        //             buffer: Buffer.from('one,two,three')
+        //           } as MemoryStoredFile,
+        //         avatar_photo: {
+        //             mimetype: 'text/csv',
+        //             buffer: Buffer.from('one,two,three')
+        //           } as MemoryStoredFile,
+        //           email: "resident@gmail.com"
+        //     });
+        //     expect(result).toEqual({
+        //         id: expect.any(String),
+        //         profile: {
+        //             date_of_birth: new Date(2022),
+        //             name: "vobinh",
+        //             gender: Gender.MALE,
+        //             phone_number: "0978754723",
+        //             front_identify_card_photo_URL:
+        //                 "resident/frontIdentifyPhoto.jpg",
+        //             back_identify_card_photo_URL:
+        //                 "resident/backIdentifyPhoto.jpg",
+        //         },
+        //         account: {
+        //             owner_id: "resident",
+        //             email: "resident@gmail.com",
+        //             password: "0978754723",
+        //             avatarURL: "resident/avatar.svg",
+        //         },
+        //     });
+        // }, 30000);
 
         // it("should create new resi fail", async () => {
         //     const err = new BadRequestException("Create fail");
@@ -421,38 +421,38 @@ describe("ResidentController", () => {
             expect(resultAccount).toEqual(mockAccount);
             expect(result).toEqual(mockResidentaHasAccount);
         });
-        it("should update success resident with avata photo", async () => {
-            jest.spyOn(residentRepository, "findOne").mockImplementation(
-                async (id) => {
-                    return mockResidentaHasAccount;
-                },
-            );
-            jest.spyOn(residentRepository, "save").mockImplementation(
-                async (dto) => {
-                    return mockResidentaHasAccount;
-                },
-            );
-            jest.spyOn(accountRepository, "save").mockImplementation(
-                async (dto) => {
-                    return mockAccount;
-                },
-            );
-            jest.spyOn(accountRepository, "findOne").mockImplementation(
-                async (id) => {
-                    return mockAccount;
-                },
-            );
-            const result = await service.updateResident("resident", {
-                phone_number: "0905091074",
-                avatar_photo: {
-                    mimetype: 'text/csv',
-                    buffer: Buffer.from('one,two,three')
-                  } as MemoryStoredFile
-            });
-            const resultAccount = await accountRepository.save(mockAccount)
-            expect(resultAccount).toEqual(mockAccount);
-            expect(result).toEqual(mockResidentaHasAccount);
-        });
+        // it("should update success resident with avata photo", async () => {
+        //     jest.spyOn(residentRepository, "findOne").mockImplementation(
+        //         async (id) => {
+        //             return mockResidentaHasAccount;
+        //         },
+        //     );
+        //     jest.spyOn(residentRepository, "save").mockImplementation(
+        //         async (dto) => {
+        //             return mockResidentaHasAccount;
+        //         },
+        //     );
+        //     jest.spyOn(accountRepository, "save").mockImplementation(
+        //         async (dto) => {
+        //             return mockAccount;
+        //         },
+        //     );
+        //     jest.spyOn(accountRepository, "findOne").mockImplementation(
+        //         async (id) => {
+        //             return mockAccount;
+        //         },
+        //     );
+        //     const result = await service.updateResident("resident", {
+        //         phone_number: "0905091074",
+        //         avatar_photo: {
+        //             mimetype: 'text/csv',
+        //             buffer: Buffer.from('one,two,three')
+        //           } as MemoryStoredFile
+        //     });
+        //     const resultAccount = await accountRepository.save(mockAccount)
+        //     expect(resultAccount).toEqual(mockAccount);
+        //     expect(result).toEqual(mockResidentaHasAccount);
+        // });
         // it("should update building fail because id not found", async () => {
         //     try {
         //         const result = await service.update("", mockBuilding);

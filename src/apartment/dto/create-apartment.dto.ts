@@ -42,9 +42,5 @@ export class CreateApartmentDto extends PickType(Apartment, [
     })
     @IsOptional()
     @IsString({ each: true })
-    @Transform(({ value }) => {
-        if (value && !Array.isArray(value)) return [value];
-        return value;
-    })
     residentIds?: string[];
 }

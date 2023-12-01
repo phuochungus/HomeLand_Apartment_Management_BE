@@ -12,7 +12,7 @@ import { Admin } from "./admin/entities/admin.entity";
 import { Technician } from "./technician/entities/technician.entity";
 import { Manager } from "./manager/entities/manager.entity";
 import { Resident } from "./resident/entities/resident.entity";
-import { Employee } from "./employee/entities/employee.entity";
+// import { Employee } from "./employee/entities/employee.entity";
 import path from "path";
 
 async function bootstrap() {
@@ -40,7 +40,7 @@ async function bootstrap() {
 
     const option: SwaggerDocumentOptions = {
         deepScanRoutes: true,
-        extraModels: [Admin, Technician, Manager, Resident, Employee],
+        extraModels: [Admin, Technician, Manager, Resident],
     };
     const document = SwaggerModule.createDocument(app, config, option);
 

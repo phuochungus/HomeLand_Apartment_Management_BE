@@ -39,9 +39,6 @@ export class UpdateApartmentDto extends PartialType(
         },
     })
     @IsOptional()
-    @Transform(({ value }) =>
-        isArray(value) ? value : value ? [value] : undefined,
-    )
     @Validate(IsURLOrImageFile, { each: true })
     images?: (string | MemoryStoredFile)[];
 }

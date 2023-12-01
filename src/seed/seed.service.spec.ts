@@ -17,7 +17,6 @@ import { ApartmentModule } from "../apartment/apartment.module";
 import { ResidentModule } from "../resident/resident.module";
 import { HashModule } from "../hash/hash.module";
 import { AvatarGeneratorModule } from "../avatar-generator/avatar-generator.module";
-import { EmployeeModule } from "../employee/employee.module";
 import { StorageModule } from "../storage/storage.module";
 import { IdGeneratorModule } from "../id-generator/id-generator.module";
 import { AuthModule } from "../auth/auth.module";
@@ -84,7 +83,6 @@ describe("SeedService", () => {
                 IdGeneratorModule,
                 HashModule,
                 AvatarGeneratorModule,
-                EmployeeModule,
                 AuthModule,
                 StorageModule,
                 JwtModule,
