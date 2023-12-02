@@ -20,6 +20,7 @@
         "test:e2e": "jest --config ./test/jest-e2e.json"
     },
     "dependencies": {
+        "@babel/core": "^7.23.5",
         "@dicebear/collection": "^7.0.1",
         "@dicebear/core": "^7.0.1",
         "@nestjs/axios": "^3.0.1",
@@ -30,7 +31,7 @@
         "@nestjs/mapped-types": "*",
         "@nestjs/platform-express": "^10.0.0",
         "@nestjs/swagger": "^7.1.13",
-        "@nestjs/typeorm": "^10.0.0",
+        "@nestjs/typeorm": "^10.0.1",
         "@supabase/supabase-js": "^2.38.0",
         "@types/bcrypt": "^5.0.0",
         "@types/lodash": "^4.14.200",
@@ -42,7 +43,7 @@
         "elasticsearch": "^10.1.2",
         "form-data": "^4.0.0",
         "moment": "^2.29.4",
-        "nestjs-form-data": "^1.9.1",
+        "nestjs-form-data": "^1.9.4",
         "passport": "^0.6.0",
         "passport-local": "^1.0.0",
         "pg": "^8.11.3",
