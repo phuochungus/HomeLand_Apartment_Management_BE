@@ -12,6 +12,7 @@ import {
 } from "typeorm";
 import { PersonRole, Profile } from "../../helper/class/profile.entity";
 import { Account } from "../../account/entities/account.entity";
+import { Task } from 'src/task/entities/task.entity';
 
 @Entity()
 export class Manager {
@@ -24,6 +25,10 @@ export class Manager {
     @OneToOne(() => Account, { nullable: true, cascade: true })
     @JoinColumn()
     account?: Account;
+
+    @OneToMany(() => Task, (task) => task.assigner)
+    @JoinColumn()
+    tasks?: Task[];
 
     @ManyToOne(() => Building, (building) => building.managers)
     @JoinColumn()

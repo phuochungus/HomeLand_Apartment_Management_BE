@@ -58,7 +58,7 @@ export class TypeORMFloorService extends FloorService {
         id?: string,
     ): Promise<Floor> {
         let floor = this.floorRepository.create(CreateFloorDto);
-        floor.floor_id = "FLR" + this.idGenerate.generateId();
+        floor.floor_id = CreateFloorDto.building_id + "/FLR" + this.idGenerate.generateId();
         if (id) floor.floor_id = id;
 
         try {
@@ -102,7 +102,7 @@ export class TypeORMFloorService extends FloorService {
         });
         if (!floor) throw new NotFoundException();
         const queryRunner = this.dataSource.createQueryRunner();
-
+       
         try {
             await queryRunner.connect();
             await queryRunner.startTransaction();
@@ -128,7 +128,7 @@ export class TypeORMFloorService extends FloorService {
     }
     async hardDelete?(id: any): Promise<boolean> {
         try {
-            const result = await this.floorRepository.delete({ floor_id: id });
+            const result = await this.floorRepository.delete({ floor_id : id });
             return isQueryAffected(result);
         } catch (error) {
             console.error(error);
@@ -191,12 +191,11 @@ export class TypeORMFloorService extends FloorService {
               floor_id,
             },
             relations: ["apartments"],
-          });
-          return newBuilding;
-        } catch (err) {
-          console.error(err);
-          throw err;
-        }
+        });
+        return newBuilding;
+    } catch (err) {
+        console.error(err);
+        throw err;
       }
-  
+    }
 }
