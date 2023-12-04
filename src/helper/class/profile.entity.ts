@@ -30,6 +30,10 @@ export class Profile {
     @Column()
     date_of_birth: Date;
 
+    @IsString()
+    @Column()
+    identify_number:string;
+
     @ApiProperty({
         default: Gender.MALE,
         type: "enum",
@@ -54,4 +58,8 @@ export class Profile {
     @IsPhoneNumber("VN")
     @Column({ unique: true })
     phone_number: string;
+    
+    @IsString()
+    @Column()
+    avatarURL: string;
 }

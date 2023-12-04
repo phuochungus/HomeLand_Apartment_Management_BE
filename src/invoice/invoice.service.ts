@@ -61,7 +61,7 @@ export class InvoiceService {
         var orderInfo = createInvoiceDto.orderInfo;
         var partnerCode = "MOMO";
         var invoiceId = "Inv" + this.idGenerate.generateId().toString();
-        var redirectUrl = createInvoiceDto.redirectUrl+"/" + invoiceId;
+        var redirectUrl = createInvoiceDto.redirectUrl + "/" + invoiceId;
         var ipnUrl =
             createInvoiceDto.baseLink +
             "/invoice/create/" +

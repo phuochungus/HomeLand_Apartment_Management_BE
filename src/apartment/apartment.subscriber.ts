@@ -35,7 +35,6 @@ export class ApartmentSubcriber
     }
 
     async afterInsert(event: InsertEvent<Apartment>) {
-        console.log(event.entity);
         let apartment = await event.manager.findOne(Apartment, {
             where: { apartment_id: event.entity.apartment_id },
         });

@@ -136,7 +136,6 @@ export class TypeORMBuildingService extends BuildingService {
                 },
                 relations: ["managers"],
             });
-            console.log(result);
             return result;
         } catch (e) {
             throw new Error(e);

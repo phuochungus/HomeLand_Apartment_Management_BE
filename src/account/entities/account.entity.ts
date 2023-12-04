@@ -53,11 +53,6 @@ export class Account {
     @Exclude({ toPlainOnly: true })
     @Column()
     password: string;
-
-    @IsString()
-    @Column()
-    avatarURL: string;
-
     @CreateDateColumn()
     created_at: Date;
 

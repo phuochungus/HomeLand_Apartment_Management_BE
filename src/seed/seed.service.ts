@@ -16,22 +16,21 @@ import { ApartmentService } from "../apartment/apartment.service";
 import { Resident } from "../resident/entities/resident.entity";
 import { Manager } from "../manager/entities/manager.entity";
 import { Technician } from "../technician/entities/technician.entity";
-import {
-    ResidentRepository,
-    ResidentService,
-} from "../resident/resident.service";
+import { ResidentRepository } from "../resident/resident.service";
 import { Contract } from "src/contract/entities/contract.entity";
 
-import { Employee } from "src/employee/entities/employee.entity";
-import {
-    EmployeeRepository,
-    EmployeeService,
-} from "src/employee/employee.service";
-import { random } from "lodash";
 import { ContractRole, ContractStatusRole } from "../helper/enums/contractEnum";
 import { Service } from "../service/entities/service.entity";
 import { ServicePackage } from "../service-package/entities/service-package.entity";
 import { Client } from "elasticsearch";
+import { BuildingService } from "../building/building.service";
+import { FloorService } from "../floor/floor.service";
+import { Apartment } from "../apartment/entities/apartment.entity";
+import {
+    Equipment,
+    EquipmentStatus,
+} from "../equipment/entities/equipment.entity";
+import { EquipmentService } from "../equipment/equipment.service";
 @Injectable()
 export class SeedService {
     constructor(
@@ -41,10 +40,13 @@ export class SeedService {
         private readonly idGenerator: IdGenerator,
         private readonly hashService: HashService,
         private readonly avatarGenerator: AvatarGenerator,
-        private readonly apartmentService: ApartmentService,
         private readonly elasticsearchClient: Client,
         private readonly residentService: ResidentRepository,
-    ) {}
+        private readonly buildingService: BuildingService,
+        private readonly apartmentService: ApartmentService,
+        private readonly floorService: FloorService,
+        private readonly equipmentService: EquipmentService,
+    ) { }
 
     async dropDB() {
         try {
@@ -74,7 +76,7 @@ export class SeedService {
     private readonly NUMBER_OF_BUILDING = 5;
     private readonly NUMBER_OF_FLOOR_PER_BUILDING = 5;
     private readonly NUMBER_OF_APARTMENT_PER_FLOOR = 6;
-    private readonly NUMBER_OF_RESIDENT = 50;
+    private readonly NUMBER_OF_RESIDENT = 5;
     private readonly NUMBER_OF_EMPLOYEE = 10;
     private readonly NUMBER_OF_MANAGER = 10;
     private readonly NUMBER_OF_TECHNICIAN = 10;
@@ -108,87 +110,160 @@ export class SeedService {
         } as MemoryStoredFile,
     ];
 
+    private buildings: Building[] = [];
+    private floors: Floor[] = [];
+    private apartments: Apartment[] = [];
+    private equipments: Equipment[] = [];
+
     async startSeeding() {
         await this.createDemoAdmin();
-        await this.createDemoResident();
         await this.createDemoManager();
         await this.createDemoTechnician();
         await this.createDemoAccountResident();
+        await this.createDemoResidents();
 
-        // Create demo building
-        let buildingInfo: any[] = await this.createDemoBuildings();
-        let floorInfo: any[] = await this.createDemoFloors(buildingInfo);
-        await this.createDemoApartments(floorInfo);
+        this.buildings = await this.createDemoBuildings();
+        this.floors = await this.createDemoFloors(this.buildings);
+        this.apartments = await this.createDemoApartments(this.floors);
+        this.equipments = await this.createDemoEquipments(
+            this.buildings,
+            this.floors,
+            this.apartments,
+        );
+
         await this.createDemoContract();
         await this.createDemoServices();
         await this.createDemoServicePackages();
     }
-    async createDemoBuildings() {
-        let buildingInfo: any[] = [];
+
+    async createDemoEquipments(
+        buildings: Building[],
+        floors: Floor[],
+        apartments: Apartment[],
+    ): Promise<Equipment[]> {
+        let equipments: Equipment[] = [];
+
+        let thangmayImage = {
+            buffer: readFileSync(process.cwd() + "/src/seed/thangmay.jpg"),
+        } as MemoryStoredFile;
+        for (let building of buildings) {
+            for (let i = 0; i < 3; i++)
+                equipments.push(
+                    await this.equipmentService.create({
+                        name: "Thang may",
+                        images: [thangmayImage],
+                        description: "Thang may",
+                        building_id: building.building_id,
+                        status: EquipmentStatus.AVAILABLE,
+                    }),
+                );
+        }
+
+        let cambienkhoiImage = {
+            buffer: readFileSync(process.cwd() + "/src/seed/cambienkhoi.jpg"),
+        } as MemoryStoredFile;
+        for (let floor of floors) {
+            for (let i = 0; i < 5; i++)
+                equipments.push(
+                    await this.equipmentService.create({
+                        name: "Cam bien khoi",
+                        images: [cambienkhoiImage],
+                        description: "Cam bien khoi",
+                        floor_id: floor.floor_id,
+                        status: EquipmentStatus.AVAILABLE,
+                    }),
+                );
+        }
+
+        let tulanhImage = {
+            buffer: readFileSync(process.cwd() + "/src/seed/tulanh.jpg"),
+        } as MemoryStoredFile;
+        for (let apartment of apartments) {
+            equipments.push(
+                await this.equipmentService.create({
+                    name: "Tu lanh",
+                    images: [tulanhImage],
+                    description: "Tu lanh",
+                    apartment_id: apartment.apartment_id,
+                    status: EquipmentStatus.AVAILABLE,
+                }),
+            );
+        }
+
+        let maylanhImage = {
+            buffer: readFileSync(process.cwd() + "/src/seed/maylanh.jpg"),
+        } as MemoryStoredFile;
+        for (let apartment of apartments) {
+            equipments.push(
+                await this.equipmentService.create({
+                    name: "May lanh",
+                    images: [maylanhImage],
+                    description: "May lanh",
+                    apartment_id: apartment.apartment_id,
+                    status: EquipmentStatus.AVAILABLE,
+                }),
+            );
+        }
+
+        return equipments;
+    }
+    async createDemoBuildings(): Promise<Building[]> {
+        let buildings: Building[] = [];
         for (let i = 0; i < this.NUMBER_OF_BUILDING; i++) {
-            buildingInfo.push({
-                building_id: `BLD${i}`,
-                name: `Building ${i}`,
-                address: faker.location.streetAddress(),
-            });
+            buildings.push(
+                await this.buildingService.create({
+                    name: `Building ${i}`,
+                    address: faker.location.streetAddress(),
+                    max_floor: this.NUMBER_OF_FLOOR_PER_BUILDING,
+                }),
+            );
         }
-        await this.dataSource
-            .createQueryBuilder()
-            .insert()
-            .into(Building)
-            .values(buildingInfo)
-            .execute();
-        return buildingInfo;
+
+        return buildings;
     }
-    async createDemoFloors(buildingInfo: any[]) {
-        let floorInfo: any[] = [];
-        for (let building of buildingInfo) {
+
+    async createDemoFloors(buildings: Building[]): Promise<Floor[]> {
+        let floors: Floor[] = [];
+        for (let building of buildings) {
             for (let i = 0; i < this.NUMBER_OF_FLOOR_PER_BUILDING; i++) {
-                floorInfo.push({
-                    floor_id: `${building.building_id}/FLR${i}`,
-                    name: `Floor ${i}`,
-                    building_id: building.building_id,
-                });
-            }
-        }
-        await this.dataSource
-            .createQueryBuilder()
-            .insert()
-            .into(Floor)
-            .values(floorInfo)
-            .execute();
-        return floorInfo;
-    }
-    async createDemoApartments(floorInfo: any[]) {
-        let apartmentIds: any[] = [];
-        for (let floor of floorInfo) {
-            for (let i = 0; i < this.NUMBER_OF_APARTMENT_PER_FLOOR; i++) {
-                apartmentIds.push(
-                    (
-                        await this.apartmentService.create({
-                            name: "St. Crytal",
-                            images: this.images,
-                            length: 20,
-                            building_id: floor.building_id,
-                            floor_id: floor.floor_id,
-                            width: 15,
-                            description: faker.lorem.paragraphs({
-                                min: 3,
-                                max: 5,
-                            }),
-                            number_of_bathroom: 2,
-                            number_of_bedroom: 1,
-                            rent: 9000000,
-                        })
-                    ).apartment_id,
+                
+                floors.push(
+                    await this.floorService.create({
+                        name: `Floor ${i}`,
+                        building_id: building.building_id,
+                        max_apartment: this.NUMBER_OF_APARTMENT_PER_FLOOR,
+                    }),
                 );
             }
         }
 
-        //create demo resident
-        for (let i = 0; i < this.NUMBER_OF_RESIDENT; i++) {
-            await this.createDemoResident();
+        return floors;
+    }
+    async createDemoApartments(floors: Floor[]): Promise<Apartment[]> {
+        let apartments: Apartment[] = [];
+        for (let floor of floors) {
+            for (let i = 0; i < this.NUMBER_OF_APARTMENT_PER_FLOOR; i++) {
+                apartments.push(
+                    await this.apartmentService.create({
+                        name: "St. Crytal",
+                        images: this.images,
+                        length: 20,
+                        building_id: floor.building_id,
+                        floor_id: floor.floor_id,
+                        width: 15,
+                        description: faker.lorem.paragraphs({
+                            min: 3,
+                            max: 5,
+                        }),
+                        number_of_bathroom: 2,
+                        number_of_bedroom: 1,
+                        rent: 9000000,
+                    }),
+                );
+            }
         }
+
+        return apartments;
     }
     async createDemoAccountResident() {
         let id = "RESIDENT";
@@ -209,16 +284,17 @@ export class SeedService {
                     "resident/" + id + "/backIdentifyPhoto.jpg",
                     "image/jpeg",
                 ),
-            },
-            account: {
-                owner_id: id,
-                email: "resident@gmail.com",
-                password: this.hashService.hash("password"),
+                identify_number: faker.string.numeric(12),
                 avatarURL: await this.storageManager.upload(
                     await this.avatarGenerator.generateAvatar("DEMO RESIDENT"),
                     "resident/" + id + "/avatar.svg",
                     "image/svg+xml",
                 ),
+            },
+            account: {
+                owner_id: id,
+                email: "resident@gmail.com",
+                password: this.hashService.hash("password"),
             },
         });
     }
@@ -237,27 +313,28 @@ export class SeedService {
                     front_identify_card_photo_URL:
                         await this.storageManager.upload(
                             this.frontIdentity.buffer,
-                            "admin/" + id + "/frontIdentifyPhoto.jpg",
+                            "technician/" + id + "/frontIdentifyPhoto.jpg",
                             "image/jpeg",
                         ),
                     back_identify_card_photo_URL:
                         await this.storageManager.upload(
                             this.backIdentity.buffer,
-                            "admin/" + id + "/backIdentifyPhoto.jpg",
+                            "technician/" + id + "/backIdentifyPhoto.jpg",
                             "image/jpeg",
                         ),
+                    identify_number: faker.string.numeric(12),
+                    avatarURL: await this.storageManager.upload(
+                        await this.avatarGenerator.generateAvatar(
+                            "DEMO TECHNICIAN",
+                        ),
+                        "technician/" + id + "/avatar.svg",
+                        "image/svg+xml",
+                    ),
                 },
                 account: {
                     owner_id: id,
                     email: "technician@gmail.com",
                     password: this.hashService.hash("password"),
-                    avatarURL: await this.storageManager.upload(
-                        await this.avatarGenerator.generateAvatar(
-                            "DEMO TECHNICIAN",
-                        ),
-                        "admin/" + id + "/avatar.svg",
-                        "image/svg+xml",
-                    ),
                 },
             });
     }
@@ -273,33 +350,31 @@ export class SeedService {
                 phone_number: "0677778787",
                 front_identify_card_photo_URL: await this.storageManager.upload(
                     this.frontIdentity.buffer,
-                    "admin/" + id + "/frontIdentifyPhoto.jpg",
+                    "manager/" + id + "/frontIdentifyPhoto.jpg",
                     "image/jpeg",
                 ),
                 back_identify_card_photo_URL: await this.storageManager.upload(
                     this.backIdentity.buffer,
-                    "admin/" + id + "/backIdentifyPhoto.jpg",
+                    "manager/" + id + "/backIdentifyPhoto.jpg",
                     "image/jpeg",
+                ),
+                identify_number: faker.string.numeric(12),
+                avatarURL: await this.storageManager.upload(
+                    await this.avatarGenerator.generateAvatar("DEMO MANAGER"),
+                    "manager/" + id + "/avatar.svg",
+                    "image/svg+xml",
                 ),
             },
             account: {
                 owner_id: id,
                 email: "manager@gmail.com",
                 password: this.hashService.hash("password"),
-                avatarURL: await this.storageManager.upload(
-                    await this.avatarGenerator.generateAvatar("DEMO MANAGER"),
-                    "admin/" + id + "/avatar.svg",
-                    "image/svg+xml",
-                ),
             },
         });
     }
 
-    async createDemoResident(residentId?: string, email?: string) {
+    async createDemoResident(index) {
         let id = "RES" + this.idGenerator.generateId();
-        const random = Math.random() * 2;
-        if (residentId) id = residentId;
-
         const resident = await this.dataSource.getRepository(Resident).save({
             id: id,
             profile: {
@@ -317,20 +392,19 @@ export class SeedService {
                     "resident/" + id + "/backIdentifyPhoto.jpg",
                     "image/jpeg",
                 ),
+                identify_number: faker.string.numeric(12),
+                avatarURL: await this.storageManager.upload(
+                    await this.avatarGenerator.generateAvatar("DEMO RESIDENT"),
+                    "resident/" + id + "/avatar.svg",
+                    "image/svg+xml",
+                ),
             },
             account:
-                random === 0
+                index % 2 === 0
                     ? {
                           owner_id: id,
                           email: faker.internet.email(),
                           password: this.hashService.hash("password"),
-                          avatarURL: await this.storageManager.upload(
-                              await this.avatarGenerator.generateAvatar(
-                                  "DEMO RESIDENT",
-                              ),
-                              "resident/" + id + "/avatar.svg",
-                              "image/svg+xml",
-                          ),
                       }
                     : undefined,
         });
@@ -347,17 +421,17 @@ export class SeedService {
                 phone_number: faker.phone.number(),
                 front_identify_card_photo_URL: await this.storageManager.upload(
                     this.frontIdentity.buffer,
-                    "resident/" + id + "/frontIdentifyPhoto.jpg",
+                    "employee/" + id + "/frontIdentifyPhoto.jpg",
                     "image/jpeg",
                 ),
                 back_identify_card_photo_URL: await this.storageManager.upload(
                     this.backIdentity.buffer,
-                    "resident/" + id + "/backIdentifyPhoto.jpg",
+                    "employee/" + id + "/backIdentifyPhoto.jpg",
                     "image/jpeg",
                 ),
                 avatarURL: await this.storageManager.upload(
                     await this.avatarGenerator.generateAvatar("DEMO EMPOLYEE"),
-                    "admin/" + id + "/avatar.svg",
+                    "employee/" + id + "/avatar.svg",
                     "image/svg+xml",
                 ),
             },
@@ -383,16 +457,17 @@ export class SeedService {
                     "admin/" + id + "/backIdentifyPhoto.jpg",
                     "image/jpeg",
                 ),
-            },
-            account: {
-                owner_id: id,
-                email: "admin@gmail.com",
-                password: this.hashService.hash("password"),
+                identify_number: faker.string.numeric(12),
                 avatarURL: await this.storageManager.upload(
                     await this.avatarGenerator.generateAvatar("DEMO ADMIN"),
                     "admin/" + id + "/avatar.svg",
                     "image/svg+xml",
                 ),
+            },
+            account: {
+                owner_id: id,
+                email: "admin@gmail.com",
+                password: this.hashService.hash("password"),
             },
         });
     }
@@ -404,8 +479,8 @@ export class SeedService {
                 name: "St. Crytal",
                 images: this.images,
                 length: 20,
-                building_id: "BLD0",
-                floor_id: "BLD0/FLR0",
+                building_id: this.floors[0].building_id,
+                floor_id: this.floors[0].floor_id,
                 width: 15,
                 description: faker.lorem.paragraphs({
                     min: 3,
@@ -418,13 +493,14 @@ export class SeedService {
             apartmentId,
         );
     }
+
     async createDemoContract() {
-        await this.createDemoResident("RES123");
+        // await this.createDemoResident(2);
         await this.createDemoApartment("APM1698502960091");
         let contractId = "Contract" + this.idGenerator.generateId();
         await this.dataSource.getRepository(Contract).save({
             contract_id: contractId,
-            resident_id: "RES123",
+            resident_id: "RESIDENT",    
             apartment_id: "APM1698502960091",
             expire_at: new Date("2030-01-01"),
             role: ContractRole.RENT,
@@ -448,6 +524,7 @@ export class SeedService {
             .values(ServiceInfo)
             .execute();
     }
+
     async createDemoServicePackages() {
         let ServicePackageInfo: any[] = [];
 
@@ -467,5 +544,11 @@ export class SeedService {
             .into(ServicePackage)
             .values(ServicePackageInfo)
             .execute();
+    }
+
+    async createDemoResidents() {
+        for (let i = 0; i < this.NUMBER_OF_RESIDENT; i++) {
+            await this.createDemoResident(i);
+        }
     }
 }

@@ -52,7 +52,8 @@ export class FloorController {
     }
     @Get(":id")
     async findOne(@Param("id") id: string) {
-        const building = await this.floorRepository.findOne(id);
+        const decodedId = decodeURIComponent(id);
+        const building = await this.floorRepository.findOne(decodedId);
         if (building) return building;
         throw new NotFoundException("Floor not found");
     }
@@ -71,13 +72,13 @@ export class FloorController {
         return floor;
     }
     @ApiOperation({ summary: "add apartment to floor" })
-    @Post("/:id/addManagers")
+    @Post("/:id")
     async addApartment(@Param("id") id: string, @Query("apartmentIds") apartmentIds: string[]) {
         return await this.floorRepository.addApartment(apartmentIds, id)
     }
 
-    @ApiOperation({ summary: "delete manager from building" })
-    @Delete("/:id/deleteManager")
+    @ApiOperation({ summary: "delete apartment from floor" })
+    @Post("/:id")
     async deleteApartment(@Param("id") id: string, @Query("apartmentId") apartmentId: string) {
         return await this.floorRepository.deleteApartment(id, apartmentId)
     }

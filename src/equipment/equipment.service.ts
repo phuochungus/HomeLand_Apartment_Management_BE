@@ -79,9 +79,8 @@ export class EquipmentServiceImp extends EquipmentService {
                 images.map((file, index) => {
                     return this.storageManager.upload(
                         file.buffer,
-                        `equipment/${equipment.id}/${
-                            index + Date.now().toString()
-                        }`,
+                        `equipment/${equipment.id}/${index + Date.now()}`,
+                        `image/${file.extension ?? "png"}`,
                     );
                 }),
             );

@@ -58,7 +58,7 @@ export class TypeORMFloorService extends FloorService {
         id?: string,
     ): Promise<Floor> {
         let floor = this.floorRepository.create(CreateFloorDto);
-        floor.floor_id = CreateFloorDto.building_id + "/FLR" + this.idGenerate.generateId();
+        floor.floor_id = "FLR" + this.idGenerate.generateId();
         if (id) floor.floor_id = id;
 
         try {
@@ -77,7 +77,7 @@ export class TypeORMFloorService extends FloorService {
             throw error;
         }
     }
-
+  
     async findAll() {
         return await this.floorRepository.find(
             {
@@ -169,32 +169,33 @@ export class TypeORMFloorService extends FloorService {
                 },
                 relations: ["apartments"],
             });
-            console.log(result);
             return result;
         } catch (e) {
             throw new Error(e);
         }
     }
-    async deleteApartment(
-        floor_id: string,
-        apartment_id: string,
-    ): Promise<Floor | null> {
-        const floor = await this.floorRepository.findOne({
+    async deleteApartment(floor_id: string, apartment_id: string): Promise<Floor | null> {
+        try {
+          const floor = await this.floorRepository.findOne({
             where: {
-                floor_id,
+              floor_id,
             },
-        });
-        await this.floorRepository
+          });
+          await this.floorRepository
             .createQueryBuilder()
             .relation(Floor, "apartments")
             .of(floor)
             .remove(apartment_id);
-        const newBuilding = await this.floorRepository.findOne({
+          const newBuilding = await this.floorRepository.findOne({
             where: {
-                floor_id,
+              floor_id,
             },
             relations: ["apartments"],
         });
         return newBuilding;
+    } catch (err) {
+        console.error(err);
+        throw err;
+      }
     }
 }

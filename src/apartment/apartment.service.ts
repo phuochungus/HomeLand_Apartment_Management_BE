@@ -95,10 +95,9 @@ export class ApartmentServiceImp extends ApartmentService {
                     this.storageManager.upload(
                         image.buffer,
                         `apartment/${apartment.apartment_id}/${
-                            index.toString() + Date.now() + image.extension ??
-                            ".png"
+                            index.toString() + Date.now()
                         }`,
-                        `image/${image.extension ?? ".png"}`,
+                        `image/${image.extension ?? "png"}`,
                     ),
                 ),
             );
@@ -189,7 +188,7 @@ export class ApartmentServiceImp extends ApartmentService {
                         return this.storageManager.upload(
                             element.buffer,
                             uploadPath,
-                            `image/${element.extension}` || ".png",
+                            `image/${element.extension ?? "png"}`,
                         );
                     }),
                 );
@@ -199,7 +198,6 @@ export class ApartmentServiceImp extends ApartmentService {
 
                 const newImageURLS = newImages.map((result) => result.value);
                 // this task can be done in parallel, will enhance later
-                // console.log(difference(apartment.imageURLs, newImageURLS));
                 await this.storageManager.remove(
                     difference(apartment.imageURLs, newImageURLS),
                 );

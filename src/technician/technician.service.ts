@@ -99,6 +99,7 @@ export class TechnicianService {
 
             profile.front_identify_card_photo_URL = frontURL;
             profile.back_identify_card_photo_URL = backURL;
+            profile.avatarURL = avatarURL;
             technician.profile = profile;
             const technicianData = await this.technicianRepository.save(technician);
             //set account
@@ -106,7 +107,6 @@ export class TechnicianService {
             account.owner_id = technician.id;
             account.email = email;
             account.password = this.hashService.hash(profile.phone_number);
-            account.avatarURL = avatarURL;
             account.technician = technician;
             await this.accountRepository.save(account);
             return technicianData;
@@ -158,11 +158,11 @@ export class TechnicianService {
                     (avataPhoto.extension || "png"),
                 avataPhoto.mimetype || "image/png",
             );
+            profile.avatarURL = avatarURL;
         } 
         try {
             await this.accountRepository.update(id, {
-                email,
-                avatarURL
+                email
             });
             technician.profile = profile;
         
@@ -205,4 +205,5 @@ export class TechnicianService {
         });
         return technicians;
     }
+  
 }

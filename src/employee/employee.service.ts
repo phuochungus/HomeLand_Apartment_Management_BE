@@ -139,7 +139,6 @@ export class EmployeeService implements EmployeeRepository {
         let employee = await this.employeeRepository.findOne({
             where: { id },
         });
-        console.log(updateEmployeeDto)
 
         if (!employee) throw new NotFoundException();
         const { profile_picture, front_identify_card_photo, back_identify_card_photo, ...rest } =

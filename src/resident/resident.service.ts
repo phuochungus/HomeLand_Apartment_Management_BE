@@ -79,7 +79,6 @@ export class ResidentService implements ResidentRepository {
             email,
             ...rest
         } = createResidentDto;
-        
         const profile = plainToInstance(Profile, rest);
         let resident = new Resident();
         resident.payment_info = payment_info;
@@ -127,7 +126,7 @@ export class ResidentService implements ResidentRepository {
                     "image/svg+xml",
                 );
             }
-          
+            profile.avatarURL = avatarURL;
             profile.front_identify_card_photo_URL = frontURL;
             profile.back_identify_card_photo_URL = backURL;
             resident.profile = profile;
@@ -135,12 +134,10 @@ export class ResidentService implements ResidentRepository {
             //set account
             if (email) {
                 resident.account_id = resident.id;
-
                 let account = new Account();
                 account.owner_id = resident.account_id;
                 account.email = email;
                 account.password = this.hashService.hash(profile.phone_number);
-                account.avatarURL = avatarURL;
                 account.resident = resident;    
                 await this.accountRepository.save(account);
             }
@@ -176,11 +173,9 @@ export class ResidentService implements ResidentRepository {
         id: string,
         updateResidentDto: UpdateResidentDto,
     ): Promise<Resident> {
-        console.log(id)
         let resident = await this.residentRepository.findOne({
             where: { id },
         });
-        console.log(resident)
         const { payment_info, avatar_photo, email, ...rest } =
             updateResidentDto;
         if (!resident) throw new NotFoundException();
@@ -192,7 +187,6 @@ export class ResidentService implements ResidentRepository {
         resident.payment_info = payment_info;
         let profile = plainToInstance(Profile, rest);
         let avatarURL: string | undefined;
-
         if (avatar_photo) {
             const avataPhoto = avatar_photo as MemoryStoredFile;
             avatarURL = await this.storageManager.upload(
@@ -203,13 +197,14 @@ export class ResidentService implements ResidentRepository {
                     (avataPhoto.extension || "png"),
                 avataPhoto.mimetype || "image/png",
             );
+            profile.avatarURL = avatarURL;
         }
+        
         if (account !== null) {
             // account.email = email as string;
             // account.avatarURL = avatarURL;
             await this.accountRepository.update(id, {
                 email,
-                avatarURL
             });
         }
 
