@@ -77,7 +77,7 @@ export class TypeORMFloorService extends FloorService {
             throw error;
         }
     }
-
+  
     async findAll() {
         return await this.floorRepository.find(
             {

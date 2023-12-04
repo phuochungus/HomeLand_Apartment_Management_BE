@@ -18,7 +18,7 @@ import { NestjsFormDataModule } from "nestjs-form-data";
 import { AccountModule } from "./account/account.module";
 import { AdminModule } from "./admin/admin.module";
 import { EmployeeModule } from "./employee/employee.module";
-import { BuildingModule} from "./building/building.module";
+import { BuildingModule } from "./building/building.module";
 import { ResidentModule } from "./resident/resident.module";
 import { VehicleModule } from "./vehicle/vehicle.module";
 import { ServiceModule } from "./service/service.module";
@@ -32,6 +32,8 @@ import { ItemRepairInvoiceModule } from "./itemRepairInvoice/itemRepairInvoice.m
 import { RepairInvoiceModule } from "./repairInvoice/repairInvoice.module";
 import { FloorModule } from "./floor/floor.module";
 import { InvoiceModule } from './invoice/invoice.module';
+import { Feedback } from "./feedback/entities/feedback.entity";
+import { FeedbackModule } from "./feedback/feedback.module";
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
@@ -89,6 +91,7 @@ import { InvoiceModule } from './invoice/invoice.module';
         ContractModule,
         TechnicianModule,
         TaskModule,
+        FeedbackModule,
         ComplainModule,
         AvatarGeneratorModule,
         NestjsFormDataModule.config({
@@ -107,4 +110,4 @@ import { InvoiceModule } from './invoice/invoice.module';
     controllers: [AppController],
     providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
