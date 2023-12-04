@@ -19,11 +19,12 @@ import { FormDataRequest } from "nestjs-form-data";
 export class InvoiceController {
     constructor(private readonly invoiceService: InvoiceService) {}
 
-    @Post("create")
+    @Post("create/:id")
     create(
         @Query() queryParams: any,
+        @Param('id') id: string,
     ) {
-        return this.invoiceService.create(queryParams);
+        return this.invoiceService.create(id,queryParams);
     }
 
     @Post()

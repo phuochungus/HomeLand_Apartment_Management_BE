@@ -17,7 +17,7 @@ export class InvoiceService {
         private readonly idGenerate: IdGenerator,
     ) {}
 
-    async create(createInvoiceDto: CreateInvoiceDto, id?: string) {
+    async create(id: string, createInvoiceDto: CreateInvoiceDto) {
         let invoice = this.invoiceRepository.create(createInvoiceDto);
         invoice.invoice_id = "Inv" + this.idGenerate.generateId().toString();
         if (id) invoice.invoice_id = id;
@@ -60,11 +60,16 @@ export class InvoiceService {
         var secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
         var orderInfo = createInvoiceDto.orderInfo;
         var partnerCode = "MOMO";
-        var redirectUrl = createInvoiceDto.redirectUrl;
+        var invoiceId = "Inv" + this.idGenerate.generateId().toString();
+        var redirectUrl = createInvoiceDto.redirectUrl + "/" + invoiceId;
         var ipnUrl =
             createInvoiceDto.baseLink +
-            "/invoice/create?" +
-            this.convertJsonToParams(createInvoiceDto);
+            "/invoice/create/" +
+            invoiceId +
+            "?" +
+            this.convertJsonToParams(createInvoiceDto) +
+            "&id=" +
+            invoiceId;
         console.log(ipnUrl);
         var requestType = "payWithMethod";
         let servicePackage = await this.servicePackageRepository.findOne({
@@ -173,6 +178,7 @@ export class InvoiceService {
                         ipnUrl: ipnUrl,
                         redirectUrl: redirectUrl,
                         orderInfo: orderInfo,
+                        invoiceId: invoiceId,
                     };
 
                     // Add additional information to the original response
