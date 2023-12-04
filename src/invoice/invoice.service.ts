@@ -60,8 +60,8 @@ export class InvoiceService {
         var secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
         var orderInfo = createInvoiceDto.orderInfo;
         var partnerCode = "MOMO";
-        var redirectUrl = createInvoiceDto.redirectUrl;
         var invoiceId = "Inv" + this.idGenerate.generateId().toString();
+        var redirectUrl = createInvoiceDto.redirectUrl+"/" + invoiceId;
         var ipnUrl =
             createInvoiceDto.baseLink +
             "/invoice/create/" +
