@@ -72,7 +72,7 @@ export class FloorController {
         return floor;
     }
     @ApiOperation({ summary: "add apartment to floor" })
-    @Post("/:id/addManagers")
+    @Post("/:id/addApartment")
     async addApartment(@Param("id") id: string, @Query("apartmentIds") apartmentIds: string[]) {
         return await this.floorRepository.addApartment(apartmentIds, id)
     }
