@@ -226,6 +226,7 @@ export class SeedService {
         let floors: Floor[] = [];
         for (let building of buildings) {
             for (let i = 0; i < this.NUMBER_OF_FLOOR_PER_BUILDING; i++) {
+                
                 floors.push(
                     await this.floorService.create({
                         name: `Floor ${i}`,

@@ -72,13 +72,13 @@ export class FloorController {
         return floor;
     }
     @ApiOperation({ summary: "add apartment to floor" })
-    @Post("/:id/addApartment")
+    @Post("/:id")
     async addApartment(@Param("id") id: string, @Query("apartmentIds") apartmentIds: string[]) {
         return await this.floorRepository.addApartment(apartmentIds, id)
     }
 
-    @ApiOperation({ summary: "delete manager from building" })
-    @Post("/:id/deleteApartment")
+    @ApiOperation({ summary: "delete apartment from floor" })
+    @Post("/:id")
     async deleteApartment(@Param("id") id: string, @Query("apartmentId") apartmentId: string) {
         return await this.floorRepository.deleteApartment(id, apartmentId)
     }
