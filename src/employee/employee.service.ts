@@ -95,25 +95,25 @@ export class EmployeeService implements EmployeeRepository {
                 backPhoto.mimetype || "image/png",
             );
 
-            let profilePictureURL: string | undefined = undefined;
+            let avatarURL: string | undefined = undefined;
             // const avatarPhoto = createEmployeeDto.profile_picture;
             const avatarPhoto = profile_picture as MemoryStoredFile;
             if (avatarPhoto) {
-                profilePictureURL = await this.storageManager.upload(
+                avatarURL = await this.storageManager.upload(
                     avatarPhoto.buffer,
                     "employee/" + employee.id + "/avatarURL." + (avatarPhoto.extension || "png"),
                     avatarPhoto.mimetype || "image/png",
                 );
             } else {
                 const avatar = await this.avatarGenerator.generateAvatar(profile.name);
-                profilePictureURL = await this.storageManager.upload(
+                avatarURL = await this.storageManager.upload(
                     avatar,
                     "employee/" + employee.id + "/avatarURL.svg",
                     "image/svg+xml",
                 );
             }
 
-            employee.profilePictureURL = profilePictureURL;
+            profile.avatarURL = avatarURL;
             profile.front_identify_card_photo_URL = frontURL;
             profile.back_identify_card_photo_URL = backURL;
             employee.profile = profile;
@@ -151,13 +151,25 @@ export class EmployeeService implements EmployeeRepository {
         try {
             await queryRunner.connect();
             await queryRunner.startTransaction();
+            // if (profile_picture) {
+            //     const imageURL = await this.storageManager.upload(
+            //         profile_picture.buffer,
+            //         `employee/${id}/${Date.now()}.${profile_picture.extension || "png"}`,
+            //         profile_picture.mimetype || "image/png",
+            //     );
+            //     employee.profilePictureURL = imageURL;
+            // }
             if (profile_picture) {
-                const imageURL = await this.storageManager.upload(
-                    profile_picture.buffer,
-                    `employee/${id}/${Date.now()}.${profile_picture.extension || "png"}`,
-                    profile_picture.mimetype || "image/png",
+                const avataPhoto = profile_picture as MemoryStoredFile;
+                avatarURL = await this.storageManager.upload(
+                    avataPhoto.buffer,
+                    "employee/" +
+                    employee.id +
+                        "/avatarURL." +
+                        (avataPhoto.extension || "png"),
+                    avataPhoto.mimetype || "image/png",
                 );
-                employee.profilePictureURL = imageURL;
+                profile.avatarURL = avatarURL;
             }
 
             if (front_identify_card_photo) {
