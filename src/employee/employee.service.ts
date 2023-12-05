@@ -70,12 +70,13 @@ export class EmployeeService implements EmployeeRepository {
             front_identify_card_photo,
             back_identify_card_photo,
             profile_picture,
+            task_info,
             ...rest
         } = createEmployeeDto;
         const profile = plainToInstance(Profile, rest);
         // let employee = this.employeeRepository.create(rest);
         let employee = new Employee();
-
+        employee.task_info = task_info;
         if (id) employee.id = id;
         else employee.id = "EMP" + this.idGenerate.generateId();
 
@@ -141,7 +142,7 @@ export class EmployeeService implements EmployeeRepository {
         });
 
         if (!employee) throw new NotFoundException();
-        const { profile_picture, front_identify_card_photo, back_identify_card_photo, ...rest } =
+        const { profile_picture, front_identify_card_photo, back_identify_card_photo,task_info, ...rest } =
             updateEmployeeDto;
         let profile = plainToInstance(Profile, rest);
         const queryRunner = this.dataSource.createQueryRunner();
