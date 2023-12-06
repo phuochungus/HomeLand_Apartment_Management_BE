@@ -2,7 +2,7 @@ import { isArray } from "class-validator";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { CreateBuildingDto } from "./dto/create-building.dto";
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { DataSource, In, Repository, Like } from "typeorm";
+import { DataSource, In, Repository, Like, createQueryBuilder } from "typeorm";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { StorageManager } from "../storage/storage.service";
 import { IRepository } from "../helper/interface/IRepository.interface";
@@ -30,6 +30,7 @@ export abstract class BuildingService implements IRepository<Building> {
         building_id: string,
         manager_id: string,
     ): Promise<Building | null>;
+    abstract reportResidentOfBuilding(): any;
 }
 
 @Injectable()
@@ -162,5 +163,17 @@ export class TypeORMBuildingService extends BuildingService {
             relations: ["managers"],
         });
         return newBuilding;
+    }
+    async reportResidentOfBuilding() {
+        const result = await this.dataSource
+            .getRepository(Building)
+            .createQueryBuilder("building")
+            .leftJoin("building.floors", "floor")
+            .leftJoin("floor.apartments", "apartment")
+             .leftJoin("apartment.residents", "resident")
+            .addSelect("COUNT(resident)", "count")
+            .groupBy("building.building_id")
+            .getRawMany()
+        return result;
     }
 }

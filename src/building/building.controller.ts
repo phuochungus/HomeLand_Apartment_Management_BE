@@ -35,6 +35,13 @@ export class BuildingController {
      * search building by name
      * @param query string that admin search by name
      */
+    @ApiOperation({summary: "report resident of building"})
+    @Get("report")  
+    async report() {
+        const result = await this.buildingRepository.reportResidentOfBuilding();
+        return result;
+    }
+
     @ApiOperation({summary: "search building"})
     @Get("search")
     async searchBuilding(@Query("query") query: string) {
@@ -48,6 +55,7 @@ export class BuildingController {
         description:
             "Page number: Page indexed from 1, each page contain 30 items, if null then return all.",
     })
+
     @ApiOperation({summary: "get all building"})
     @Get()
     findAll() {
