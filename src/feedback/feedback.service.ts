@@ -13,6 +13,7 @@ import { Apartment } from "src/apartment/entities/apartment.entity";
 import { floor } from "lodash";
 import { Service } from "src/service/entities/service.entity";
 import { PersonRole } from "src/helper/class/profile.entity";
+import { Resident } from "src/resident/entities/resident.entity";
 export abstract class FeedbackService implements IRepository<Feedback> {
     abstract findOne(id: string): Promise<Feedback | null>;
     abstract update(id: string, updateEntityDto: any): Promise<boolean>;
@@ -36,6 +37,8 @@ export class TypeORMFeedbackService extends FeedbackService {
         private readonly serviceRepository: Repository<Service>,
         @InjectRepository(Feedback)
         private readonly feedbackRepository: Repository<Feedback>,
+        @InjectRepository(Resident)
+        private readonly residentRepository: Repository<Resident>,
         @InjectDataSource()
         private readonly dataSource: DataSource,
         private readonly idGenerate: IdGenerator,
@@ -44,19 +47,31 @@ export class TypeORMFeedbackService extends FeedbackService {
         super();
     }
 
-    async create(
-        CreateFloorDto: CreateFeedbackDto,
-        id?: string,
-    ): Promise<Feedback> {
-        let feedback = this.feedbackRepository.create(CreateFloorDto);
-        feedback.feedback_id = "FEB" + this.idGenerate.generateId();
-        if (id) feedback.feedback_id = id;
-
+    async create(createFeedbackDto: CreateFeedbackDto): Promise<Feedback> {
+        const { rating, comment, resident_id, service_id } = createFeedbackDto;
+        const resident = (await this.residentRepository.findOne({
+            where: {
+                id: resident_id,
+            },
+        })) as Resident;
+        const service = (await this.serviceRepository.findOne({
+            where: {
+                service_id: service_id,
+            },
+        })) as Service;
+        const feedback_id = "FDB" + this.idGenerate.generateId();
+        const data = {
+            feedback_id,
+            resident,
+            comment,
+            rating,
+            service,
+        };
+        const feedbackData = this.feedbackRepository.create(data);
         try {
-            feedback = await this.feedbackRepository.save(feedback);
+            const feedback = await this.feedbackRepository.save(feedbackData);
             return feedback;
         } catch (error) {
-            console.error(error);
             throw error;
         }
     }

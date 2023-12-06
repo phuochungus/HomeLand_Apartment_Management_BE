@@ -18,6 +18,7 @@ import { FeedbackService } from "./feedback.service";
 import { id_ID } from "@faker-js/faker";
 import { Feedback } from "./entities/feedback.entity";
 import { UpdateFeedbackDto } from "./dto/update-feedback.dto";
+import { UpdateFloorDto } from "src/floor/dto/update-floor.dto";
 
 @ApiTags("Feedback")
 @Controller("Feedback")
@@ -52,18 +53,25 @@ export class FeedbackController {
         throw new NotFoundException("Floor not found");
     }
 
-    @Patch(":id")
-    @ApiConsumes("multipart/form-data")
+    @ApiOperation({ summary: "edit feedback" })
     @FormDataRequest()
-    async updateFeedback(
+    @ApiConsumes("multipart/form-data")
+    @Patch(":id")
+    async update(
         @Param("id") id: string,
-        @Body() updateFeedbackDto: UpdateFeedbackDto,
-    ): Promise<Feedback> {
-        const floor = await this.feedbackRepository.updateFeedback(
+        @Body() updateFloorDto: UpdateFeedbackDto,
+    ) {
+        const result = await this.feedbackRepository.update(
             id,
-            updateFeedbackDto,
+            updateFloorDto,
         );
-        return floor;
+        if (result) return { msg: "Complain updated" };
+        throw new NotFoundException("Complain not found");
+    }
+    @ApiOperation({ summary: "delete feedback" })
+    @Delete("/:id")
+    async deleteFeedback(@Param("id") id: string) {
+        return await this.feedbackRepository.delete(id);
     }
    
 
