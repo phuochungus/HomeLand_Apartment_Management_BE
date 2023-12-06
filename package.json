@@ -44,6 +44,7 @@
         "form-data": "^4.0.0",
         "moment": "^2.29.4",
         "nestjs-form-data": "^1.9.4",
+        "nestjs-typeorm-paginate": "^4.0.4",
         "passport": "^0.6.0",
         "passport-local": "^1.0.0",
         "pg": "^8.11.3",

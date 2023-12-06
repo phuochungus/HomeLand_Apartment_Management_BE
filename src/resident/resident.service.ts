@@ -15,7 +15,10 @@ import { IdGenerator } from "../id-generator/id-generator.service";
 import { plainToInstance } from "class-transformer";
 import { Account } from "../account/entities/account.entity";
 import { HashService } from "../hash/hash.service";
-
+import { IPaginationOptions } from "nestjs-typeorm-paginate";
+import { paginate } from "nestjs-typeorm-paginate/dist/paginate";
+import { IPaginationMeta } from "nestjs-typeorm-paginate/dist/interfaces";
+import { Pagination } from "nestjs-typeorm-paginate/dist/pagination";
 /**
  * Person repository interface
  */
@@ -38,6 +41,7 @@ export abstract class ResidentRepository implements IRepository<Resident> {
     ): Promise<Resident>;
     abstract findAll(): Promise<Resident[]>;
     abstract search(query: string): Promise<Resident[]>;
+    abstract paginate(options: IPaginationOptions):Promise<Pagination<Resident>>;
 }
 
 @Injectable()
@@ -258,5 +262,11 @@ export class ResidentService implements ResidentRepository {
             relations: ["account", "stay_at"],
         });
         return residents;
+    }
+
+    async paginate(options: IPaginationOptions<IPaginationMeta>) {
+        const result = this.residentRepository.createQueryBuilder("resident");
+        result.orderBy("resident.id", "DESC");
+        return paginate<Resident>(result, options)
     }
 }

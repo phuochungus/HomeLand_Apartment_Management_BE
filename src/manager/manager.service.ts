@@ -13,7 +13,9 @@ import { HashService } from "src/hash/hash.service";
 import { Manager } from "./entities/manager.entity";
 import { CreateManagerDto } from "./dto/create-manager.dto";
 import { UpdateResult } from "typeorm/browser";
-
+import { IPaginationOptions } from "nestjs-typeorm-paginate";
+import { paginate } from "nestjs-typeorm-paginate/dist/paginate";
+import { IPaginationMeta } from "nestjs-typeorm-paginate/dist/interfaces";
 /**
  * Person repository interface
  */
@@ -204,5 +206,9 @@ export class ManagerService {
             relations: ["account", "building"],
         });
         return managers;
+    }
+    async paginate(options: IPaginationOptions<IPaginationMeta>) {
+        const result = this.managerRepository.createQueryBuilder("manager").leftJoinAndSelect("manager.account", "account");
+        return paginate<Manager>(result, options)
     }
 }
