@@ -38,16 +38,14 @@ export class Feedback {
         comment?: string;
 
         @ManyToOne(() => Resident, (resident) => resident.feedback)
-        @JoinColumn({ name: "resident_id" })
+        @JoinColumn()
         resident: Resident;
-        @Column({ nullable: true })
-        resident_id: string;
+       
 
         @ManyToOne(() => Service, (service) => service.feedback)
-        @JoinColumn({ name: "service_id" })
+        @JoinColumn()
         service: Service;
-        @Column({ nullable: true })
-        service_id: string;
+      
 
         @CreateDateColumn()
         created_at: Date;

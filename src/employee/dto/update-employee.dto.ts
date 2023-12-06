@@ -9,6 +9,7 @@ export class UpdateEmployeeDto extends PartialType(
     OmitType(CreateEmployeeDto, [
         "back_identify_card_photo",
         "front_identify_card_photo",
+        "identify_number",
     ] as const),
 ) {
     @ApiProperty({ type: "file"})

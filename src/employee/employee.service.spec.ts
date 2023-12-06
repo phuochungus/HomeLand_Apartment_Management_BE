@@ -234,6 +234,8 @@ describe('EmployeeController', () => {
                                         mimetype: 'text/csv',
                                         buffer: Buffer.from('one,two,three')
                                 } as MemoryStoredFile,
+                                task_info: '',
+                                identify_number: ''
                         });
                         expect(result).toEqual({
                                 id: expect.any(String),
@@ -287,26 +289,30 @@ describe('EmployeeController', () => {
                                         mimetype: 'text/csv',
                                         buffer: Buffer.from('one,two,three')
                                 } as MemoryStoredFile,
+                                task_info: '',
+                                identify_number: ''
                         })).rejects.toThrow(err)
                 }, 30000);
                 it("should create an employee", async () => {
                         const result = await service.create({
-                          date_of_birth: new Date(),
-                          name: "Dinh Dai Duong",
-                          gender: Gender.MALE,
-                          phone_number: "0326465520",
-                          front_identify_card_photo: {
-                            mimetype: 'text/csv',
-                            buffer: Buffer.from('one,two,three'),
-                          } as MemoryStoredFile,
-                          back_identify_card_photo: {
-                            mimetype: 'text/csv',
-                            buffer: Buffer.from('one,two,three')
-                          } as MemoryStoredFile,
-                          profile_picture: {
-                            mimetype: 'text/csv',
-                            buffer: Buffer.from('one,two,three')
-                          } as MemoryStoredFile,
+                                date_of_birth: new Date(),
+                                name: "Dinh Dai Duong",
+                                gender: Gender.MALE,
+                                phone_number: "0326465520",
+                                front_identify_card_photo: {
+                                        mimetype: 'text/csv',
+                                        buffer: Buffer.from('one,two,three'),
+                                } as MemoryStoredFile,
+                                back_identify_card_photo: {
+                                        mimetype: 'text/csv',
+                                        buffer: Buffer.from('one,two,three')
+                                } as MemoryStoredFile,
+                                profile_picture: {
+                                        mimetype: 'text/csv',
+                                        buffer: Buffer.from('one,two,three')
+                                } as MemoryStoredFile,
+                                task_info: '',
+                                identify_number: ''
                         });
                       
                         expect(result).toEqual({

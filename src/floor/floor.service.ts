@@ -58,7 +58,7 @@ export class TypeORMFloorService extends FloorService {
         id?: string,
     ): Promise<Floor> {
         let floor = this.floorRepository.create(CreateFloorDto);
-        floor.floor_id = CreateFloorDto.building_id + "/FLR" + this.idGenerate.generateId();
+        floor.floor_id = "FLR" + this.idGenerate.generateId();
         if (id) floor.floor_id = id;
 
         try {
@@ -77,7 +77,7 @@ export class TypeORMFloorService extends FloorService {
             throw error;
         }
     }
-
+  
     async findAll() {
         return await this.floorRepository.find(
             {
