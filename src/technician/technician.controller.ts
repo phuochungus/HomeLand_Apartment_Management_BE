@@ -12,6 +12,8 @@ import {
     Put,
     Query,
     ParseEnumPipe,
+    DefaultValuePipe,
+    ParseIntPipe,
 } from "@nestjs/common";
 import {
     ApiConsumes,
@@ -29,7 +31,8 @@ import { TechnicianService } from './technician.service';
 import { CreateTechnicianDto } from './dto/create-technician.dto';
 import { UpdateTechnicianDto } from './dto/update-technician.dto';
 import { Technician } from './entities/technician.entity';
-
+import { Pagination } from "nestjs-typeorm-paginate/dist/pagination";
+import { IPaginationOptions } from "nestjs-typeorm-paginate/dist/interfaces";
 @ApiTags("Technician")
 // @UseGuards(JWTAuthGuard)
 // @ApiBearerAuth()
@@ -93,10 +96,17 @@ export class TechnicianController {
 
     @ApiOperation({ summary: "get all technician" })
     @Get()
-    async findAll() 
-    : Promise<Technician[]> {
- 
-        return this.technicianRepository.findAll();
+    async findAll(
+        @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+        limit: number = 1,
+    ): Promise<Pagination<Technician>> {
+        const options: IPaginationOptions = {
+            limit,
+            page
+        }
+        console.log(limit)
+        return this.technicianRepository.paginate(options);
     }
     @ApiOperation({ summary: "get technician by id" })
     @Get("/:id")

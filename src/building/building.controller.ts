@@ -9,6 +9,8 @@ import {
     NotFoundException,
     Query,
     Delete,
+    DefaultValuePipe,
+    ParseIntPipe,
 } from "@nestjs/common";
 
 import { ApiConsumes, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
@@ -17,7 +19,9 @@ import { UpdateBuildingDto } from "./dto/update-building.dto";
 import { CreateBuildingDto } from "./dto/create-building.dto";
 import { BuildingService } from "./building.service";
 import { id_ID } from "@faker-js/faker";
-
+import { Pagination } from "nestjs-typeorm-paginate/dist/pagination";
+import { IPaginationOptions } from "nestjs-typeorm-paginate/dist/interfaces";
+import { Building } from "./entities/building.entity";
 @ApiTags("Building")
 @Controller("building")
 export class BuildingController {
@@ -58,8 +62,17 @@ export class BuildingController {
 
     @ApiOperation({summary: "get all building"})
     @Get()
-    findAll() {
-        return this.buildingRepository.findAll();
+    async findAll(
+        @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+        limit: number = 1,
+    ): Promise<Pagination<Building>> {
+        const options: IPaginationOptions = {
+            limit,
+            page
+        }
+        console.log(limit)
+        return this.buildingRepository.paginate(options);
     }
 
     @ApiOperation({summary: "get building by id"})

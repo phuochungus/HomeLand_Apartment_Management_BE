@@ -11,6 +11,8 @@ import {
     Put,
     Query,
     ParseEnumPipe,
+    DefaultValuePipe,
+    ParseIntPipe,
 } from "@nestjs/common";
 import { ResidentRepository } from "./resident.service";
 import {
@@ -30,6 +32,8 @@ import { CreateResidentDto } from "./dto/create-resident.dto";
 import { Resident } from "./entities/resident.entity";
 import { UpdateResidentDto } from "./dto/update-resident.dto";
 import { Auth } from "src/helper/decorator/auth.decorator";
+import { Pagination } from "nestjs-typeorm-paginate/dist/pagination";
+import { IPaginationOptions } from "nestjs-typeorm-paginate/dist/interfaces";
 
 @ApiTags("Resident")
 // @UseGuards(JWTAuthGuard)
@@ -57,7 +61,6 @@ export class ResidentController {
     @Post()
     @FormDataRequest()
     async create(@Body() createResidentDto: CreateResidentDto) {
-      
         return await this.residentRepository.create(createResidentDto);
     }
     @Get("/search")
@@ -67,9 +70,7 @@ export class ResidentController {
     }
     @Delete("/:id")
     async softDeleteResident(@Param("id") id: string) {
-    
         const result = await this.residentRepository.delete(id);
-        
     }
     /**
      *
@@ -91,19 +92,24 @@ export class ResidentController {
         );
         return resident;
     }
-
     @ApiOperation({ summary: "get all resident" })
     @Get()
-    async findAll() 
-    : Promise<Resident[]> {
- 
-        return this.residentRepository.findAll();
+    async findAll(
+        @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+        limit: number = 1,
+    ): Promise<Pagination<Resident>> {
+        const options: IPaginationOptions = {
+            limit,
+            page
+        }
+        console.log(limit)
+        return this.residentRepository.paginate(options);
     }
+
     @ApiOperation({ summary: "get resident by id" })
     @Get("/:id")
-    async findOne(
-        @Param("id") id: string,
-    ): Promise<Resident | null> {
+    async findOne(@Param("id") id: string): Promise<Resident | null> {
         const resident = await this.residentRepository.findOne(id);
         return resident;
     }

@@ -14,6 +14,9 @@ import { UpdateResult } from "typeorm/browser";
 import { Technician } from "./entities/technician.entity";
 import { CreateTechnicianDto } from "./dto/create-technician.dto";
 import { UpdateTechnicianDto } from "./dto/update-technician.dto";
+import { IPaginationOptions } from "nestjs-typeorm-paginate";
+import { paginate } from "nestjs-typeorm-paginate/dist/paginate";
+import { IPaginationMeta } from "nestjs-typeorm-paginate/dist/interfaces";
 
 /**
  * Person repository interface
@@ -204,6 +207,11 @@ export class TechnicianService {
             relations: ["account"],
         });
         return technicians;
+    }
+    async paginate(options: IPaginationOptions<IPaginationMeta>) {
+        const result = this.technicianRepository.createQueryBuilder("technician").leftJoinAndSelect("technician.account", "account");
+        
+        return paginate<Technician>(result, options)
     }
   
 }
