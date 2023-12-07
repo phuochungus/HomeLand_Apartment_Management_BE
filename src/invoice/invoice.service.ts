@@ -214,12 +214,12 @@ export class InvoiceService {
             cache: true,
         });
     }
-    async getAllInvoiceWithResidentId(residentId: string, serviceId): Promise<Invoice[]> {
-        let servicePackage = await this.servicePackageRepository.find({
+    async getAllInvoiceWithResidentId(residentId: string, serviceId:string): Promise<Invoice[]> {
+        let servicePackages = await this.servicePackageRepository.find({
             where: { service_id: serviceId },
         });
-        const invoices: Invoice[] = [];
-        forEach(servicePackage, async (servicePackage) => {
+        var invoices: Invoice[] = [];
+        for (const servicePackage of servicePackages) { 
             const invoice = await this.invoiceRepository.find({
                 where: {
                     buyer_id: residentId,
@@ -229,7 +229,8 @@ export class InvoiceService {
                 cache: true,
             });
             invoices.push(...invoice);
-        });
+            
+        }
         return invoices;
     }
 

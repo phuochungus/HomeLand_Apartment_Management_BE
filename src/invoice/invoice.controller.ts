@@ -43,9 +43,7 @@ export class InvoiceController {
     //     return await this.vehicleService.getAllVehicle();
     // }
     @Get()
-    @FormDataRequest()
-    
-    async findAll(@User() user: AccountOwner | null, @Param("serviceId") serviceId: string) {
+    async findAll(@User() user: AccountOwner | null, @Query("serviceId") serviceId: string) {
         if (user?.role === PersonRole.RESIDENT) {
             return await this.invoiceService.getAllInvoiceWithResidentId(user.id, serviceId);
         }
