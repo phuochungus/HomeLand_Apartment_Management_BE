@@ -13,7 +13,9 @@ import { CreateBuildingDto } from "src/building/dto/create-building.dto";
 import { BuildingController } from "src/building/building.controller";
 import { Apartment } from "src/apartment/entities/apartment.entity";
 import { floor } from "lodash";
-
+import { IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
+import { paginate } from "nestjs-typeorm-paginate/dist/paginate";
+import { IPaginationMeta } from "nestjs-typeorm-paginate/dist/interfaces";
 export abstract class FloorService implements IRepository<Floor> {
     abstract findOne(id: string): Promise<Floor | null>;
     abstract update(id: string, updateEntityDto: any): Promise<boolean>;
@@ -36,6 +38,7 @@ export abstract class FloorService implements IRepository<Floor> {
         floor_id: string,
         apartment_id: string,
     ): Promise<Floor | null>;
+    abstract paginate(options: IPaginationOptions<IPaginationMeta>):Promise<Pagination<Floor>>
 }
 
 @Injectable()
@@ -197,5 +200,11 @@ export class TypeORMFloorService extends FloorService {
         console.error(err);
         throw err;
       }
+    }
+   
+    async paginate(options: IPaginationOptions<IPaginationMeta>) {
+        const result = this.floorRepository.createQueryBuilder("floor");
+        result.orderBy("floor.floor_id", "DESC");
+        return paginate<Floor>(result, options)
     }
 }
