@@ -533,9 +533,9 @@ export class SeedService {
                 ServicePackageInfo.push({
                     servicePackage_id: `ServicePackage${i}-${j}`,
                     service_id: `Service${i}`,
-                    name: `Service package ${j} in Service ${i}`,
+                    name: `Service package ${i}.${j}`,
                     expired_date: 30,
-                    per_unit_price: 10,
+                    per_unit_price: 50000,
                 });
 
         await this.dataSource

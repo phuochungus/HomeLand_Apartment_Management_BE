@@ -6,6 +6,7 @@ import { Invoice } from "./entities/invoice.entity";
 import { Repository } from "typeorm";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { ServicePackage } from "../service-package/entities/service-package.entity";
+import { forEach } from "lodash";
 
 @Injectable()
 export class InvoiceService {
@@ -61,7 +62,8 @@ export class InvoiceService {
         var orderInfo = createInvoiceDto.orderInfo;
         var partnerCode = "MOMO";
         var invoiceId = "Inv" + this.idGenerate.generateId().toString();
-        var redirectUrl = createInvoiceDto.redirectUrl + "/" + invoiceId+"?auth=true";
+        var redirectUrl =
+            createInvoiceDto.redirectUrl + "/" + invoiceId + "?auth=true";
         var ipnUrl =
             createInvoiceDto.baseLink +
             "/invoice/create/" +
@@ -211,6 +213,36 @@ export class InvoiceService {
             relations: ["servicePackage", "buyer"],
             cache: true,
         });
+    }
+    async getAllInvoiceWithResidentId(residentId: string, serviceId:string): Promise<Invoice[]> {
+        let servicePackages = await this.servicePackageRepository.find({
+            where: { service_id: serviceId },
+        });
+        var invoices: Invoice[] = [];
+        for (const servicePackage of servicePackages) { 
+            const invoice = await this.invoiceRepository.find({
+                where: {
+                    buyer_id: residentId,
+                    servicePackage_id: servicePackage.servicePackage_id,
+                },
+                relations: ["servicePackage", "buyer"],
+                cache: true,
+            });
+            invoices.push(...invoice);
+            
+        }
+        invoices.sort((invoice1, invoice2) => {
+            if (invoice1.created_at < invoice2.created_at) {
+              return -1; // Sort invoice1 before invoice2
+            }
+          
+            if (invoice1.created_at > invoice2.created_at) {
+              return 1; // Sort invoice2 before invoice1
+            }
+          
+            return 0; // Equal, keep the order unchanged
+          });
+        return invoices;
     }
 
     async update(id: string, updateInvoiceDto: UpdateInvoiceDto) {
