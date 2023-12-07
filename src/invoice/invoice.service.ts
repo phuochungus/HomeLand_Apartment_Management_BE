@@ -6,6 +6,7 @@ import { Invoice } from "./entities/invoice.entity";
 import { Repository } from "typeorm";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { ServicePackage } from "../service-package/entities/service-package.entity";
+import { forEach } from "lodash";
 
 @Injectable()
 export class InvoiceService {
@@ -61,7 +62,8 @@ export class InvoiceService {
         var orderInfo = createInvoiceDto.orderInfo;
         var partnerCode = "MOMO";
         var invoiceId = "Inv" + this.idGenerate.generateId().toString();
-        var redirectUrl = createInvoiceDto.redirectUrl + "/" + invoiceId+"?auth=true";
+        var redirectUrl =
+            createInvoiceDto.redirectUrl + "/" + invoiceId + "?auth=true";
         var ipnUrl =
             createInvoiceDto.baseLink +
             "/invoice/create/" +
@@ -211,6 +213,24 @@ export class InvoiceService {
             relations: ["servicePackage", "buyer"],
             cache: true,
         });
+    }
+    async getAllInvoiceId(residentId: string, serviceId): Promise<Invoice[]> {
+        let servicePackage = await this.servicePackageRepository.find({
+            where: { servicePackage_id: serviceId },
+        });
+        const invoices: Invoice[] = [];
+        forEach(servicePackage, async (servicePackage) => {
+            const invoice = await this.invoiceRepository.find({
+                where: {
+                    buyer_id: residentId,
+                    servicePackage_id: servicePackage.servicePackage_id,
+                },
+                relations: ["servicePackage", "buyer"],
+                cache: true,
+            });
+            invoices.push(...invoice);
+        });
+        return invoices;
     }
 
     async update(id: string, updateInvoiceDto: UpdateInvoiceDto) {
