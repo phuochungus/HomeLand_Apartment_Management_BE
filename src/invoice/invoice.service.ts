@@ -231,6 +231,17 @@ export class InvoiceService {
             invoices.push(...invoice);
             
         }
+        invoices.sort((invoice1, invoice2) => {
+            if (invoice1.created_at < invoice2.created_at) {
+              return -1; // Sort invoice1 before invoice2
+            }
+          
+            if (invoice1.created_at > invoice2.created_at) {
+              return 1; // Sort invoice2 before invoice1
+            }
+          
+            return 0; // Equal, keep the order unchanged
+          });
         return invoices;
     }
 
