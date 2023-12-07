@@ -9,6 +9,8 @@ import {
     NotFoundException,
     Query,
     Delete,
+    DefaultValuePipe,
+    ParseIntPipe,
 } from "@nestjs/common";
 
 import { ApiConsumes, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
@@ -18,7 +20,8 @@ import { CreateFloorDto } from "./dto/create-floor.dto";
 import { FloorService } from "./floor.service";
 import { id_ID } from "@faker-js/faker";
 import { Floor } from "./entities/floor.entity";
-
+import { Pagination } from "nestjs-typeorm-paginate/dist/pagination";
+import { IPaginationOptions } from "nestjs-typeorm-paginate/dist/interfaces";
 @ApiTags("Floor")
 @Controller("floor")
 export class FloorController {
@@ -46,10 +49,22 @@ export class FloorController {
         description:
             "Page number: Page indexed from 1, each page contain 30 items, if null then return all.",
     })
+    @ApiOperation({summary: "get all floor"})
     @Get()
-    findAll() {
-        return this.floorRepository.findAll();
+    async findAll(
+        @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+        limit: number = 1,
+    ): Promise<Pagination<Floor>> {
+        const options: IPaginationOptions = {
+            limit,
+            page
+        }
+        console.log(limit)
+        return this.floorRepository.paginate(options);
     }
+
+   
     @Get(":id")
     async findOne(@Param("id") id: string) {
         const decodedId = decodeURIComponent(id);
