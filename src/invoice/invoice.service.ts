@@ -216,7 +216,7 @@ export class InvoiceService {
     }
     async getAllInvoiceWithResidentId(residentId: string, serviceId): Promise<Invoice[]> {
         let servicePackage = await this.servicePackageRepository.find({
-            where: { servicePackage_id: serviceId },
+            where: { service_id: serviceId },
         });
         const invoices: Invoice[] = [];
         forEach(servicePackage, async (servicePackage) => {
