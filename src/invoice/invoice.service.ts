@@ -214,7 +214,7 @@ export class InvoiceService {
             cache: true,
         });
     }
-    async getAllInvoiceId(residentId: string, serviceId): Promise<Invoice[]> {
+    async getAllInvoiceWithResidentId(residentId: string, serviceId): Promise<Invoice[]> {
         let servicePackage = await this.servicePackageRepository.find({
             where: { servicePackage_id: serviceId },
         });
