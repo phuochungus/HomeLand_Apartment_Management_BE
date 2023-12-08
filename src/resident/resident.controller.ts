@@ -94,18 +94,21 @@ export class ResidentController {
     }
     @ApiOperation({ summary: "get all resident" })
     @Get()
-    async findAll(
-        @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-        @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
-        limit: number = 1,
-    ): Promise<Pagination<Resident>> {
-        const options: IPaginationOptions = {
-            limit,
-            page
-        }
-        console.log(limit)
-        return this.residentRepository.paginate(options);
+    async findAll() {
+        return await this.residentRepository.findAll();
     }
+    // async findAll(
+    //     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    //     @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+    //     limit: number = 1,
+    // ): Promise<Pagination<Resident>> {
+    //     const options: IPaginationOptions = {
+    //         limit,
+    //         page
+    //     }
+    //     console.log(limit)
+    //     return this.residentRepository.paginate(options);
+    // }
 
     @ApiOperation({ summary: "get resident by id" })
     @Get("/:id")

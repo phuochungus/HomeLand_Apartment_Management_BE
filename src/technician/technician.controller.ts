@@ -96,18 +96,21 @@ export class TechnicianController {
 
     @ApiOperation({ summary: "get all technician" })
     @Get()
-    async findAll(
-        @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-        @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
-        limit: number = 1,
-    ): Promise<Pagination<Technician>> {
-        const options: IPaginationOptions = {
-            limit,
-            page
-        }
-        console.log(limit)
-        return this.technicianRepository.paginate(options);
+    async findAll() {
+        return await this.technicianRepository.findAll();
     }
+    // async findAll(
+    //     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    //     @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+    //     limit: number = 1,
+    // ): Promise<Pagination<Technician>> {
+    //     const options: IPaginationOptions = {
+    //         limit,
+    //         page
+    //     }
+    //     console.log(limit)
+    //     return this.technicianRepository.paginate(options);
+    // }
     @ApiOperation({ summary: "get technician by id" })
     @Get("/:id")
     async findOne(
