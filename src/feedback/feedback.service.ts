@@ -68,10 +68,10 @@ export class TypeORMFeedbackService extends FeedbackService {
         const feedback_id = "FDB" + this.idGenerate.generateId();
         const data = {
             feedback_id,
-            resident,
+            resident_id,
             comment,
             rating,
-            service,
+            service_id,
         };
         const feedbackData = this.feedbackRepository.create(data);
         try {
