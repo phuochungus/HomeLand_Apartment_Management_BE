@@ -34,7 +34,9 @@ export abstract class BuildingService implements IRepository<Building> {
         manager_id: string,
     ): Promise<Building | null>;
     abstract reportResidentOfBuilding(): any;
-    abstract paginate(options: IPaginationOptions<IPaginationMeta>):Promise<Pagination<Building>>
+    abstract paginate(
+        options: IPaginationOptions<IPaginationMeta>,
+    ): Promise<Pagination<Building>>;
 }
 
 @Injectable()
@@ -72,14 +74,14 @@ export class TypeORMBuildingService extends BuildingService {
     }
     async findAll() {
         return await this.buildingRepository.find({
-            relations: ["managers"],
+            relations: ["managers", "floors", "floors.apartments"],
         });
     }
 
     async findOne(id: string) {
         return await this.buildingRepository.findOne({
             where: { building_id: id },
-            relations: ["managers", "managers.account"],
+            relations: ["managers", "managers.account", "floors.apartments"],
         });
     }
 
@@ -174,15 +176,15 @@ export class TypeORMBuildingService extends BuildingService {
             .createQueryBuilder("building")
             .leftJoin("building.floors", "floor")
             .leftJoin("floor.apartments", "apartment")
-             .leftJoin("apartment.residents", "resident")
+            .leftJoin("apartment.residents", "resident")
             .addSelect("COUNT(resident)", "count")
             .groupBy("building.building_id")
-            .getRawMany()
+            .getRawMany();
         return result;
     }
     async paginate(options: IPaginationOptions<IPaginationMeta>) {
         const result = this.buildingRepository.createQueryBuilder("building");
         result.orderBy("building.building_id", "DESC");
-        return paginate<Building>(result, options)
+        return paginate<Building>(result, options);
     }
 }
