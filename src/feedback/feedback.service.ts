@@ -15,6 +15,12 @@ import { Service } from "src/service/entities/service.entity";
 import { PersonRole } from "src/helper/class/profile.entity";
 import { Resident } from "src/resident/entities/resident.entity";
 export abstract class FeedbackService implements IRepository<Feedback> {
+    findByServiceId(service: string) {
+        throw new Error("Method not implemented.");
+    }
+    find(arg0: { where: { service: string; }; relations: string[]; }) {
+        throw new Error("Method not implemented.");
+    }
     abstract findOne(id: string): Promise<Feedback | null>;
     abstract update(id: string, updateEntityDto: any): Promise<boolean>;
     abstract delete(id: string): Promise<boolean>;
@@ -88,10 +94,19 @@ export class TypeORMFeedbackService extends FeedbackService {
     }
     async findAll() {
         return await this.feedbackRepository.find({
-            relations: ["service"],
+            relations: ["service","resident"],
         });
     }
-
+    async findByServiceId(service_id: string): Promise<Feedback[]> {
+        return await this.feedbackRepository.find({
+            where: {
+                service: {
+                    service_id: service_id,
+                },
+            },
+            relations: ["service", "resident"],
+        });
+    }
     async updateFeedback(
         id: string,
         updateFeedbackDto: UpdateFeedbackDto,
