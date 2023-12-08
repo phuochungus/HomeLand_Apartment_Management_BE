@@ -37,14 +37,20 @@ export class FeedbackController {
      * @param query string that admin search by name
      */
     @ApiQuery({
-        name: "page",
+        name: "Service",
         required: false,
-        description:
-            "Page number: Page indexed from 1, each page contain 30 items, if null then return all.",
     })
     @Get()
     findAll() {
         return this.feedbackRepository.findAll();
+    }
+    // @ApiQuery({
+    //     name: "Service",
+    //     required: false,
+    // })
+    @Get(":service")
+    findAllByService(@Query("service") service: string) {
+        return this.feedbackRepository.findByServiceId(service);
     }
     @Get(":id")
     async findOne(@Param("id") id: string) {
