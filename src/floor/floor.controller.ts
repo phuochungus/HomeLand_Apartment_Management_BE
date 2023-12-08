@@ -51,17 +51,19 @@ export class FloorController {
     })
     @ApiOperation({summary: "get all floor"})
     @Get()
-    async findAll(
-        @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-        @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
-        limit: number = 1,
-    ): Promise<Pagination<Floor>> {
-        const options: IPaginationOptions = {
-            limit,
-            page
-        }
-        console.log(limit)
-        return this.floorRepository.paginate(options);
+    async findAll(): Promise<Floor[]> {
+        return await this.floorRepository.findAll();
+        
+    //     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    //     @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+    //     limit: number = 1,
+    // ): Promise<Pagination<Floor>> {
+    //     const options: IPaginationOptions = {
+    //         limit,
+    //         page
+    //     }
+    //     console.log(limit)
+    //     return this.floorRepository.paginate(options);
     }
 
    
