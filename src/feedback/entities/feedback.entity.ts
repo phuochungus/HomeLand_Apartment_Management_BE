@@ -31,7 +31,7 @@ export class Feedback {
         @Column()
         rating: string;
 
-        @ApiProperty({       
+        @ApiProperty({
         })
         @IsOptional()
         @Column({ nullable: true })
@@ -40,12 +40,20 @@ export class Feedback {
         @ManyToOne(() => Resident, (resident) => resident.feedback)
         @JoinColumn()
         resident: Resident;
-       
+
+        @ApiProperty({})
+        @IsString()
+        @Column({ nullable: true })
+        resident_id: string;
 
         @ManyToOne(() => Service, (service) => service.feedback)
         @JoinColumn()
         service: Service;
-      
+
+        @ApiProperty({})
+        @IsString()
+        @Column({ nullable: true })
+        service_id: string;
 
         @CreateDateColumn()
         created_at: Date;
