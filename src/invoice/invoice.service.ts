@@ -54,7 +54,7 @@ export class InvoiceService {
 
         return params.toString();
     }
-    async payment(createInvoiceDto: CreateInvoiceDto) {
+    async payment(createInvoiceDto: CreateInvoiceDto, residentId: string) {
         //https://developers.momo.vn/#/docs/en/aiov2/?id=payment-method
         //parameters
         var accessKey = "F8BBA842ECF85";
@@ -64,6 +64,7 @@ export class InvoiceService {
         var invoiceId = "Inv" + this.idGenerate.generateId().toString();
         var redirectUrl =
             createInvoiceDto.redirectUrl + "/" + invoiceId + "?auth=true";
+        createInvoiceDto.buyer_id = residentId;
         var ipnUrl =
             createInvoiceDto.baseLink +
             "/invoice/create/" +
@@ -72,7 +73,6 @@ export class InvoiceService {
             this.convertJsonToParams(createInvoiceDto) +
             "&id=" +
             invoiceId;
-        console.log(ipnUrl);
         var requestType = "payWithMethod";
         let servicePackage = await this.servicePackageRepository.findOne({
             where: { servicePackage_id: createInvoiceDto.servicePackage_id },
@@ -214,35 +214,49 @@ export class InvoiceService {
             cache: true,
         });
     }
-    async getAllInvoiceWithResidentId(residentId: string, serviceId:string): Promise<Invoice[]> {
-        let servicePackages = await this.servicePackageRepository.find({
-            where: { service_id: serviceId },
-        });
-        var invoices: Invoice[] = [];
-        for (const servicePackage of servicePackages) { 
+    async getAllInvoiceWithResidentId(
+        residentId: string,
+        serviceId: string | null,
+    ): Promise<Invoice[]> {
+        if (serviceId) {
+            let servicePackages = await this.servicePackageRepository.find({
+                where: { service_id: serviceId },
+            });
+            var invoices: Invoice[] = [];
+            for (const servicePackage of servicePackages) {
+                const invoice = await this.invoiceRepository.find({
+                    where: {
+                        buyer_id: residentId,
+                        servicePackage_id: servicePackage.servicePackage_id,
+                    },
+                    relations: ["servicePackage", "buyer"],
+                    cache: true,
+                });
+                invoices.push(...invoice);
+            }
+            invoices.sort((invoice1, invoice2) => {
+                if (invoice1.created_at < invoice2.created_at) {
+                    return -1; // Sort invoice1 before invoice2
+                }
+
+                if (invoice1.created_at > invoice2.created_at) {
+                    return 1; // Sort invoice2 before invoice1
+                }
+
+                return 0; // Equal, keep the order unchanged
+            });
+            return invoices;
+        }
+        else{
             const invoice = await this.invoiceRepository.find({
                 where: {
-                    buyer_id: residentId,
-                    servicePackage_id: servicePackage.servicePackage_id,
+                    buyer_id: residentId, 
                 },
                 relations: ["servicePackage", "buyer"],
                 cache: true,
             });
-            invoices.push(...invoice);
-            
+            return invoice;
         }
-        invoices.sort((invoice1, invoice2) => {
-            if (invoice1.created_at < invoice2.created_at) {
-              return -1; // Sort invoice1 before invoice2
-            }
-          
-            if (invoice1.created_at > invoice2.created_at) {
-              return 1; // Sort invoice2 before invoice1
-            }
-          
-            return 0; // Equal, keep the order unchanged
-          });
-        return invoices;
     }
 
     async update(id: string, updateInvoiceDto: UpdateInvoiceDto) {
