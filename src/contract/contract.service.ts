@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateContractDto } from "./dto/create-contract.dto";
 import { UpdateContractDto } from "./dto/update-contract.dto";
-import { DataSource, Repository, TypeORMError } from "typeorm";
+import { DataSource, Like, Repository, TypeORMError } from "typeorm";
 import { Contract } from "./entities/contract.entity";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { isQueryAffected } from "../helper/validation";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { StorageManager } from "../storage/storage.service";
+import { ContractRole, ContractStatusRole } from "../helper/enums/contractEnum";
 
 @Injectable()
 export class ContractService {
@@ -74,6 +75,7 @@ export class ContractService {
                 );
                 contract.contract_id = id;
                 contract.contract_with_signature_photo_URL = imageURL;
+                contract.status = ContractStatusRole.ACTIVE;
                 contract = await this.contractRepository.save(contract);
                 await queryRunner.commitTransaction();
             } catch (error) {
@@ -106,4 +108,15 @@ export class ContractService {
             contract_id: id,
         });
     }
+    async search(query: string): Promise<Contract[]> {
+        console.log(query);
+        const result = await this.contractRepository.find({
+            where: {
+                resident: { profile: {name:Like(`%${query}%`)} },
+            },
+        });
+
+        return result;
+    }
+    
 }
