@@ -24,7 +24,7 @@ class ImageFileContainer {
 }
 
 class URLContainer {
-    @IsUrl()
+    @IsUrl({ require_tld: false })
     value: string;
 }
 
