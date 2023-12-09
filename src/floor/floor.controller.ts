@@ -49,24 +49,22 @@ export class FloorController {
         description:
             "Page number: Page indexed from 1, each page contain 30 items, if null then return all.",
     })
-    @ApiOperation({summary: "get all floor"})
+    @ApiOperation({ summary: "get all floor" })
     @Get()
-    async findAll(): Promise<Floor[]> {
-        return await this.floorRepository.findAll();
-        
-    //     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-    //     @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
-    //     limit: number = 1,
-    // ): Promise<Pagination<Floor>> {
-    //     const options: IPaginationOptions = {
-    //         limit,
-    //         page
-    //     }
-    //     console.log(limit)
-    //     return this.floorRepository.paginate(options);
+    async findAll(
+        @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+        limit: number = 1,
+    ): Promise<Pagination<Floor>> {
+        const options: IPaginationOptions = {
+            limit,
+            page
+        }
+        console.log(limit)
+        return this.floorRepository.paginate(options);
     }
 
-   
+
     @Get(":id")
     async findOne(@Param("id") id: string) {
         const decodedId = decodeURIComponent(id);
