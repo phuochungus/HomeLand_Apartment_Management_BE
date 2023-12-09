@@ -1,26 +1,64 @@
-import { Injectable } from '@nestjs/common';
-import { CreateServicePackageDto } from './dto/create-service-package.dto';
-import { UpdateServicePackageDto } from './dto/update-service-package.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateServicePackageDto } from "./dto/create-service-package.dto";
+import { UpdateServicePackageDto } from "./dto/update-service-package.dto";
+import { ServicePackage } from "./entities/service-package.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { IdGenerator } from "../id-generator/id-generator.service";
+import { isQueryAffected } from "../helper/validation";
 
 @Injectable()
 export class ServicePackageService {
-  create(createServicePackageDto: CreateServicePackageDto) {
-    return 'This action adds a new servicePackage';
-  }
+    constructor(
+        @InjectRepository(ServicePackage)
+        private servicePackageRepository: Repository<ServicePackage>,
+        private readonly idGenerate: IdGenerator,
+    ) {}
+    async create(
+        createServicePackageDto: CreateServicePackageDto,
+        id?: string,
+    ) {
+        let servicePackage = this.servicePackageRepository.create(
+            createServicePackageDto,
+        );
+        servicePackage.servicePackage_id =
+            "SP" + this.idGenerate.generateId().toString();
+        if (id) servicePackage.servicePackage_id = id;
+        return await this.servicePackageRepository.save(servicePackage);
+    }
 
-  findAll() {
-    return `This action returns all servicePackage`;
-  }
+    async findAll() {
+        return await this.servicePackageRepository.find({
+            relations: ["service"],
+            cache: true,
+        });
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} servicePackage`;
-  }
+    async findOne(id: string) {
+        return await this.servicePackageRepository.findOne({
+            where: {
+                servicePackage_id: id,
+            },
+            relations: ["service"],
+            cache: true,
+        });
+    }
 
-  update(id: number, updateServicePackageDto: UpdateServicePackageDto) {
-    return `This action updates a #${id} servicePackage`;
-  }
+    async update(id: string, updateServicePackageDto: UpdateServicePackageDto) {
+        try {
+            let result = await this.servicePackageRepository.update(
+                id,
+                updateServicePackageDto,
+            );
+            return isQueryAffected(result);
+        } catch (error) {
+            throw new Error("Update failed due to " + error.message);
+        }
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} servicePackage`;
-  }
+    async remove(id: string) {
+        return await this.servicePackageRepository.softDelete({
+            servicePackage_id: id,
+        });
+    }
 }

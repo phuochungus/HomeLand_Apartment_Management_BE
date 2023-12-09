@@ -22,7 +22,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsOptional, IsString } from "class-validator";
 import { on } from "events";
 import { ServicePackage } from "../../service-package/entities/service-package.entity";
-
+import { Feedback } from "src/feedback/entities/feedback.entity";
 @Entity()
 export class Service {
     @PrimaryColumn()
@@ -52,8 +52,13 @@ export class Service {
     @OneToMany(() => ServicePackage, (service) => service.service, {
         nullable: true,
     })
-    @JoinTable()
-    servicePackages?: ServicePackage[];
+
+    @OneToMany(() => ServicePackage, (feedback) => feedback.service)
+    feedback: Feedback[];
+
+    @OneToMany(() => ServicePackage, (servicePackage) => servicePackage.service)
+    servicePackages: ServicePackage[];
+
     @CreateDateColumn()
     created_at: Date;
 

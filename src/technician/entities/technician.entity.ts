@@ -5,10 +5,16 @@ import {
     OneToOne,
     DeleteDateColumn,
     CreateDateColumn,
+    ManyToOne,
+    ManyToMany,
+    OneToMany
 } from "typeorm";
 import { PersonRole, Profile } from "../../helper/class/profile.entity";
 import { Account } from "../../account/entities/account.entity";
-import { JoinColumn } from "typeorm";
+import { JoinColumn, JoinTable } from "typeorm";
+import { Task } from "src/task/entities/task.entity";
+import { RepairInvoice } from "src/repairInvoice/entities/repairInvoice.entity";
+
 
 @Entity()
 export class Technician {
@@ -24,6 +30,10 @@ export class Technician {
     })
     @JoinColumn()
     account?: Account;
+
+    @OneToMany(() => Task, (task) => task.assignee)
+    @JoinColumn()
+    tasks: Task[];
 
     @CreateDateColumn()
     created_at: Date;

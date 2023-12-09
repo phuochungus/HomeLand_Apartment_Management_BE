@@ -3,6 +3,7 @@ import {
     CanActivate,
     ExecutionContext,
     UnauthorizedException,
+    HttpException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Observable } from "rxjs";
@@ -41,7 +42,7 @@ export class JWTAuthGuard implements CanActivate {
                     } else if (error instanceof JsonWebTokenError) {
                         throw new UnauthorizedException("Token invalid");
                     }
-                    console.error(error);
+                    if (!(error instanceof HttpException)) console.error(error);
                     throw error;
                 }
             }

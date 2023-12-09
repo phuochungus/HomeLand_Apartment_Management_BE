@@ -70,12 +70,13 @@ export class EmployeeService implements EmployeeRepository {
             front_identify_card_photo,
             back_identify_card_photo,
             profile_picture,
+            task_info,
             ...rest
         } = createEmployeeDto;
         const profile = plainToInstance(Profile, rest);
         // let employee = this.employeeRepository.create(rest);
         let employee = new Employee();
-
+        employee.task_info = task_info;
         if (id) employee.id = id;
         else employee.id = "EMP" + this.idGenerate.generateId();
 
@@ -94,25 +95,25 @@ export class EmployeeService implements EmployeeRepository {
                 backPhoto.mimetype || "image/png",
             );
 
-            let profilePictureURL: string | undefined = undefined;
+            let avatarURL: string | undefined = undefined;
             // const avatarPhoto = createEmployeeDto.profile_picture;
             const avatarPhoto = profile_picture as MemoryStoredFile;
             if (avatarPhoto) {
-                profilePictureURL = await this.storageManager.upload(
+                avatarURL = await this.storageManager.upload(
                     avatarPhoto.buffer,
                     "employee/" + employee.id + "/avatarURL." + (avatarPhoto.extension || "png"),
                     avatarPhoto.mimetype || "image/png",
                 );
             } else {
                 const avatar = await this.avatarGenerator.generateAvatar(profile.name);
-                profilePictureURL = await this.storageManager.upload(
+                avatarURL = await this.storageManager.upload(
                     avatar,
                     "employee/" + employee.id + "/avatarURL.svg",
                     "image/svg+xml",
                 );
             }
 
-            employee.profilePictureURL = profilePictureURL;
+            profile.avatarURL = avatarURL;
             profile.front_identify_card_photo_URL = frontURL;
             profile.back_identify_card_photo_URL = backURL;
             employee.profile = profile;
@@ -139,10 +140,9 @@ export class EmployeeService implements EmployeeRepository {
         let employee = await this.employeeRepository.findOne({
             where: { id },
         });
-        console.log(updateEmployeeDto)
 
         if (!employee) throw new NotFoundException();
-        const { profile_picture, front_identify_card_photo, back_identify_card_photo, ...rest } =
+        const { profile_picture, front_identify_card_photo, back_identify_card_photo,task_info, ...rest } =
             updateEmployeeDto;
         let profile = plainToInstance(Profile, rest);
         const queryRunner = this.dataSource.createQueryRunner();
@@ -151,13 +151,25 @@ export class EmployeeService implements EmployeeRepository {
         try {
             await queryRunner.connect();
             await queryRunner.startTransaction();
+            // if (profile_picture) {
+            //     const imageURL = await this.storageManager.upload(
+            //         profile_picture.buffer,
+            //         `employee/${id}/${Date.now()}.${profile_picture.extension || "png"}`,
+            //         profile_picture.mimetype || "image/png",
+            //     );
+            //     employee.profilePictureURL = imageURL;
+            // }
             if (profile_picture) {
-                const imageURL = await this.storageManager.upload(
-                    profile_picture.buffer,
-                    `employee/${id}/${Date.now()}.${profile_picture.extension || "png"}`,
-                    profile_picture.mimetype || "image/png",
+                const avataPhoto = profile_picture as MemoryStoredFile;
+                avatarURL = await this.storageManager.upload(
+                    avataPhoto.buffer,
+                    "employee/" +
+                    employee.id +
+                        "/avatarURL." +
+                        (avataPhoto.extension || "png"),
+                    avataPhoto.mimetype || "image/png",
                 );
-                employee.profilePictureURL = imageURL;
+                profile.avatarURL = avatarURL;
             }
 
             if (front_identify_card_photo) {

@@ -13,4 +13,21 @@ export class CreateFloorDto extends PickType(Floor, [
     @ApiProperty()
     @IsNumberString()
     max_apartment: number
+
+    @ApiProperty({
+        type: "string",
+        required: false,
+        isArray: true,
+        items: {
+            type: "string",
+        },
+        minItems: 1,
+    })
+    @IsOptional()
+    @IsString({ each: true })
+    @Transform(({ value }) => {
+        if (value && !Array.isArray(value)) return [value];
+        return value;
+    })
+    apartmentIds?: string[];
 }

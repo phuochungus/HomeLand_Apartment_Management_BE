@@ -12,6 +12,8 @@ import {
     Put,
     Query,
     ParseEnumPipe,
+    DefaultValuePipe,
+    ParseIntPipe,
 } from "@nestjs/common";
 import {
     ApiConsumes,
@@ -28,7 +30,8 @@ import { Auth } from "src/helper/decorator/auth.decorator";
 import { ManagerService } from './manager.service';
 import { CreateManagerDto } from './dto/create-manager.dto';
 import { UpdateManagerDto } from './dto/update-manager.dto';
-
+import { Pagination } from "nestjs-typeorm-paginate/dist/pagination";
+import { IPaginationOptions } from "nestjs-typeorm-paginate/dist/interfaces";
 @ApiTags("Manager")
 // @UseGuards(JWTAuthGuard)
 // @ApiBearerAuth()
@@ -93,11 +96,22 @@ export class ManagerController {
 
     @ApiOperation({ summary: "get all manager" })
     @Get()
-    async findAll() 
-    : Promise<Manager[]> {
- 
-        return this.managerRepository.findAll();
+    async findAll() {
+    return await this.managerRepository.findAll();
     }
+    // async findAll(
+        //     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        //     @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+        //     limit: number = 1,
+    // ): Promise<Pagination<Manager>> {
+        //     const options: IPaginationOptions = {
+            //         limit,
+            //         page
+        //     }
+    //     console.log(limit)
+        //     return this.managerRepository.paginate(options);
+    // }
+
     @ApiOperation({ summary: "get manager by id" })
     @Get("/:id")
     async findOne(

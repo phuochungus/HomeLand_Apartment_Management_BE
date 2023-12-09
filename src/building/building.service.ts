@@ -2,7 +2,7 @@ import { isArray } from "class-validator";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { CreateBuildingDto } from "./dto/create-building.dto";
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { DataSource, In, Repository, Like } from "typeorm";
+import { DataSource, In, Repository, Like, createQueryBuilder } from "typeorm";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { StorageManager } from "../storage/storage.service";
 import { IRepository } from "../helper/interface/IRepository.interface";
@@ -11,6 +11,9 @@ import { Floor } from "../floor/entities/floor.entity";
 import { UpdateBuildingDto } from "./dto/update-building.dto";
 import { isQueryAffected } from "../helper/validation";
 import { Manager } from "src/manager/entities/manager.entity";
+import { IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
+import { paginate } from "nestjs-typeorm-paginate/dist/paginate";
+import { IPaginationMeta } from "nestjs-typeorm-paginate/dist/interfaces";
 export abstract class BuildingService implements IRepository<Building> {
     abstract findOne(id: string): Promise<Building | null>;
     abstract update(id: string, updateEntityDto: any): Promise<boolean>;
@@ -30,6 +33,8 @@ export abstract class BuildingService implements IRepository<Building> {
         building_id: string,
         manager_id: string,
     ): Promise<Building | null>;
+    abstract reportResidentOfBuilding(): any;
+    abstract paginate(options: IPaginationOptions<IPaginationMeta>):Promise<Pagination<Building>>
 }
 
 @Injectable()
@@ -136,7 +141,6 @@ export class TypeORMBuildingService extends BuildingService {
                 },
                 relations: ["managers"],
             });
-            console.log(result);
             return result;
         } catch (e) {
             throw new Error(e);
@@ -163,5 +167,22 @@ export class TypeORMBuildingService extends BuildingService {
             relations: ["managers"],
         });
         return newBuilding;
+    }
+    async reportResidentOfBuilding() {
+        const result = await this.dataSource
+            .getRepository(Building)
+            .createQueryBuilder("building")
+            .leftJoin("building.floors", "floor")
+            .leftJoin("floor.apartments", "apartment")
+             .leftJoin("apartment.residents", "resident")
+            .addSelect("COUNT(resident)", "count")
+            .groupBy("building.building_id")
+            .getRawMany()
+        return result;
+    }
+    async paginate(options: IPaginationOptions<IPaginationMeta>) {
+        const result = this.buildingRepository.createQueryBuilder("building");
+        result.orderBy("building.building_id", "DESC");
+        return paginate<Building>(result, options)
     }
 }

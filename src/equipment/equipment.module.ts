@@ -16,5 +16,6 @@ import { AuthModule } from "../auth/auth.module";
     ],
     controllers: [EquipmentController],
     providers: [{ provide: EquipmentService, useClass: EquipmentServiceImp }],
+    exports: [EquipmentService],
 })
 export class EquipmentModule {}

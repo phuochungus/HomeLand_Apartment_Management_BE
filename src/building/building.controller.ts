@@ -9,6 +9,8 @@ import {
     NotFoundException,
     Query,
     Delete,
+    DefaultValuePipe,
+    ParseIntPipe,
 } from "@nestjs/common";
 
 import { ApiConsumes, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
@@ -17,7 +19,9 @@ import { UpdateBuildingDto } from "./dto/update-building.dto";
 import { CreateBuildingDto } from "./dto/create-building.dto";
 import { BuildingService } from "./building.service";
 import { id_ID } from "@faker-js/faker";
-
+import { Pagination } from "nestjs-typeorm-paginate/dist/pagination";
+import { IPaginationOptions } from "nestjs-typeorm-paginate/dist/interfaces";
+import { Building } from "./entities/building.entity";
 @ApiTags("Building")
 @Controller("building")
 export class BuildingController {
@@ -35,6 +39,13 @@ export class BuildingController {
      * search building by name
      * @param query string that admin search by name
      */
+    @ApiOperation({summary: "report resident of building"})
+    @Get("report")  
+    async report() {
+        const result = await this.buildingRepository.reportResidentOfBuilding();
+        return result;
+    }
+
     @ApiOperation({summary: "search building"})
     @Get("search")
     async searchBuilding(@Query("query") query: string) {
@@ -48,11 +59,24 @@ export class BuildingController {
         description:
             "Page number: Page indexed from 1, each page contain 30 items, if null then return all.",
     })
+
     @ApiOperation({summary: "get all building"})
     @Get()
-    findAll() {
-        return this.buildingRepository.findAll();
+    async findAll() {
+    return await this.buildingRepository.findAll();
     }
+    // async findAll(
+        //     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        //     @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+        //     limit: number = 1,
+    // ): Promise<Pagination<Building>> {
+        //     const options: IPaginationOptions = {
+            //         limit,
+            //         page
+        //     }
+    //     console.log(limit)
+        //     return this.buildingRepository.paginate(options);
+    // }
 
     @ApiOperation({summary: "get building by id"})
     @Get(":id")

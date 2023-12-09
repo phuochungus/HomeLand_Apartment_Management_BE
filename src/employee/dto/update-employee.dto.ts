@@ -9,16 +9,17 @@ export class UpdateEmployeeDto extends PartialType(
     OmitType(CreateEmployeeDto, [
         "back_identify_card_photo",
         "front_identify_card_photo",
+        "identify_number",
     ] as const),
 ) {
-    @ApiProperty({ type: "file", required: false })
+    @ApiProperty({ type: "file"})
     @IsFile()
     @IsOptional()
     @MaxFileSize(10e6)
     @HasMimeType(commonImageMIMETypes)
     front_identify_card_photo: MemoryStoredFile;
 
-    @ApiProperty({ type: "file", required: false })
+    @ApiProperty({ type: "file"})
     @IsFile()
     @IsOptional()
     @MaxFileSize(10e6)

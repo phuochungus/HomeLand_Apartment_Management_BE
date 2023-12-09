@@ -15,6 +15,7 @@ import { ApiConsumes, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { FormDataRequest } from "nestjs-form-data";
 import { UpdateApartmentDto } from "./dto/update-apartment.dto";
 import { Auth } from "../helper/decorator/auth.decorator";
+import { SearchDto } from "./dto/search-apartment.dto";
 
 @Auth()
 @ApiTags("Apartment")
@@ -81,5 +82,14 @@ export class ApartmentController {
     @Delete(":id")
     async delete(@Param("id") id: string) {
         return await this.apartmentRepository.delete(id);
+    }
+
+    @Post("/search")
+    async search(@Body() searchDto: SearchDto) {
+        return await this.apartmentRepository.search(
+            searchDto.field,
+            searchDto.value,
+            searchDto.page,
+        );
     }
 }

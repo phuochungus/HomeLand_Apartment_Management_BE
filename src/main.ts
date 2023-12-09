@@ -13,11 +13,9 @@ import { Technician } from "./technician/entities/technician.entity";
 import { Manager } from "./manager/entities/manager.entity";
 import { Resident } from "./resident/entities/resident.entity";
 import { Employee } from "./employee/entities/employee.entity";
-import path from "path";
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
-    app.useStaticAssets(path.join(process.cwd(), "doc"));
     app.useGlobalPipes(
         new ValidationPipe({
             whitelist: true,
@@ -45,12 +43,11 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config, option);
 
     SwaggerModule.setup("api", app, document, {
-        customCssUrl: "/style.css",
         swaggerOptions: {
             useUnsafeMarkdown: true,
         },
     });
 
-    await app.listen(process.env.PORT || 3000);
+    await app.listen(process.env.PORT || 8080);
 }
 bootstrap();

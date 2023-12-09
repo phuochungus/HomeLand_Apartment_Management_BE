@@ -5,6 +5,7 @@ export class UpdateTechnicianDto extends PartialType(
         "back_identify_card_photo",
         "front_identify_card_photo",
         "name",
-        "date_of_birth"
+        "date_of_birth",
+        "identify_number"
     ] as const),
 ) {}

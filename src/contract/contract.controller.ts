@@ -69,4 +69,11 @@ export class ContractController {
     remove(@Param("id") id: string) {
         return this.contractService.remove(id);
     }
+    
+    @Get("/search")
+    async searchResident(@Query("query") query: string) {
+        const result = await this.contractService.search(query);
+        return result;
+    }
+    
 }

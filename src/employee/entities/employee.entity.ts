@@ -17,7 +17,9 @@ export class Employee {
 
     @Column(() => Profile)
     profile: Profile;
-  
+
+    @Column({ nullable: true })
+    task_info?: string;
 
     @Column({ nullable: true })
     activated_at?: Date;

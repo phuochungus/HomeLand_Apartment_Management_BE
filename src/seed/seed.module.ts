@@ -8,6 +8,10 @@ import { HashModule } from "../hash/hash.module";
 import { AvatarGeneratorModule } from "../avatar-generator/avatar-generator.module";
 import { EmployeeModule } from "src/employee/employee.module";
 import { ResidentModule } from "../resident/resident.module";
+import { BuildingModule } from "../building/building.module";
+import { FloorModule } from "../floor/floor.module";
+import { EquipmentModule } from "../equipment/equipment.module";
+
 @Module({
     imports: [
         ApartmentModule,
@@ -17,6 +21,9 @@ import { ResidentModule } from "../resident/resident.module";
         HashModule,
         AvatarGeneratorModule,
         EmployeeModule,
+        BuildingModule,
+        FloorModule,
+        EquipmentModule,
     ],
     controllers: [Seed],
     providers: [SeedService],

@@ -15,7 +15,10 @@ import { IdGenerator } from "../id-generator/id-generator.service";
 import { plainToInstance } from "class-transformer";
 import { Account } from "../account/entities/account.entity";
 import { HashService } from "../hash/hash.service";
-
+import { IPaginationOptions } from "nestjs-typeorm-paginate";
+import { paginate } from "nestjs-typeorm-paginate/dist/paginate";
+import { IPaginationMeta } from "nestjs-typeorm-paginate/dist/interfaces";
+import { Pagination } from "nestjs-typeorm-paginate/dist/pagination";
 /**
  * Person repository interface
  */
@@ -38,6 +41,7 @@ export abstract class ResidentRepository implements IRepository<Resident> {
     ): Promise<Resident>;
     abstract findAll(): Promise<Resident[]>;
     abstract search(query: string): Promise<Resident[]>;
+    abstract paginate(options: IPaginationOptions):Promise<Pagination<Resident>>;
 }
 
 @Injectable()
@@ -79,7 +83,6 @@ export class ResidentService implements ResidentRepository {
             email,
             ...rest
         } = createResidentDto;
-        
         const profile = plainToInstance(Profile, rest);
         let resident = new Resident();
         resident.payment_info = payment_info;
@@ -127,7 +130,7 @@ export class ResidentService implements ResidentRepository {
                     "image/svg+xml",
                 );
             }
-          
+            profile.avatarURL = avatarURL;
             profile.front_identify_card_photo_URL = frontURL;
             profile.back_identify_card_photo_URL = backURL;
             resident.profile = profile;
@@ -135,12 +138,10 @@ export class ResidentService implements ResidentRepository {
             //set account
             if (email) {
                 resident.account_id = resident.id;
-
                 let account = new Account();
                 account.owner_id = resident.account_id;
                 account.email = email;
                 account.password = this.hashService.hash(profile.phone_number);
-                account.avatarURL = avatarURL;
                 account.resident = resident;    
                 await this.accountRepository.save(account);
             }
@@ -176,11 +177,9 @@ export class ResidentService implements ResidentRepository {
         id: string,
         updateResidentDto: UpdateResidentDto,
     ): Promise<Resident> {
-        console.log(id)
         let resident = await this.residentRepository.findOne({
             where: { id },
         });
-        console.log(resident)
         const { payment_info, avatar_photo, email, ...rest } =
             updateResidentDto;
         if (!resident) throw new NotFoundException();
@@ -192,7 +191,6 @@ export class ResidentService implements ResidentRepository {
         resident.payment_info = payment_info;
         let profile = plainToInstance(Profile, rest);
         let avatarURL: string | undefined;
-
         if (avatar_photo) {
             const avataPhoto = avatar_photo as MemoryStoredFile;
             avatarURL = await this.storageManager.upload(
@@ -203,13 +201,14 @@ export class ResidentService implements ResidentRepository {
                     (avataPhoto.extension || "png"),
                 avataPhoto.mimetype || "image/png",
             );
+            profile.avatarURL = avatarURL;
         }
+        
         if (account !== null) {
             // account.email = email as string;
             // account.avatarURL = avatarURL;
             await this.accountRepository.update(id, {
                 email,
-                avatarURL
             });
         }
 
@@ -263,5 +262,11 @@ export class ResidentService implements ResidentRepository {
             relations: ["account", "stay_at"],
         });
         return residents;
+    }
+
+    async paginate(options: IPaginationOptions<IPaginationMeta>) {
+        const result = this.residentRepository.createQueryBuilder("resident");
+        result.orderBy("resident.id", "DESC");
+        return paginate<Resident>(result, options)
     }
 }

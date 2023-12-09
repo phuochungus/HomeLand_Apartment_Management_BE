@@ -17,6 +17,7 @@ export class CreateResidentDto extends PickType(Profile, [
     "name",
     "date_of_birth",
     "gender",
+    "identify_number",
     "phone_number",
 ] as const) {
     @ApiProperty({ required: false })

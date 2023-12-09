@@ -40,11 +40,11 @@ export class ServiceService {
         const queryRunner = this.dataSource.createQueryRunner();
         if (images) {
             let uploadResults: PromiseSettledResult<string>[] = [];
-            
+
             try {
                 await queryRunner.connect();
                 await queryRunner.startTransaction();
-                
+
                 uploadResults = await Promise.allSettled(
                     images.map((image) =>
                         this.storageManager.upload(
@@ -148,7 +148,6 @@ export class ServiceService {
 
                 const newImageURLS = newImages.map((result) => result.value);
                 // this task can be done in parallel, will enhance later
-                console.log(difference(service.imageURLs, newImageURLS));
                 await this.storageManager.remove(
                     difference(service.imageURLs, newImageURLS),
                 );
