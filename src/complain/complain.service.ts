@@ -10,6 +10,7 @@ import { isQueryAffected } from "../helper/validation";
 import { Manager } from "src/manager/entities/manager.entity";
 import { Task } from "src/task/entities/task.entity";
 import { Resident } from "src/resident/entities/resident.entity";
+import axios from "axios";
 @Injectable()
 export class ComplainService {
     constructor(
@@ -17,6 +18,8 @@ export class ComplainService {
         private readonly complainRepository: Repository<Complain>,
         @InjectRepository(Resident)
         private readonly residentRepository: Repository<Resident>,
+        @InjectRepository(Manager)
+        private readonly managerRepository: Repository<Manager>,
         @InjectRepository(Task)
         private readonly taskRepository: Repository<Task>,
         @InjectDataSource()
@@ -105,5 +108,29 @@ export class ComplainService {
             where: { complain_id: id },
         });
         return result;
+    }
+    async getComplainOfBuilding(manager_id: string) {
+        const manager = await this.managerRepository.findOne({
+            where: {
+                id: manager_id
+            },
+            relations: {
+                building: true
+            }
+        });
+        const result = await this.complainRepository.find({
+            where: {
+                resident: {
+                    stay_at: {
+                        building: {
+                            building_id: manager?.building?.building_id 
+                        }
+                    }
+                }
+            },
+            relations: ["resident", "task"]
+        })
+        return result;
+
     }
 }

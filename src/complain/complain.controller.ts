@@ -35,6 +35,12 @@ export class ComplainController {
         return this.complainRepository.findAll();
     }
 
+    @ApiOperation({ summary: "get all complain of building" })
+    @Get("/building/:id")
+    getComplainOfBuilding(@Param ("id") manager_id: string) {
+        return this.complainRepository.getComplainOfBuilding(manager_id);
+    }
+
     @ApiOperation({ summary: "get complain of resident" })
     @Get("/resident/:id")
     getComplainsOfResident(@Param("id") id: string) {

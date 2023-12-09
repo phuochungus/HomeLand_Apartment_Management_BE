@@ -8,9 +8,10 @@ import { Complain } from "./entities/complain.entity";
 import { ComplainController } from "./complain.controller";
 import { Resident } from "src/resident/entities/resident.entity";
 import { Task } from "src/task/entities/task.entity";
+import { Manager } from "src/manager/entities/manager.entity";
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Complain, Resident, Task]),
+        TypeOrmModule.forFeature([Complain, Resident, Task, Manager]),
         IdGeneratorModule,
         StorageModule,
     ],

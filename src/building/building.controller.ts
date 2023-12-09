@@ -63,19 +63,19 @@ export class BuildingController {
     @ApiOperation({summary: "get all building"})
     @Get()
     async findAll() {
-        return await this.buildingRepository.findAll();
+    return await this.buildingRepository.findAll();
     }
     // async findAll(
-    //     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-    //     @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
-    //     limit: number = 1,
+        //     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        //     @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+        //     limit: number = 1,
     // ): Promise<Pagination<Building>> {
-    //     const options: IPaginationOptions = {
-    //         limit,
-    //         page
-    //     }
+        //     const options: IPaginationOptions = {
+            //         limit,
+            //         page
+        //     }
     //     console.log(limit)
-    //     return this.buildingRepository.paginate(options);
+        //     return this.buildingRepository.paginate(options);
     // }
 
     @ApiOperation({summary: "get building by id"})

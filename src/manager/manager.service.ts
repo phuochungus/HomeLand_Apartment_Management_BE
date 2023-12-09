@@ -181,8 +181,6 @@ export class ManagerService {
         catch(err) {
             throw new Error('Count not update manager');
         }
-          
-         
     }
     findOne(id: string): Promise<Manager | null> {
         return this.managerRepository.findOne({
@@ -190,7 +188,7 @@ export class ManagerService {
                 id,
             },
             cache: true,
-            relations: ["account"],
+            relations: ["account", "building"],
         });
     }
     async delete(id: string) {
@@ -208,7 +206,7 @@ export class ManagerService {
         return managers;
     }
     async paginate(options: IPaginationOptions<IPaginationMeta>) {
-        const result = this.managerRepository.createQueryBuilder("manager").leftJoinAndSelect("manager.account", "account");
+        const result = this.managerRepository.createQueryBuilder("manager").leftJoinAndSelect("manager.account", "account").leftJoinAndSelect("manager.building", "building")
         return paginate<Manager>(result, options)
     }
 }
