@@ -9,7 +9,7 @@ import {
 import { commonImageMIMETypes } from "../../helper/constant";
 import { Contract } from "../entities/contract.entity";
 
-export class CreateContractDto extends PickType(Contract, ['role', 'status'] as const) {
+export class CreateContractDto extends PickType(Contract, ['role'] as const) {
     @ApiProperty({ example: null, description: "The Previous contract id" })
     @IsOptional()
     @IsString()
@@ -21,8 +21,7 @@ export class CreateContractDto extends PickType(Contract, ['role', 'status'] as 
     
     @ApiProperty({ example: new Date(), description: "The expire date" })
     @IsOptional()
-    @IsDateString()
-    expire_at: Date;
+    expire_at?: Date;
     
     @ApiProperty({
         example: "APM1698502960091",

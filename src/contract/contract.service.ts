@@ -25,6 +25,7 @@ export class ContractService {
 
         contract.contract_id = "CT" + this.idGenerate.generateId().toString();
         if (id) contract.contract_id = id;
+        contract.status = ContractStatusRole.INACTIVE;
         await this.contractRepository.save(contract);
         return await this.findOne(contract.contract_id);
     }
@@ -51,7 +52,7 @@ export class ContractService {
                 contract_id: id,
             },
             cache: true,
-            relations: ["resident", "apartment"],
+            relations: ["resident", "apartment","apartment.floor","apartment.floor.building"],
         });
         if (contract == null) throw new NotFoundException();
         return contract;
@@ -115,7 +116,6 @@ export class ContractService {
                 resident: { profile: {name:Like(`%${query}%`)} },
             },
         });
-
         return result;
     }
     
