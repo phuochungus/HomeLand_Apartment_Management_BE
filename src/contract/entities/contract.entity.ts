@@ -75,7 +75,7 @@ export class Contract {
     @CreateDateColumn()
     created_at: Date;
 
-    @Column()
+    @Column({nullable: true})
     expire_at?: Date;
 
     @DeleteDateColumn()

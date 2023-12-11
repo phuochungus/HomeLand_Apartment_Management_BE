@@ -6,7 +6,7 @@ import { commonImageMIMETypes } from "src/helper/constant";
 
 export class UpdateContractDto extends OmitType(
     CreateContractDto,
-    ['previous_contract_id','status'] as const,
+    ['previous_contract_id'] as const,
 ) {
     @ApiProperty({
         type: "file",
