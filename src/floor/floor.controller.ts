@@ -97,7 +97,11 @@ export class FloorController {
     async deleteApartment(@Param("id") id: string, @Query("apartmentId") apartmentId: string) {
         return await this.floorRepository.deleteApartment(id, apartmentId)
     }
-
+    @ApiOperation({summary: "soft delete floor"})
+    @Delete("/:id")
+    async softDeleteFloor(@Param("id") id: string) {
+        return await this.floorRepository.delete(id);
+    }
     // @Delete(":id")
     // remove(@Param("id") id: string) {
     //         return this.floorRepository.delete(id);

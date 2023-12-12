@@ -126,8 +126,14 @@ export class TypeORMFloorService extends FloorService {
         return isQueryAffected(result);
     }
     async delete(id: string): Promise<boolean> {
-        const result = await this.floorRepository.softDelete({ floor_id: id });
-        return isQueryAffected(result);
+        try {
+            const result = await this.floorRepository.softDelete({
+                floor_id: id,
+            });
+            return isQueryAffected(result);
+        } catch (error) {
+            throw new Error("Method not implemented.");
+        }
     }
     async hardDelete?(id: any): Promise<boolean> {
         try {
