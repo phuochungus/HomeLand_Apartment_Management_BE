@@ -94,7 +94,13 @@ export class ResidentController {
     }
     @ApiOperation({ summary: "get all resident" })
     @Get()
-    async findAll(
+    async findAll(){
+        return this.residentRepository.findAll();
+    }
+    
+    @ApiOperation({summary: "pagination resident"})
+    @Get("/pagination")
+    async paginationResident(
             @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
             @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
             limit: number = 1,

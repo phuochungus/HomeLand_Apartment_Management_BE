@@ -115,7 +115,7 @@ export class ComplainService {
                 id: manager_id
             },
             relations: {
-                building: true
+                building: true,
             }
         });
         const result = await this.complainRepository.find({
