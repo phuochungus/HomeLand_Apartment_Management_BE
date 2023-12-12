@@ -59,24 +59,26 @@ export class BuildingController {
         description:
             "Page number: Page indexed from 1, each page contain 30 items, if null then return all.",
     })
-
     @ApiOperation({summary: "get all building"})
     @Get()
-    async findAll() {
-        return await this.buildingRepository.findAll();
+    async findAll(){
+        return this.buildingRepository.findAll();
     }
-    // async findAll(
-    //     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-    //     @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
-    //     limit: number = 1,
-    // ): Promise<Pagination<Building>> {
-    //     const options: IPaginationOptions = {
-    //         limit,
-    //         page
-    //     }
-    //     console.log(limit)
-    //     return this.buildingRepository.paginate(options);
-    // }
+    
+    @ApiOperation({summary: "pagination building"})
+    @Get("/pagination")
+    async paginationBuilding(
+            @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+            @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+            limit: number = 1,
+    ): Promise<Pagination<Building>> {
+            const options: IPaginationOptions = {
+                    limit,
+                    page
+            }
+        console.log(limit)
+            return this.buildingRepository.paginate(options);
+    }
 
     @ApiOperation({summary: "get building by id"})
     @Get(":id")

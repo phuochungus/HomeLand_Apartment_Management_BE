@@ -96,21 +96,24 @@ export class ManagerController {
 
     @ApiOperation({ summary: "get all manager" })
     @Get()
-    async findAll() {
-        return await this.managerRepository.findAll();
+    async findAll(){
+        return this.managerRepository.findAll();
     }
-    // async findAll(
-    //     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-    //     @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
-    //     limit: number = 1,
-    // ): Promise<Pagination<Manager>> {
-    //     const options: IPaginationOptions = {
-    //         limit,
-    //         page
-    //     }
-    //     console.log(limit)
-    //     return this.managerRepository.paginate(options);
-    // }
+    
+    @ApiOperation({summary: "pagination manager"})
+    @Get("/pagination")
+    async paginationManager(
+            @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+            @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+            limit: number = 1,
+    ): Promise<Pagination<Manager>> {
+            const options: IPaginationOptions = {
+                    limit,
+                    page
+            }
+        console.log(limit)
+            return this.managerRepository.paginate(options);
+    }
 
     @ApiOperation({ summary: "get manager by id" })
     @Get("/:id")

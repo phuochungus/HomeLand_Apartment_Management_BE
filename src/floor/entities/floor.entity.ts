@@ -1,5 +1,6 @@
 import {
     Column,
+    DeleteDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
@@ -46,5 +47,7 @@ export class Floor {
     
     @OneToMany(() => Equipment, (equipment) => equipment.floor)
     equipments: Equipment[];
+    @DeleteDateColumn()
+    deleted_at?: Date;
   
 }
