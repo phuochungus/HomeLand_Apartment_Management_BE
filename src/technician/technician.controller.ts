@@ -96,7 +96,13 @@ export class TechnicianController {
 
     @ApiOperation({ summary: "get all technician" })
     @Get()
-    async findAll(
+    async findAll() {
+        return this.technicianRepository.findAll();
+    }
+
+    @ApiOperation({ summary: "pagination technician" })
+    @Get("/pagination")
+    async paginationTechnician(
             @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
             @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
             limit: number = 1,
@@ -108,6 +114,7 @@ export class TechnicianController {
         console.log(limit)
             return this.technicianRepository.paginate(options);
     }
+    
     @ApiOperation({ summary: "get technician by id" })
     @Get("/:id")
     async findOne(

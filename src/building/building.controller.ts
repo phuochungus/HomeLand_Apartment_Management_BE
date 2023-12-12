@@ -59,11 +59,15 @@ export class BuildingController {
         description:
             "Page number: Page indexed from 1, each page contain 30 items, if null then return all.",
     })
-
     @ApiOperation({summary: "get all building"})
     @Get()
-   
-    async findAll(
+    async findAll(){
+        return this.buildingRepository.findAll();
+    }
+    
+    @ApiOperation({summary: "pagination building"})
+    @Get("/pagination")
+    async paginationBuilding(
             @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
             @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
             limit: number = 1,

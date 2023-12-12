@@ -96,7 +96,13 @@ export class ManagerController {
 
     @ApiOperation({ summary: "get all manager" })
     @Get()
-    async findAll(
+    async findAll(){
+        return this.managerRepository.findAll();
+    }
+    
+    @ApiOperation({summary: "pagination manager"})
+    @Get("/pagination")
+    async paginationManager(
             @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
             @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
             limit: number = 1,
