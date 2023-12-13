@@ -192,8 +192,11 @@ export class TypeORMFloorService extends FloorService {
     }
 
     async paginate(options: IPaginationOptions<IPaginationMeta>) {
-        const result = this.floorRepository.createQueryBuilder("floor");
-        result.orderBy("floor.floor_id", "DESC");
-        return paginate<Floor>(result, options)
-    }
+        const result = this.floorRepository.createQueryBuilder('floor')
+          .leftJoinAndSelect('floor.building', 'building')
+          .orderBy('floor.floor_id', 'DESC');
+      
+        return paginate<Floor>(result, options);
+      }
+      
 }
