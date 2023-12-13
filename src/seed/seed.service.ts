@@ -76,7 +76,7 @@ export class SeedService {
     private readonly NUMBER_OF_BUILDING = 5;
     private readonly NUMBER_OF_FLOOR_PER_BUILDING = 5;
     private readonly NUMBER_OF_APARTMENT_PER_FLOOR = 6;
-    private readonly NUMBER_OF_RESIDENT = 5;
+    private readonly NUMBER_OF_RESIDENT = 1;
     private readonly NUMBER_OF_EMPLOYEE = 10;
     private readonly NUMBER_OF_MANAGER = 10;
     private readonly NUMBER_OF_TECHNICIAN = 10;
@@ -120,7 +120,7 @@ export class SeedService {
         await this.createDemoManager();
         await this.createDemoTechnician();
         await this.createDemoAccountResident();
-        await this.createDemoResidents();
+       
 
         this.buildings = await this.createDemoBuildings();
         this.floors = await this.createDemoFloors(this.buildings);
@@ -134,6 +134,7 @@ export class SeedService {
         await this.createDemoContract();
         await this.createDemoServices();
         await this.createDemoServicePackages();
+        await this.createDemoResidents();
     }
 
     async createDemoEquipments(
@@ -373,8 +374,11 @@ export class SeedService {
         });
     }
 
-    async createDemoResident(index) {
+    async createDemoResident(index, apartment_id:string) {
         let id = "RES" + this.idGenerator.generateId();
+        const apartmentData = await this.dataSource.getRepository(Apartment).findOne({where: {
+            apartment_id
+        }}) as Apartment
         const resident = await this.dataSource.getRepository(Resident).save({
             id: id,
             profile: {
@@ -398,7 +402,9 @@ export class SeedService {
                     "resident/" + id + "/avatar.svg",
                     "image/svg+xml",
                 ),
+                
             },
+            // stay_at: apartment,
             account:
                 index % 2 === 0
                     ? {
@@ -407,6 +413,7 @@ export class SeedService {
                           password: this.hashService.hash("password"),
                       }
                     : undefined,
+                    stay_at: apartmentData
         });
     }
 
@@ -495,7 +502,6 @@ export class SeedService {
     }
 
     async createDemoContract() {
-        // await this.createDemoResident(2);
         await this.createDemoApartment("APM1698502960091");
         let contractId = "Contract" + this.idGenerator.generateId();
         await this.dataSource.getRepository(Contract).save({
@@ -547,8 +553,10 @@ export class SeedService {
     }
 
     async createDemoResidents() {
+        for (let apartment of this.apartments) {
         for (let i = 0; i < this.NUMBER_OF_RESIDENT; i++) {
-            await this.createDemoResident(i);
+            await this.createDemoResident(i,  apartment.apartment_id);
         }
+    }
     }
 }
