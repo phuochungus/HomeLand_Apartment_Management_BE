@@ -68,9 +68,9 @@ export class TypeORMFloorService extends FloorService {
 
     async findAll() {
         return await this.floorRepository.find({
-          relations: ["building"], 
+            relations: ["building"],
         });
-      }
+    }
 
     async findOne(id: string) {
         return await this.floorRepository.findOne({
@@ -133,13 +133,14 @@ export class TypeORMFloorService extends FloorService {
      * @returns
      */
     async search(query: string): Promise<Floor[]> {
-        const result = await this.floorRepository.find({
-            where: {
-                name: Like(`%${query}%`),
-            },
-        });
+        const result = await this.floorRepository.createQueryBuilder('floor')
+            .leftJoinAndSelect('floor.building', 'building')
+            .where('floor.name LIKE :query', { query: `%${query}%` })
+            .getMany();
+
         return result;
     }
+
     async addApartment(
         apartmentIds: string[] | string,
         id: string,
@@ -193,10 +194,10 @@ export class TypeORMFloorService extends FloorService {
 
     async paginate(options: IPaginationOptions<IPaginationMeta>) {
         const result = this.floorRepository.createQueryBuilder('floor')
-          .leftJoinAndSelect('floor.building', 'building')
-          .orderBy('floor.floor_id', 'DESC');
-      
+            .leftJoinAndSelect('floor.building', 'building')
+            .orderBy('floor.floor_id', 'DESC');
+
         return paginate<Floor>(result, options);
-      }
-      
+    }
+
 }
