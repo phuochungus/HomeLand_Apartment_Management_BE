@@ -9,10 +9,11 @@ import { ResidentController } from "./resident.controller";
 import { ResidentRepository, ResidentService } from "./resident.service";
 import { Account } from "../account/entities/account.entity";
 import { AuthModule } from "../auth/auth.module";
+import { Contract } from "src/contract/entities/contract.entity";
 @Global()
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Resident, Account]),
+        TypeOrmModule.forFeature([Resident, Account, Contract]),
         IdGeneratorModule,
         AuthModule,
         StorageModule,

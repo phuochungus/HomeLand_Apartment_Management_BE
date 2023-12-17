@@ -3,7 +3,7 @@ import { Resident } from "./entities/resident.entity";
 
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Like, Repository, TypeORMError } from "typeorm";
+import { In, Like, Repository, TypeORMError } from "typeorm";
 import { StorageManager } from "../storage/storage.service";
 import { isQueryAffected } from "../helper/validation";
 import { IRepository } from "../helper/interface/IRepository.interface";
@@ -19,6 +19,7 @@ import { IPaginationOptions } from "nestjs-typeorm-paginate";
 import { paginate } from "nestjs-typeorm-paginate/dist/paginate";
 import { IPaginationMeta } from "nestjs-typeorm-paginate/dist/interfaces";
 import { Pagination } from "nestjs-typeorm-paginate/dist/pagination";
+import { Contract } from "src/contract/entities/contract.entity";
 /**
  * Person repository interface
  */
@@ -51,6 +52,8 @@ export class ResidentService implements ResidentRepository {
         private readonly residentRepository: Repository<Resident>,
         @InjectRepository(Account)
         private readonly accountRepository: Repository<Account>,
+        @InjectRepository(Contract)
+        private readonly contractRepository: Repository<Contract>,
         private readonly storageManager: StorageManager,
         private readonly hashService: HashService,
         private readonly idGenerate: IdGenerator,
@@ -243,8 +246,14 @@ export class ResidentService implements ResidentRepository {
     }
 
     async delete(id: string): Promise<boolean> {
+        const resident = await this.residentRepository.findOne({where: {
+            id
+        }, relations: {
+            contracts: true
+        }}) as Resident;
+        let contractIds = resident.contracts.map(contract => contract.contract_id);
         const result = await this.residentRepository.softDelete({ id });
-        
+        await this.contractRepository.softDelete({contract_id: In(contractIds)})
         return isQueryAffected(result);
     }
 

@@ -78,6 +78,7 @@ export class SeedService {
     private readonly NUMBER_OF_FLOOR_PER_BUILDING = 5;
     private readonly NUMBER_OF_APARTMENT_PER_FLOOR = 6;
     private readonly NUMBER_OF_RESIDENT = 1;
+  
     private readonly NUMBER_OF_EMPLOYEE = 10;
     private readonly NUMBER_OF_MANAGER = 10;
     private readonly NUMBER_OF_TECHNICIAN = 10;
@@ -121,7 +122,7 @@ export class SeedService {
         await this.createDemoManager();
         await this.createDemoTechnician();
         await this.createDemoAccountResident();
-
+       
 
         this.buildings = await this.createDemoBuildings();
         this.floors = await this.createDemoFloors(this.buildings);
@@ -375,13 +376,11 @@ export class SeedService {
         });
     }
 
-    async createDemoResident(index, apartment_id: string) {
+    async createDemoResident(index, apartment_id:string) {
         let id = "RES" + this.idGenerator.generateId();
-        const apartmentData = await this.dataSource.getRepository(Apartment).findOne({
-            where: {
-                apartment_id
-            }
-        }) as Apartment
+        const apartmentData = await this.dataSource.getRepository(Apartment).findOne({where: {
+            apartment_id
+        }}) as Apartment
         const resident = await this.dataSource.getRepository(Resident).save({
             id: id,
             profile: {
@@ -405,7 +404,7 @@ export class SeedService {
                     "resident/" + id + "/avatar.svg",
                     "image/svg+xml",
                 ),
-
+                
             },
             // stay_at: apartment,
             account:
@@ -416,7 +415,7 @@ export class SeedService {
                         password: this.hashService.hash("password"),
                     }
                     : undefined,
-            stay_at: apartmentData
+                    stay_at: apartmentData
         });
     }
 
