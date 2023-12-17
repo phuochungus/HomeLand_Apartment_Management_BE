@@ -278,7 +278,7 @@ export class ResidentService implements ResidentRepository {
         if(buildingId) {
             result.innerJoinAndSelect("resident.stay_at", "apartment").where('apartment.building_id = :buildingId', {buildingId: buildingId})
         }
-        result.orderBy("resident.id", "DESC");
+        else result.innerJoinAndSelect("resident.stay_at", "apartment")
         return paginate<Resident>(result, options)
     }
 }
