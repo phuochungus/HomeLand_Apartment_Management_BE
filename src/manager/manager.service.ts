@@ -175,7 +175,7 @@ export class ManagerService {
             where: {
                 id
             },
-            relations: ["account"],
+            relations: ["account", "building"],
         })
         }
         catch(err) {

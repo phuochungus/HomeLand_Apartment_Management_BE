@@ -104,13 +104,14 @@ export class ResidentController {
             @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
             @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
             limit: number = 1,
+            @Query ("buildingId") buildingId?: string
     ): Promise<Pagination<Resident>> {
             const options: IPaginationOptions = {
                     limit,
                     page
             }
         console.log(limit)
-            return this.residentRepository.paginate(options);
+            return this.residentRepository.paginate(options, buildingId);
     }
 
     @ApiOperation({ summary: "get resident by id" })
@@ -119,4 +120,5 @@ export class ResidentController {
         const resident = await this.residentRepository.findOne(id);
         return resident;
     }
+
 }
