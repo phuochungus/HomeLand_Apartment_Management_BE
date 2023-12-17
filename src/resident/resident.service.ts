@@ -42,7 +42,7 @@ export abstract class ResidentRepository implements IRepository<Resident> {
     ): Promise<Resident>;
     abstract findAll(): Promise<Resident[]>;
     abstract search(query: string): Promise<Resident[]>;
-    abstract paginate(options: IPaginationOptions):Promise<Pagination<Resident>>;
+    abstract paginate(options: IPaginationOptions, buildingId?: string):Promise<Pagination<Resident>>;
 }
 
 @Injectable()
@@ -273,8 +273,11 @@ export class ResidentService implements ResidentRepository {
         return residents;
     }
 
-    async paginate(options: IPaginationOptions<IPaginationMeta>) {
+    async paginate(options: IPaginationOptions<IPaginationMeta>, buildingId?: string ) {
         const result = this.residentRepository.createQueryBuilder("resident");
+        if(buildingId) {
+            result.innerJoinAndSelect("resident.stay_at", "apartment").where('apartment.building_id = :buildingId', {buildingId: buildingId})
+        }
         result.orderBy("resident.id", "DESC");
         return paginate<Resident>(result, options)
     }
