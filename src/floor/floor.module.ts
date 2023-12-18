@@ -13,7 +13,7 @@ import { Apartment } from "src/apartment/entities/apartment.entity";
 @Module(
   {
     imports: [
-        TypeOrmModule.forFeature([Apartment, Floor]),
+        TypeOrmModule.forFeature([Building, Floor]),
         IdGeneratorModule,
         StorageModule,
     ],

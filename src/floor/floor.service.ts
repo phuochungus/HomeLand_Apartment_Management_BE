@@ -30,22 +30,15 @@ export abstract class FloorService implements IRepository<Floor> {
     ): Promise<Floor>;
     abstract findAll(page?: number): Promise<Floor[]>;
     abstract search(query: string): Promise<Floor[]>;
-    abstract addApartment(
-        apartmentIds: string[] | string,
-        id: string,
-    ): Promise<Floor | null>;
-    abstract deleteApartment(
-        floor_id: string,
-        apartment_id: string,
-    ): Promise<Floor | null>;
-    abstract paginate(options: IPaginationOptions<IPaginationMeta>):Promise<Pagination<Floor>>
+
+    abstract paginate(options: IPaginationOptions<IPaginationMeta>): Promise<Pagination<Floor>>
 }
 
 @Injectable()
 export class TypeORMFloorService extends FloorService {
     constructor(
-        @InjectRepository(Apartment)
-        private readonly apartmentRepository: Repository<Apartment>,
+        @InjectRepository(Building)
+        private readonly buildingRepository: Repository<Building>,
         @InjectRepository(Floor)
         private readonly floorRepository: Repository<Floor>,
         @InjectDataSource()
@@ -65,14 +58,6 @@ export class TypeORMFloorService extends FloorService {
         if (id) floor.floor_id = id;
 
         try {
-            if (CreateFloorDto.apartmentIds) {
-                const apartments = await this.apartmentRepository.find({
-                    where: { apartment_id: In(CreateFloorDto.apartmentIds) },
-                });
-                if (apartments.length !== CreateFloorDto.apartmentIds.length)
-                    throw new NotFoundException("Some resident not found");
-                floor.apartments = apartments;
-            }
             floor = await this.floorRepository.save(floor);
             return floor;
         } catch (error) {
@@ -80,11 +65,11 @@ export class TypeORMFloorService extends FloorService {
             throw error;
         }
     }
-  
+
     async findAll() {
         return await this.floorRepository.find(
             {
-                relations: ["apartments"],
+                relations: ["apartments", "building"],
                 withDeleted: true 
             }
         );
@@ -93,7 +78,7 @@ export class TypeORMFloorService extends FloorService {
     async findOne(id: string) {
         return await this.floorRepository.findOne({
             where: { floor_id: id },
-            relations: ["apartments"],
+            relations: ["apartments", "building"],
             withDeleted: true 
         });
     }
@@ -107,7 +92,7 @@ export class TypeORMFloorService extends FloorService {
         });
         if (!floor) throw new NotFoundException();
         const queryRunner = this.dataSource.createQueryRunner();
-       
+
         try {
             await queryRunner.connect();
             await queryRunner.startTransaction();
@@ -139,7 +124,7 @@ export class TypeORMFloorService extends FloorService {
     }
     async hardDelete?(id: any): Promise<boolean> {
         try {
-            const result = await this.floorRepository.delete({ floor_id : id });
+            const result = await this.floorRepository.delete({ floor_id: id });
             return isQueryAffected(result);
         } catch (error) {
             console.error(error);
@@ -152,13 +137,14 @@ export class TypeORMFloorService extends FloorService {
      * @returns
      */
     async search(query: string): Promise<Floor[]> {
-        const result = await this.floorRepository.find({
-            where: {
-                name: Like(`%${query}%`),
-            },
-        });
+        const result = await this.floorRepository.createQueryBuilder('floor')
+            .leftJoinAndSelect('floor.building', 'building')
+            .where('floor.name LIKE :query', { query: `%${query}%` })
+            .getMany();
+
         return result;
     }
+
     async addApartment(
         apartmentIds: string[] | string,
         id: string,
@@ -187,32 +173,35 @@ export class TypeORMFloorService extends FloorService {
     }
     async deleteApartment(floor_id: string, apartment_id: string): Promise<Floor | null> {
         try {
-          const floor = await this.floorRepository.findOne({
-            where: {
-              floor_id,
-            },
-          });
-          await this.floorRepository
-            .createQueryBuilder()
-            .relation(Floor, "apartments")
-            .of(floor)
-            .remove(apartment_id);
-          const newBuilding = await this.floorRepository.findOne({
-            where: {
-              floor_id,
-            },
-            relations: ["apartments"],
-        });
-        return newBuilding;
-    } catch (err) {
-        console.error(err);
-        throw err;
-      }
+            const floor = await this.floorRepository.findOne({
+                where: {
+                    floor_id,
+                },
+            });
+            await this.floorRepository
+                .createQueryBuilder()
+                .relation(Floor, "apartments")
+                .of(floor)
+                .remove(apartment_id);
+            const newBuilding = await this.floorRepository.findOne({
+                where: {
+                    floor_id,
+                },
+                relations: ["apartments"],
+            });
+            return newBuilding;
+        } catch (err) {
+            console.error(err);
+            throw err;
+        }
     }
-   
+
     async paginate(options: IPaginationOptions<IPaginationMeta>) {
-        const result = this.floorRepository.createQueryBuilder("floor");
-        result.orderBy("floor.floor_id", "DESC");
-        return paginate<Floor>(result, options)
+        const result = this.floorRepository.createQueryBuilder('floor')
+            .leftJoinAndSelect('floor.building', 'building')
+            .orderBy('floor.floor_id', 'DESC');
+
+        return paginate<Floor>(result, options);
     }
+
 }

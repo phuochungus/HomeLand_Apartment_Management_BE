@@ -51,18 +51,24 @@ export class FloorController {
     })
     @ApiOperation({ summary: "get all floor" })
     @Get()
-    async findAll(
+    async findAll() {
+        return this.floorRepository.findAll();
+    }
+    @ApiOperation({ summary: "pagination floor" })
+    @Get("/pagination")
+    async paginationFloor(
         @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-        @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
-        limit: number = 1,
+        @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number = 1,
     ): Promise<Pagination<Floor>> {
         const options: IPaginationOptions = {
             limit,
-            page
-        }
-        console.log(limit)
+            page,
+       
+        };
+
         return this.floorRepository.paginate(options);
     }
+
 
 
     @Get(":id")
@@ -86,18 +92,8 @@ export class FloorController {
         );
         return floor;
     }
-    @ApiOperation({ summary: "add apartment to floor" })
-    @Post("/:id")
-    async addApartment(@Param("id") id: string, @Query("apartmentIds") apartmentIds: string[]) {
-        return await this.floorRepository.addApartment(apartmentIds, id)
-    }
 
-    @ApiOperation({ summary: "delete apartment from floor" })
-    @Post("/:id")
-    async deleteApartment(@Param("id") id: string, @Query("apartmentId") apartmentId: string) {
-        return await this.floorRepository.deleteApartment(id, apartmentId)
-    }
-    @ApiOperation({summary: "soft delete floor"})
+    @ApiOperation({ summary: "soft delete floor" })
     @Delete("/:id")
     async softDeleteFloor(@Param("id") id: string) {
         return await this.floorRepository.delete(id);

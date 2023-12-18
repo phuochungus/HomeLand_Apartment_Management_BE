@@ -31,7 +31,7 @@ export class Floor {
     @ManyToOne(() => Building, (building) => building.floors)
     @JoinColumn({ name: "building_id" })
     building: Building;
-
+    
     @ApiProperty({ example: "BLD0" })
     @IsString()
     @Column({ nullable: true })
@@ -44,6 +44,11 @@ export class Floor {
         cascade: true,
     })
     apartments: Apartment[];
+    
+    // @OneToMany(() => Building, (building) => building.floors, {
+    //     cascade: true,
+    // })
+    // buildings: Building[];
     
     @OneToMany(() => Equipment, (equipment) => equipment.floor)
     equipments: Equipment[];
