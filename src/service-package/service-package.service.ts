@@ -31,6 +31,7 @@ export class ServicePackageService {
         return await this.servicePackageRepository.find({
             relations: ["service"],
             cache: true,
+            withDeleted: true 
         });
     }
 
@@ -41,6 +42,7 @@ export class ServicePackageService {
             },
             relations: ["service"],
             cache: true,
+            withDeleted: true 
         });
     }
 

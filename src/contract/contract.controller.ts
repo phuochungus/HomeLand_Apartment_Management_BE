@@ -47,7 +47,7 @@ export class ContractController {
         return { data, current_page: page, per_page: 30, total: data.length};
     }
 
-    @Get(":id")
+    @Get("/:id")
     findOne(@Param("id") id: string) {
         return this.contractService.findOne(id);
     }
@@ -69,8 +69,12 @@ export class ContractController {
     remove(@Param("id") id: string) {
         return this.contractService.remove(id);
     }
-    
     @Get("/search")
+    async helloResident(@Query("query") query: string) {
+        const result = await this.contractService.search(query);
+        return result;
+    }
+    @Get("/search/byQuery")
     async searchResident(@Query("query") query: string) {
         const result = await this.contractService.search(query);
         return result;
