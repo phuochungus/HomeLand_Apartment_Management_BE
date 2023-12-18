@@ -260,6 +260,7 @@ export class ResidentService implements ResidentRepository {
     async findAll(): Promise<Resident[]> {
         const residents = await this.residentRepository.find({
             relations: ["account", "stay_at"],
+            withDeleted: true 
         });
         return residents;
     }

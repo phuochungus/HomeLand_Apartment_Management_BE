@@ -89,6 +89,7 @@ export class ServiceService {
                 take: 30,
                 relations: ["servicePackages"],
                 cache: true,
+                withDeleted: true 
             });
         }
 
@@ -104,6 +105,7 @@ export class ServiceService {
                 service_id: id,
             },
             cache: true,
+            withDeleted: true ,
             relations: ["servicePackages"],
         });
         if (service == null) throw new NotFoundException();

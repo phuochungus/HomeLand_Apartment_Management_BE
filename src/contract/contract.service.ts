@@ -37,12 +37,14 @@ export class ContractService {
                 take: 30,
                 relations: ["resident", "apartment"],
                 cache: true,
+                withDeleted: true 
             });
         }
 
         return await this.contractRepository.find({
             relations: ["resident", "apartment"],
             cache: true,
+            withDeleted: true 
         });
     }
 
@@ -53,6 +55,7 @@ export class ContractService {
             },
             cache: true,
             relations: ["resident", "apartment","apartment.floor","apartment.floor.building"],
+            withDeleted: true 
         });
         if (contract == null) throw new NotFoundException();
         return contract;

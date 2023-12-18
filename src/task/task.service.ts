@@ -121,7 +121,7 @@ export class TaskService {
                 }
                 ,invoice: true
                 
-            }
+            },withDeleted: true 
         });
         return result;
     }

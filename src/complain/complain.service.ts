@@ -52,6 +52,7 @@ export class ComplainService {
     async findAll() {
         return await this.complainRepository.find({
             relations: ["resident", "task"],
+            withDeleted: true 
         });
     }
 
@@ -59,6 +60,7 @@ export class ComplainService {
         return await this.complainRepository.findOne({
             where: { complain_id: id },
             relations: ["resident"],
+            withDeleted: true 
         });
     }
     async update(

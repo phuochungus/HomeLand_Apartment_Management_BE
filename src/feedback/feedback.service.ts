@@ -90,11 +90,13 @@ export class TypeORMFeedbackService extends FeedbackService {
             },
             relations: ["service"],
             cache: true,
+            withDeleted: true 
         });
     }
     async findAll() {
         return await this.feedbackRepository.find({
             relations: ["service","resident"],
+            withDeleted: true 
         });
     }
     async findByServiceId(service_id: string): Promise<Feedback[]> {

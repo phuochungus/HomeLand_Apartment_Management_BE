@@ -85,6 +85,7 @@ export class TypeORMFloorService extends FloorService {
         return await this.floorRepository.find(
             {
                 relations: ["apartments"],
+                withDeleted: true 
             }
         );
     }
@@ -93,6 +94,7 @@ export class TypeORMFloorService extends FloorService {
         return await this.floorRepository.findOne({
             where: { floor_id: id },
             relations: ["apartments"],
+            withDeleted: true 
         });
     }
 
