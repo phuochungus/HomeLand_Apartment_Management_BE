@@ -31,6 +31,7 @@ import {
     EquipmentStatus,
 } from "../equipment/entities/equipment.entity";
 import { EquipmentService } from "../equipment/equipment.service";
+import { Employee } from "src/employee/entities/employee.entity";
 @Injectable()
 export class SeedService {
     constructor(
@@ -77,6 +78,7 @@ export class SeedService {
     private readonly NUMBER_OF_FLOOR_PER_BUILDING = 5;
     private readonly NUMBER_OF_APARTMENT_PER_FLOOR = 6;
     private readonly NUMBER_OF_RESIDENT = 1;
+  
     private readonly NUMBER_OF_EMPLOYEE = 10;
     private readonly NUMBER_OF_MANAGER = 10;
     private readonly NUMBER_OF_TECHNICIAN = 10;
@@ -130,7 +132,7 @@ export class SeedService {
             this.floors,
             this.apartments,
         );
-
+        await this.createDemoEmployees();
         await this.createDemoContract();
         await this.createDemoServices();
         await this.createDemoServicePackages();
@@ -227,7 +229,7 @@ export class SeedService {
         let floors: Floor[] = [];
         for (let building of buildings) {
             for (let i = 0; i < this.NUMBER_OF_FLOOR_PER_BUILDING; i++) {
-                
+
                 floors.push(
                     await this.floorService.create({
                         name: `Floor ${i}`,
@@ -408,24 +410,24 @@ export class SeedService {
             account:
                 index % 2 === 0
                     ? {
-                          owner_id: id,
-                          email: faker.internet.email(),
-                          password: this.hashService.hash("password"),
-                      }
+                        owner_id: id,
+                        email: faker.internet.email(),
+                        password: this.hashService.hash("password"),
+                    }
                     : undefined,
                     stay_at: apartmentData
         });
     }
 
-    async createDemoEmployee() {
+    async createDemoEmployee(index) {
         let id = "EMP" + this.idGenerator.generateId();
-        const employee = await this.dataSource.getRepository(Resident).save({
+        const employee = await this.dataSource.getRepository(Employee).save({
             id: id,
             profile: {
                 date_of_birth: faker.date.birthdate(),
                 name: faker.person.fullName(),
                 gender: Gender.MALE,
-                phone_number: faker.phone.number(),
+                phone_number: faker.string.numeric(10),
                 front_identify_card_photo_URL: await this.storageManager.upload(
                     this.frontIdentity.buffer,
                     "employee/" + id + "/frontIdentifyPhoto.jpg",
@@ -436,8 +438,9 @@ export class SeedService {
                     "employee/" + id + "/backIdentifyPhoto.jpg",
                     "image/jpeg",
                 ),
+                identify_number: faker.string.numeric(12),
                 avatarURL: await this.storageManager.upload(
-                    await this.avatarGenerator.generateAvatar("DEMO EMPOLYEE"),
+                    await this.avatarGenerator.generateAvatar("DEMO EMPLOYEE"),
                     "employee/" + id + "/avatar.svg",
                     "image/svg+xml",
                 ),
@@ -506,7 +509,7 @@ export class SeedService {
         let contractId = "Contract" + this.idGenerator.generateId();
         await this.dataSource.getRepository(Contract).save({
             contract_id: contractId,
-            resident_id: "RESIDENT",    
+            resident_id: "RESIDENT",
             apartment_id: "APM1698502960091",
             expire_at: new Date("2030-01-01"),
             role: ContractRole.RENT,
@@ -554,9 +557,16 @@ export class SeedService {
 
     async createDemoResidents() {
         for (let apartment of this.apartments) {
-        for (let i = 0; i < this.NUMBER_OF_RESIDENT; i++) {
-            await this.createDemoResident(i,  apartment.apartment_id);
+            for (let i = 0; i < this.NUMBER_OF_RESIDENT; i++) {
+                await this.createDemoResident(i, apartment.apartment_id);
+            }
         }
     }
+    async createDemoEmployees() {
+
+        for (let i = 0; i < this.NUMBER_OF_EMPLOYEE; i++) {
+            await this.createDemoEmployee(i);
+
+        }
     }
 }
