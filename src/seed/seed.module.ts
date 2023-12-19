@@ -11,6 +11,7 @@ import { ResidentModule } from "../resident/resident.module";
 import { BuildingModule } from "../building/building.module";
 import { FloorModule } from "../floor/floor.module";
 import { EquipmentModule } from "../equipment/equipment.module";
+import { ServicePackageModule } from "../service-package/service-package.module";
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { EquipmentModule } from "../equipment/equipment.module";
         BuildingModule,
         FloorModule,
         EquipmentModule,
+        ServicePackageModule,
     ],
     controllers: [Seed],
     providers: [SeedService],
