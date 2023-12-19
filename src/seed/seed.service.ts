@@ -32,6 +32,9 @@ import {
 } from "../equipment/entities/equipment.entity";
 import { EquipmentService } from "../equipment/equipment.service";
 import { Employee } from "src/employee/entities/employee.entity";
+import { Invoice } from "../invoice/entities/invoice.entity";
+import { ServicePackageService } from "../service-package/service-package.service";
+import { ServiceService } from "../service/service.service";
 @Injectable()
 export class SeedService {
     constructor(
@@ -47,6 +50,8 @@ export class SeedService {
         private readonly apartmentService: ApartmentService,
         private readonly floorService: FloorService,
         private readonly equipmentService: EquipmentService,
+        private readonly servicePackageService: ServicePackageService,
+        private readonly serviceService: ServiceService,
     ) {}
 
     async dropDB() {
@@ -93,6 +98,12 @@ export class SeedService {
     private readonly backIdentity = {
         buffer: readFileSync(process.cwd() + "/src/seed/back.jpg"),
     } as MemoryStoredFile;
+    private readonly pool = {
+        buffer: readFileSync(process.cwd() + "/src/seed/pool.jpg"),
+    } as MemoryStoredFile;
+    private readonly gym = {
+        buffer: readFileSync(process.cwd() + "/src/seed/gym.jpg"),
+    } as MemoryStoredFile;
 
     private readonly images = [
         {
@@ -136,6 +147,7 @@ export class SeedService {
         await this.createDemoServices();
         await this.createDemoServicePackages();
         await this.createDemoResidents();
+        await this.createDemoInvoices();
     }
 
     async createDemoEquipments(
@@ -518,35 +530,77 @@ export class SeedService {
         });
     }
     async createDemoServices() {
-        let ServiceInfo: any[] = [];
-        for (let i = 0; i < this.NUMBER_OF_Service; i++) {
-            ServiceInfo.push({
-                service_id: `Service${i}`,
-                name: `Service ${i}`,
-                images: this.images,
-                description: `This is a demo service ${i}`,
-            });
-        }
-        await this.dataSource
-            .createQueryBuilder()
-            .insert()
-            .into(Service)
-            .values(ServiceInfo)
-            .execute();
+        await this.serviceService.create(
+            {
+                name: `pool`,
+                images: [this.pool],
+                description: `This is pool service`,
+            },
+            `Service${0}`,
+        );
+        await this.serviceService.create(
+            {
+                name: `gym`,
+                images: [this.gym],
+                description: `This is gym service`,
+            },
+            `Service${1}`,
+        );
     }
-
     async createDemoServicePackages() {
         let ServicePackageInfo: any[] = [];
+        //pool
 
-        for (let i = 0; i < this.NUMBER_OF_Service; i++)
-            for (let j = 0; j < this.NUMBER_OF_ServicePackage_PER_SERVICE; j++)
-                ServicePackageInfo.push({
-                    servicePackage_id: `ServicePackage${i}-${j}`,
-                    service_id: `Service${i}`,
-                    name: `Service package ${i}.${j}`,
-                    expired_date: 30,
-                    per_unit_price: 50000,
-                });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${0}-${0}`,
+            service_id: `Service${0}`,
+            name: `day`,
+            expired_date: 1,
+            per_unit_price: 50000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${0}-${1}`,
+            service_id: `Service${0}`,
+            name: `week`,
+            expired_date: 7,
+            per_unit_price: 300000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${0}-${2}`,
+            service_id: `Service${0}`,
+            name: `month`,
+            expired_date: 30,
+            per_unit_price: 1000000,
+        });
+        //gym
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${1}-${0}`,
+            service_id: `Service${1}`,
+            name: `day`,
+            expired_date: 1,
+            per_unit_price: 25000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${1}-${1}`,
+            service_id: `Service${1}`,
+            name: `week`,
+            expired_date: 7,
+            per_unit_price: 120000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${1}-${2}`,
+            service_id: `Service${1}`,
+            name: `month`,
+            expired_date: 30,
+            per_unit_price: 280000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${1}-${3}`,
+            service_id: `Service${1}`,
+            name: `quarter`,
+            expired_date: 30,
+            per_unit_price: 1000000,
+        });
 
         await this.dataSource
             .createQueryBuilder()
@@ -555,7 +609,30 @@ export class SeedService {
             .values(ServicePackageInfo)
             .execute();
     }
+    async createDemoInvoices() {
+        let InvoiceInfo: any[] = [];
+        let residents: Resident[] = await this.residentService.findAll();
+        let servicePackages: ServicePackage[] =
+            await this.servicePackageService.findAll();
 
+        for (let resident of residents) {
+            for (let servicePackage of servicePackages) {
+                InvoiceInfo.push({
+                    invoice_id: `Invoice${servicePackage.servicePackage_id}-${resident.id}`,
+                    buyer_id: resident.id,
+                    servicePackage_id: servicePackage.servicePackage_id,
+                    amount: 1,
+                    total: servicePackage.per_unit_price,
+                });
+            }
+        }
+        await this.dataSource
+            .createQueryBuilder()
+            .insert()
+            .into(Invoice)
+            .values(InvoiceInfo)
+            .execute();
+    }
     async createDemoResidents() {
         for (let apartment of this.apartments) {
             for (let i = 0; i < this.NUMBER_OF_RESIDENT; i++) {
