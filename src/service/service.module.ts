@@ -14,5 +14,6 @@ import { IdGeneratorModule } from "../id-generator/id-generator.module";
     ],
     controllers: [ServiceController],
     providers: [ServiceService],
+    exports: [ServiceService],
 })
 export class ServiceModule {}

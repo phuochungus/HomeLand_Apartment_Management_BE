@@ -34,6 +34,7 @@ import { EquipmentService } from "../equipment/equipment.service";
 import { Employee } from "src/employee/entities/employee.entity";
 import { Invoice } from "../invoice/entities/invoice.entity";
 import { ServicePackageService } from "../service-package/service-package.service";
+import { ServiceService } from "../service/service.service";
 @Injectable()
 export class SeedService {
     constructor(
@@ -50,6 +51,7 @@ export class SeedService {
         private readonly floorService: FloorService,
         private readonly equipmentService: EquipmentService,
         private readonly servicePackageService: ServicePackageService,
+        private readonly serviceService: ServiceService,
     ) {}
 
     async dropDB() {
@@ -97,7 +99,7 @@ export class SeedService {
         buffer: readFileSync(process.cwd() + "/src/seed/back.jpg"),
     } as MemoryStoredFile;
     private readonly pool = {
-        buffer: readFileSync(process.cwd() + "/src/seed/pool.png"),
+        buffer: readFileSync(process.cwd() + "/src/seed/pool.jpg"),
     } as MemoryStoredFile;
     private readonly gym = {
         buffer: readFileSync(process.cwd() + "/src/seed/gym.jpg"),
@@ -125,7 +127,7 @@ export class SeedService {
     private floors: Floor[] = [];
     private apartments: Apartment[] = [];
     private equipments: Equipment[] = [];
-    
+
     async startSeeding() {
         await this.createDemoAdmin();
         await this.createDemoManager();
@@ -145,7 +147,7 @@ export class SeedService {
         await this.createDemoServices();
         await this.createDemoServicePackages();
         await this.createDemoResidents();
-       //await this.createDemoInvoices();
+        await this.createDemoInvoices();
     }
 
     async createDemoEquipments(
@@ -528,45 +530,34 @@ export class SeedService {
         });
     }
     async createDemoServices() {
-        let ServiceInfo: any[] = [];
-        ServiceInfo.push({
-            service_id: `Service${0}`,
-            name: `pool`,
-            images: await this.storageManager.upload(
-                this.pool.buffer,
-                "Service/" + `Service${0}` + "/image.jpg",
-                "image/jpeg",
-            ),
-            description: `This is pool service`,
-        });
-        ServiceInfo.push({
-            service_id: `Service${1}`,
-            name: `gym`,
-            images: await this.storageManager.upload(
-                this.gym.buffer,
-                "Service/" + `Service${1}` + "/image.jpg",
-                "image/jpeg",
-            ),
-            description: `This is gym service`,
-        });
-        await this.dataSource
-            .createQueryBuilder()
-            .insert()
-            .into(Service)
-            .values(ServiceInfo)
-            .execute();
+        await this.serviceService.create(
+            {
+                name: `pool`,
+                images: [this.pool],
+                description: `This is pool service`,
+            },
+            `Service${0}`,
+        );
+        await this.serviceService.create(
+            {
+                name: `gym`,
+                images: [this.gym],
+                description: `This is gym service`,
+            },
+            `Service${1}`,
+        );
     }
-
     async createDemoServicePackages() {
         let ServicePackageInfo: any[] = [];
         //pool
+
         ServicePackageInfo.push({
             servicePackage_id: `ServicePackage${0}-${0}`,
             service_id: `Service${0}`,
             name: `day`,
             expired_date: 1,
             per_unit_price: 50000,
-        });   
+        });
         ServicePackageInfo.push({
             servicePackage_id: `ServicePackage${0}-${1}`,
             service_id: `Service${0}`,
@@ -581,30 +572,30 @@ export class SeedService {
             expired_date: 30,
             per_unit_price: 1000000,
         });
-       //gym
+        //gym
         ServicePackageInfo.push({
             servicePackage_id: `ServicePackage${1}-${0}`,
             service_id: `Service${1}`,
             name: `day`,
             expired_date: 1,
             per_unit_price: 25000,
-        });   
+        });
         ServicePackageInfo.push({
-            servicePackage_id: `ServicePackage${0}-${1}`,
+            servicePackage_id: `ServicePackage${1}-${1}`,
             service_id: `Service${1}`,
             name: `week`,
             expired_date: 7,
             per_unit_price: 120000,
         });
         ServicePackageInfo.push({
-            servicePackage_id: `ServicePackage${0}-${2}`,
+            servicePackage_id: `ServicePackage${1}-${2}`,
             service_id: `Service${1}`,
             name: `month`,
             expired_date: 30,
             per_unit_price: 280000,
         });
         ServicePackageInfo.push({
-            servicePackage_id: `ServicePackage${0}-${3}`,
+            servicePackage_id: `ServicePackage${1}-${3}`,
             service_id: `Service${1}`,
             name: `quarter`,
             expired_date: 30,
@@ -618,19 +609,19 @@ export class SeedService {
             .values(ServicePackageInfo)
             .execute();
     }
-    async createDemoInvoices() 
-    {
+    async createDemoInvoices() {
         let InvoiceInfo: any[] = [];
-        let residents:Resident[]=await this.residentService.findAll();
-        let servicePackages:ServicePackage[]=await this.servicePackageService.findAll();
-        
-        for(let resident of residents){
-            for(let servicePackage of servicePackages){
+        let residents: Resident[] = await this.residentService.findAll();
+        let servicePackages: ServicePackage[] =
+            await this.servicePackageService.findAll();
+
+        for (let resident of residents) {
+            for (let servicePackage of servicePackages) {
                 InvoiceInfo.push({
                     invoice_id: `Invoice${servicePackage.servicePackage_id}-${resident.id}`,
                     buyer_id: resident.id,
                     servicePackage_id: servicePackage.servicePackage_id,
-                    amount:1,
+                    amount: 1,
                     total: servicePackage.per_unit_price,
                 });
             }
