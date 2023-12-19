@@ -19,7 +19,7 @@ import { Equipment } from "../../equipment/entities/equipment.entity";
 import { Technician } from "src/technician/entities/technician.entity";
 import { Complain } from "src/complain/entities/complain.entity";
 import { RepairInvoice } from "src/repairInvoice/entities/repairInvoice.entity";
-
+import { Admin } from "src/admin/entities/admin.entity";
 
 
 export enum taskStatus {
@@ -35,7 +35,11 @@ export class Task {
 
     @ManyToOne(() => Manager, (manager) => manager.tasks)
     @JoinColumn()
-    assigner: Manager;
+    manager?: Manager;
+
+    @ManyToOne(() => Admin, (admin) => admin.tasks)
+    @JoinColumn()
+    admin?: Admin;
 
     @ManyToOne(() => Technician, (technician) => technician.tasks)
     @JoinColumn()

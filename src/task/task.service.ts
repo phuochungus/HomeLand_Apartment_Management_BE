@@ -15,6 +15,7 @@ import {
     complainStatus,
 } from "src/complain/entities/complain.entity";
 import { RepairInvoice } from "src/repairInvoice/entities/repairInvoice.entity";
+import { Admin } from "src/admin/entities/admin.entity";
 @Injectable()
 export class TaskService {
     constructor(
@@ -22,6 +23,8 @@ export class TaskService {
         private readonly taskRepository: Repository<Task>,
         @InjectRepository(Manager)
         private readonly managerRepository: Repository<Manager>,
+        @InjectRepository(Admin)
+        private readonly adminRepository: Repository<Admin>,
         @InjectRepository(Complain)
         private readonly complainRepository: Repository<Complain>,
         @InjectRepository(Technician)
@@ -39,9 +42,16 @@ export class TaskService {
     ): Promise<Task | null> {
         try {
             const task_id = "T" + this.idGenerate.generateId();
-            const assigner = (await this.managerRepository.findOne({
+            let assigner:any;
+            if(assigneeId.includes("MNG")) {
+                 assigner = (await this.managerRepository.findOne({
+                    where: { id: createTaskDto.assigner_id },
+                })) as Manager;
+            }
+            else
+             assigner = (await this.adminRepository.findOne({
                 where: { id: createTaskDto.assigner_id },
-            })) as Manager;
+            })) as Admin;
             const complain = (await this.complainRepository.findOne({
                 where: { complain_id: createTaskDto.complain_id },
             })) as Complain;
@@ -50,20 +60,26 @@ export class TaskService {
                     id: assigneeId,
                 },
             })) as Technician;
+            
             const data = {
                 task_id,
-                assigner,
-                complain,
+                complain,    
                 status: taskStatus.PROCESSING,
                 assignee,
             };
-            const taskData = this.taskRepository.create(data);
+            let newData;
+            if(assigneeId.includes("MNG")) {
+                newData = {...data, manager: assigner}
+            }
+            else newData = {...data, admin: assigner}
+            
+            const taskData = this.taskRepository.create(newData);
             await this.taskRepository.save(taskData);
             const result = await this.taskRepository.findOne({
                 where: {
                     task_id,
                 },
-                relations: ["assignee", "assigner", "complain"]
+                relations: ["assignee", "manager", "admin", "complain"]
             });
             await this.complainRepository.update(createTaskDto.complain_id, {
                 status: complainStatus.RECEIVED,
@@ -77,14 +93,14 @@ export class TaskService {
 
     async findAll() {
         return await this.taskRepository.find({
-            relations: ["assignee", "assigner", "complain", "invoice"],
+            relations: ["assignee", "manager", "admin", "complain", "invoice"],
         });
     }
 
     async findOne(id: string) {
         return await this.taskRepository.findOne({
             where: { task_id: id },
-            relations: ["assignee", "assigner", "complain"],
+            relations: ["assignee", "manager", "admin", "complain"],
         });
     }
 
@@ -113,7 +129,10 @@ export class TaskService {
             },
             relations: {
                 assignee: true,
-                assigner: {
+                manager: {
+                    account : true
+                },
+                admin: {
                     account : true
                 },
                 complain: {
