@@ -10,9 +10,10 @@ import { Manager } from "src/manager/entities/manager.entity";
 import { Technician } from "src/technician/entities/technician.entity";
 import { Complain } from "src/complain/entities/complain.entity";
 import { RepairInvoice } from "src/repairInvoice/entities/repairInvoice.entity";
+import { Admin } from "src/admin/entities/admin.entity";
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Task, Complain, Manager, Technician, RepairInvoice]),
+        TypeOrmModule.forFeature([Task, Complain, Manager, Technician, RepairInvoice, Admin]),
         IdGeneratorModule,
         StorageModule,
     ],

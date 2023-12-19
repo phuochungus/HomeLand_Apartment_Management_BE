@@ -26,7 +26,7 @@ export class Manager {
     @JoinColumn()
     account?: Account;
 
-    @OneToMany(() => Task, (task) => task.assigner)
+    @OneToMany(() => Task, (task) => task.manager)
     @JoinColumn()
     tasks?: Task[];
 
