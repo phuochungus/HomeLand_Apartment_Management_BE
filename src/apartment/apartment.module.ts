@@ -9,10 +9,11 @@ import { Resident } from "../resident/entities/resident.entity";
 import { AuthModule } from "../auth/auth.module";
 import { ApartmentSubcriber } from "./apartment.subscriber";
 import { Client } from "elasticsearch";
+import { Floor } from "../floor/entities/floor.entity";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Apartment, Resident]),
+        TypeOrmModule.forFeature([Apartment, Resident, Floor]),
         IdGeneratorModule,
         StorageModule,
         AuthModule,
