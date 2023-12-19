@@ -55,10 +55,9 @@ export class FeedbackController {
     @Get(":id")
     async findOne(@Param("id") id: string) {
         const building = await this.feedbackRepository.findOne(id);
-        if (building) return building;
-        throw new NotFoundException("Floor not found");
+    
+        throw new NotFoundException("Feedback not found");
     }
-
     @ApiOperation({ summary: "edit feedback" })
     @FormDataRequest()
     @ApiConsumes("multipart/form-data")

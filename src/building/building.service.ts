@@ -74,14 +74,14 @@ export class TypeORMBuildingService extends BuildingService {
     }
     async findAll() {
         return await this.buildingRepository.find({
-            relations: ["managers", "floors", "floors.apartments"],
+            relations: ["managers", "floors", "floors.apartments"],withDeleted: true 
         });
     }
 
     async findOne(id: string) {
         return await this.buildingRepository.findOne({
             where: { building_id: id },
-            relations: ["managers", "managers.account", "floors.apartments"],
+            relations: ["managers", "managers.account", "floors.apartments"],withDeleted: true 
         });
     }
 

@@ -41,6 +41,7 @@ export class InvoiceService {
         return await this.invoiceRepository.find({
             relations: ["servicePackage", "buyer"],
             cache: true,
+            withDeleted: true // Get soft deleted invoices
         });
     }
     convertJsonToParams(jsonObject: any): string {
@@ -212,6 +213,7 @@ export class InvoiceService {
             },
             relations: ["servicePackage", "buyer"],
             cache: true,
+            withDeleted: true 
         });
     }
     async getAllInvoiceWithResidentId(

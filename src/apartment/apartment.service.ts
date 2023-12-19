@@ -144,17 +144,20 @@ export class ApartmentServiceImp extends ApartmentService {
                 take: 30,
                 relations: {
                     residents: true,
+                    
                 },
+                withDeleted: true 
             });
         }
 
-        return await this.apartmentRepository.find();
+        return await this.apartmentRepository.find({withDeleted: true });
     }
 
     async findOne(id: string) {
         return await this.apartmentRepository.findOne({
             where: { apartment_id: id },
             relations: ["residents"],
+            withDeleted: true 
         });
     }
 

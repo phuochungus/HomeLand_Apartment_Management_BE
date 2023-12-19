@@ -72,6 +72,8 @@ export class TypeORMFeedbackService extends FeedbackService {
             comment,
             rating,
             service_id,
+            resident,
+            service
         };
         const feedbackData = this.feedbackRepository.create(data);
         try {
@@ -90,13 +92,16 @@ export class TypeORMFeedbackService extends FeedbackService {
             },
             relations: ["service"],
             cache: true,
+            withDeleted: true 
         });
     }
     async findAll() {
         return await this.feedbackRepository.find({
             relations: ["service","resident"],
+            withDeleted: true 
         });
     }
+
     async findByServiceId(service_id: string): Promise<Feedback[]> {
         return await this.feedbackRepository.find({
             where: {
