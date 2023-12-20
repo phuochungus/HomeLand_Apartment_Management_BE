@@ -130,11 +130,12 @@ export class SeedService {
 
     async startSeeding() {
         await this.createDemoAdmin();
-        await this.createDemoManager();
         await this.createDemoTechnician();
         await this.createDemoAccountResident();
 
         this.buildings = await this.createDemoBuildings();
+        await this.createDemoManager();
+
         this.floors = await this.createDemoFloors(this.buildings);
         this.apartments = await this.createDemoApartments(this.floors);
         this.equipments = await this.createDemoEquipments(
@@ -224,13 +225,14 @@ export class SeedService {
     async createDemoBuildings(): Promise<Building[]> {
         let buildings: Building[] = [];
         for (let i = 0; i < this.NUMBER_OF_BUILDING; i++) {
-            buildings.push(
-                await this.buildingService.create({
-                    name: `Building ${i}`,
-                    address: faker.location.streetAddress(),
-                    max_floor: this.NUMBER_OF_FLOOR_PER_BUILDING,
-                }),
-            );
+            const buildingData: Building = await this.buildingService.create({
+                name: `Building ${i}`,
+                address: faker.location.streetAddress(),
+                max_floor: this.NUMBER_OF_FLOOR_PER_BUILDING,
+            });
+            this.createManagerOfBuilding(buildingData);
+
+            buildings.push(buildingData);
         }
 
         return buildings;
@@ -351,9 +353,47 @@ export class SeedService {
                 },
             });
     }
+ 
 
+    async createManagerOfBuilding(building: Building) {
+        let id = "MNG" + this.idGenerator.generateId();
+        const manager = await this.dataSource.getRepository(Manager).save({
+            id: id,
+            profile: {
+                date_of_birth:  faker.date.birthdate(),
+                name:faker.person.fullName(),
+                gender: Gender.MALE,
+                phone_number: faker.phone.number(),
+                front_identify_card_photo_URL: await this.storageManager.upload(
+                    this.frontIdentity.buffer,
+                    "manager/" + id + "/frontIdentifyPhoto.jpg",
+                    "image/jpeg",
+                ),
+                back_identify_card_photo_URL: await this.storageManager.upload(
+                    this.backIdentity.buffer,
+                    "manager/" + id + "/backIdentifyPhoto.jpg",
+                    "image/jpeg",
+                ),
+                identify_number: faker.string.numeric(12),
+                avatarURL: await this.storageManager.upload(
+                    await this.avatarGenerator.generateAvatar(id),
+                    "manager/" + id + "/avatar.svg",
+                    "image/svg+xml",
+                ),
+            },
+            account: {
+                owner_id: id,
+                email:  faker.internet.email(),
+                password: this.hashService.hash("password"),
+            },
+            building: building
+        });
+    }
     async createDemoManager() {
         let id = "MNG" + this.idGenerator.generateId();
+        const building = await this.dataSource.getRepository(Building).findOne({where: {
+            name: "Building 0"
+        }}) as Building;
         const manager = await this.dataSource.getRepository(Manager).save({
             id: id,
             profile: {
@@ -376,13 +416,16 @@ export class SeedService {
                     await this.avatarGenerator.generateAvatar("DEMO MANAGER"),
                     "manager/" + id + "/avatar.svg",
                     "image/svg+xml",
-                ),
+                )
+               
             },
             account: {
                 owner_id: id,
                 email: "manager@gmail.com",
                 password: this.hashService.hash("password"),
             },
+            building: building
+            
         });
     }
 
