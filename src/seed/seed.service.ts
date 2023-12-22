@@ -257,7 +257,7 @@ export class SeedService {
     async createDemoApartments(floors: Floor[]): Promise<Apartment[]> {
         let apartments: Apartment[] = [];
         for (let floor of floors) {
-            for (let i = 0; i < this.NUMBER_OF_APARTMENT_PER_FLOOR; i++) {
+            for (let i = 0; i < this.NUMBER_OF_APARTMENT_PER_FLOOR - 1; i++) {
                 apartments.push(
                     await this.apartmentService.create({
                         name: faker.person.lastName(),
