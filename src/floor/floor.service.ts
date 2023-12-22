@@ -69,7 +69,7 @@ export class TypeORMFloorService extends FloorService {
     async findAll() {
         return await this.floorRepository.find(
             {
-                relations: ["apartments", "building"],
+                relations: ["building"],
                 withDeleted: true 
             }
         );
@@ -78,7 +78,7 @@ export class TypeORMFloorService extends FloorService {
     async findOne(id: string) {
         return await this.floorRepository.findOne({
             where: { floor_id: id },
-            relations: ["apartments", "building"],
+            relations: ["building"],
             withDeleted: true 
         });
     }
@@ -145,62 +145,10 @@ export class TypeORMFloorService extends FloorService {
         return result;
     }
 
-    async addApartment(
-        apartmentIds: string[] | string,
-        id: string,
-    ): Promise<Floor | null> {
-        try {
-            const floor = (await this.floorRepository.findOne({
-                where: {
-                    floor_id: id,
-                },
-            })) as Floor;
-            await this.floorRepository
-                .createQueryBuilder()
-                .relation(Floor, "apartments")
-                .of(floor)
-                .add(apartmentIds);
-            const result = await this.floorRepository.findOne({
-                where: {
-                    floor_id: id,
-                },
-                relations: ["apartments"],
-            });
-            return result;
-        } catch (e) {
-            throw new Error(e);
-        }
-    }
-    async deleteApartment(floor_id: string, apartment_id: string): Promise<Floor | null> {
-        try {
-            const floor = await this.floorRepository.findOne({
-                where: {
-                    floor_id,
-                },
-            });
-            await this.floorRepository
-                .createQueryBuilder()
-                .relation(Floor, "apartments")
-                .of(floor)
-                .remove(apartment_id);
-            const newBuilding = await this.floorRepository.findOne({
-                where: {
-                    floor_id,
-                },
-                relations: ["apartments"],
-            });
-            return newBuilding;
-        } catch (err) {
-            console.error(err);
-            throw err;
-        }
-    }
-
     async paginate(options: IPaginationOptions<IPaginationMeta>) {
         const result = this.floorRepository.createQueryBuilder('floor')
             .leftJoinAndSelect('floor.building', 'building')
             .orderBy('floor.floor_id', 'DESC');
-
         return paginate<Floor>(result, options);
     }
 
