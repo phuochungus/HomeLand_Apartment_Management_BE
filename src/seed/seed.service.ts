@@ -244,7 +244,7 @@ export class SeedService {
             for (let i = 0; i < this.NUMBER_OF_FLOOR_PER_BUILDING; i++) {
                 floors.push(
                     await this.floorService.create({
-                        name: `Floor${i+1}/${building.name}`,
+                        name: `Floor${i + 1}/${building.name}`,
                         building_id: building.building_id,
                         max_apartment: this.NUMBER_OF_APARTMENT_PER_FLOOR,
                     }),
@@ -353,15 +353,14 @@ export class SeedService {
                 },
             });
     }
- 
 
     async createManagerOfBuilding(building: Building) {
         let id = "MNG" + this.idGenerator.generateId();
         const manager = await this.dataSource.getRepository(Manager).save({
             id: id,
             profile: {
-                date_of_birth:  faker.date.birthdate(),
-                name:faker.person.fullName(),
+                date_of_birth: faker.date.birthdate(),
+                name: faker.person.fullName(),
                 gender: Gender.MALE,
                 phone_number: faker.phone.number(),
                 front_identify_card_photo_URL: await this.storageManager.upload(
@@ -383,17 +382,21 @@ export class SeedService {
             },
             account: {
                 owner_id: id,
-                email:  faker.internet.email(),
+                email: faker.internet.email(),
                 password: this.hashService.hash("password"),
             },
-            building: building
+            building: building,
         });
     }
     async createDemoManager() {
         let id = "MNG" + this.idGenerator.generateId();
-        const building = await this.dataSource.getRepository(Building).findOne({where: {
-            name: "Building 0"
-        }}) as Building;
+        const building = (await this.dataSource
+            .getRepository(Building)
+            .findOne({
+                where: {
+                    name: "Building 0",
+                },
+            })) as Building;
         const manager = await this.dataSource.getRepository(Manager).save({
             id: id,
             profile: {
@@ -416,16 +419,14 @@ export class SeedService {
                     await this.avatarGenerator.generateAvatar("DEMO MANAGER"),
                     "manager/" + id + "/avatar.svg",
                     "image/svg+xml",
-                )
-               
+                ),
             },
             account: {
                 owner_id: id,
                 email: "manager@gmail.com",
                 password: this.hashService.hash("password"),
             },
-            building: building
-            
+            building: building,
         });
     }
 
