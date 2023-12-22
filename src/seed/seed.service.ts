@@ -230,7 +230,7 @@ export class SeedService {
             for (let i = 0; i < this.NUMBER_OF_FLOOR_PER_BUILDING; i++) {
                 floors.push(
                     await this.floorService.create({
-                        name: `Floor${i+1}/${building.name}`,
+                        name: `Floor${i}`,
                         building_id: building.building_id,
                         max_apartment: this.NUMBER_OF_APARTMENT_PER_FLOOR,
                     }),

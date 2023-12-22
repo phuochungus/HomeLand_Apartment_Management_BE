@@ -67,15 +67,19 @@ export class TypeORMFloorService extends FloorService {
     }
 
     async findAll() {
-        return await this.floorRepository.find({
-            relations: ["building"],
-        });
+        return await this.floorRepository.find(
+            {
+                relations: ["apartments", "building"],
+                withDeleted: true 
+            }
+        );
     }
 
     async findOne(id: string) {
         return await this.floorRepository.findOne({
             where: { floor_id: id },
-            relations: ["building"],
+            relations: ["apartments", "building"],
+            withDeleted: true 
         });
     }
 
