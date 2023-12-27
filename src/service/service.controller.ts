@@ -6,6 +6,8 @@ import { Auth } from '../helper/decorator/auth.decorator';
 import { PersonRole } from '../helper/class/profile.entity';
 import { ApiConsumes, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { FormDataRequest } from 'nestjs-form-data';
+import { SearchDto } from '../apartment/dto/search-apartment.dto';
+import { SearchServiceDto } from './dto/search-service';
 
 @ApiTags("Service")
 @Controller('service')
@@ -49,4 +51,17 @@ export class ServiceController {
   remove(@Param('id') id: string) {
     return this.serviceService.remove(id);
   }
+  @Get("report")
+  async report() {
+      const result = await this.serviceService.reportService();
+      return result;
+  }
+   @Post("/search/byQuery")
+    @ApiConsumes("multipart/form-data")
+    @FormDataRequest()
+    async searchResident(@Body() searchServiceDto: SearchServiceDto) {
+        const result = await this.serviceService.search( searchServiceDto);
+        return result;
+    }
+  
 }
