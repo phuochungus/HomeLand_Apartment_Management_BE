@@ -8,6 +8,7 @@ import { ApiConsumes, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { FormDataRequest } from 'nestjs-form-data';
 import { SearchDto } from '../apartment/dto/search-apartment.dto';
 import { SearchServiceDto } from './dto/search-service';
+import { ReportServiceDto } from './dto/report-service-dto';
 
 @ApiTags("Service")
 @Controller('service')
@@ -51,9 +52,11 @@ export class ServiceController {
   remove(@Param('id') id: string) {
     return this.serviceService.remove(id);
   }
-  @Get("report")
-  async report() {
-      const result = await this.serviceService.reportService();
+  @Post("report/data")
+  @ApiConsumes("multipart/form-data")
+  @FormDataRequest()
+  async report(@Body() reportServiceDto:ReportServiceDto) {
+      const result = await this.serviceService.reportService(reportServiceDto);
       return result;
   }
    @Post("/search/byQuery")
