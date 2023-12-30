@@ -43,7 +43,7 @@ export class TaskService {
         try {
             const task_id = "T" + this.idGenerate.generateId();
             let assigner:any;
-            if(assigneeId.includes("MNG")) {
+            if(createTaskDto.assigner_id.includes("MNG")) {
                  assigner = (await this.managerRepository.findOne({
                     where: { id: createTaskDto.assigner_id },
                 })) as Manager;
@@ -68,7 +68,7 @@ export class TaskService {
                 assignee,
             };
             let newData;
-            if(assigneeId.includes("MNG")) {
+            if(createTaskDto.assigner_id.includes("MNG")) {
                 newData = {...data, manager: assigner}
             }
             else newData = {...data, admin: assigner}
