@@ -297,14 +297,14 @@ export class ApartmentServiceImp extends ApartmentService {
         from: number,
     ): Promise<Apartment[]> {
         let object = {};
-        object[field] = value;
+        object[field] = `*${value}*`;
         let result = await this.elasticSearchClient.search<Apartment>({
             index: "apartment",
             body: {
                 from: from,
                 size: 30,
                 query: {
-                    match: object,
+                    wildcard: object,
                 },
             },
         });
