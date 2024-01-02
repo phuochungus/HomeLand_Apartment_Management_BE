@@ -8,6 +8,7 @@ import { isQueryAffected } from "../helper/validation";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { StorageManager } from "../storage/storage.service";
 import { ContractRole, ContractStatusRole } from "../helper/enums/contractEnum";
+import { SearchContractDto } from "./dto/search-contract-dto";
 
 @Injectable()
 export class ContractService {
@@ -37,14 +38,14 @@ export class ContractService {
                 take: 30,
                 relations: ["resident", "apartment"],
                 cache: true,
-                withDeleted: true 
+                withDeleted: true,
             });
         }
 
         return await this.contractRepository.find({
             relations: ["resident", "apartment"],
             cache: true,
-            withDeleted: true 
+            withDeleted: true,
         });
     }
 
@@ -54,8 +55,13 @@ export class ContractService {
                 contract_id: id,
             },
             cache: true,
-            relations: ["resident", "apartment","apartment.floor","apartment.floor.building"],
-            withDeleted: true 
+            relations: [
+                "resident",
+                "apartment",
+                "apartment.floor",
+                "apartment.floor.building",
+            ],
+            withDeleted: true,
         });
         if (contract == null) throw new NotFoundException();
         return contract;
@@ -112,14 +118,47 @@ export class ContractService {
             contract_id: id,
         });
     }
-    async search(query: string): Promise<Contract[]> {
-        console.log(query);
-        const result = await this.contractRepository.find({
-            where: {
-                resident: { profile: {name:Like(`%${query}%`)} },
-            },
-        });
+    async search(searchOptions: SearchContractDto): Promise<Contract[]> {
+        var result = await this.contractRepository
+            .createQueryBuilder("contract")
+            .leftJoinAndSelect("contract.apartment", "apartment")
+            .leftJoinAndSelect("contract.resident", "resident")
+
+            .getMany();
+
+        try {
+            if (searchOptions.searchText) {
+                result = await this.contractRepository
+                    .createQueryBuilder("contract")
+                    .leftJoinAndSelect("contract.resident", "resident")
+                    .leftJoinAndSelect("contract.apartment", "apartment")
+                    .where(
+                        "unaccent(Lower(resident.profile.name)) LIKE unaccent(:query)",
+                        {
+                            query: `%${searchOptions.searchText.toLocaleLowerCase()}%`,
+                        },
+                    )
+                    .getMany();
+            }
+            if (searchOptions.apartmentId != null) {
+                result = result.filter((contract) => {
+                    return contract.apartment_id == searchOptions.apartmentId;
+                });
+            } else if (searchOptions.floorId != null) {
+                result = result.filter((contract) => {
+                    return contract.apartment.floor_id == searchOptions.floorId;
+                });
+            } else if (searchOptions.buildingId != null) {
+                result = result.filter((contract) => {
+                    return (
+                        contract.apartment.building_id ==
+                        searchOptions.buildingId
+                    );
+                });
+            }
+        } catch (error) {
+            result = [];
+        }
         return result;
     }
-    
 }
