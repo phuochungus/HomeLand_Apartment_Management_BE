@@ -69,7 +69,7 @@ export class Account {
         if (this.resident) owners.push(this.resident);
         if (this.admin) owners.push(this.admin);
         if (this.technician) owners.push(this.technician);
-        if (this.manager) owners.push(this.manager);    
+        if (this.manager) owners.push(this.manager);
         if (owners.length != 1) {
             throw new Error("Account must have only one owner");
         }
