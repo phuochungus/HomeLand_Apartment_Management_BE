@@ -1,24 +1,20 @@
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { CreateFeedbackDto } from "./dto/create-feedback.dto";
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { DataSource, In, Repository, Like } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { StorageManager } from "../storage/storage.service";
-import { IRepository } from "../helper/interface/IRepository.interface";
 import { Feedback } from "./entities/feedback.entity";
 import { UpdateFeedbackDto } from "./dto/update-feedback.dto";
 import { isQueryAffected } from "../helper/validation";
-import { Building } from "src/building/entities/building.entity";
-import { Apartment } from "src/apartment/entities/apartment.entity";
-import { floor } from "lodash";
 import { Service } from "src/service/entities/service.entity";
-import { PersonRole } from "src/helper/class/profile.entity";
 import { Resident } from "src/resident/entities/resident.entity";
-export abstract class FeedbackService implements IRepository<Feedback> {
+
+export abstract class FeedbackService {
     findByServiceId(service: string) {
         throw new Error("Method not implemented.");
     }
-    find(arg0: { where: { service: string; }; relations: string[]; }) {
+    find(arg0: { where: { service: string }; relations: string[] }) {
         throw new Error("Method not implemented.");
     }
     abstract findOne(id: string): Promise<Feedback | null>;
@@ -33,7 +29,6 @@ export abstract class FeedbackService implements IRepository<Feedback> {
         updateFloorDto: CreateFeedbackDto,
     ): Promise<Feedback>;
     abstract findAll(page?: number): Promise<Feedback[]>;
-   
 }
 
 @Injectable()
@@ -73,7 +68,7 @@ export class TypeORMFeedbackService extends FeedbackService {
             rating,
             service_id,
             resident,
-            service
+            service,
         };
         const feedbackData = this.feedbackRepository.create(data);
         try {
@@ -88,17 +83,16 @@ export class TypeORMFeedbackService extends FeedbackService {
         return this.feedbackRepository.findOne({
             where: {
                 feedback_id: id,
-                
             },
             relations: ["service"],
             cache: true,
-            withDeleted: true 
+            withDeleted: true,
         });
     }
     async findAll() {
         return await this.feedbackRepository.find({
-            relations: ["service","resident"],
-            withDeleted: true 
+            relations: ["service", "resident"],
+            withDeleted: true,
         });
     }
 
@@ -130,7 +124,10 @@ export class TypeORMFeedbackService extends FeedbackService {
             await queryRunner.startTransaction();
             let { rating, ...rest } = updateFeedbackDto;
             if (feedback) {
-                feedback = this.feedbackRepository.merge(feedback, updateFeedbackDto);
+                feedback = this.feedbackRepository.merge(
+                    feedback,
+                    updateFeedbackDto,
+                );
                 feedback = await this.feedbackRepository.save(feedback);
             }
             await queryRunner.commitTransaction();
@@ -143,16 +140,23 @@ export class TypeORMFeedbackService extends FeedbackService {
         return feedback;
     }
     async update(id: string, UpdateFeedbackDto: UpdateFeedbackDto) {
-        let result = await this.feedbackRepository.update(id, UpdateFeedbackDto as any);
+        let result = await this.feedbackRepository.update(
+            id,
+            UpdateFeedbackDto as any,
+        );
         return isQueryAffected(result);
     }
     async delete(id: string): Promise<boolean> {
-        const result = await this.feedbackRepository.softDelete({ feedback_id: id });
+        const result = await this.feedbackRepository.softDelete({
+            feedback_id: id,
+        });
         return isQueryAffected(result);
     }
     async hardDelete?(id: any): Promise<boolean> {
         try {
-            const result = await this.feedbackRepository.delete({ feedback_id : id });
+            const result = await this.feedbackRepository.delete({
+                feedback_id: id,
+            });
             return isQueryAffected(result);
         } catch (error) {
             console.error(error);
@@ -164,5 +168,4 @@ export class TypeORMFeedbackService extends FeedbackService {
      * @param query chuỗi cần tìm theo tên
      * @returns
      */
-   
 }

@@ -1,13 +1,12 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateContractDto } from "./dto/create-contract.dto";
 import { UpdateContractDto } from "./dto/update-contract.dto";
-import { DataSource, Like, Repository, TypeORMError } from "typeorm";
-import { Contract } from "./entities/contract.entity";
+import { DataSource, Repository, TypeORMError } from "typeorm";
+import { Contract, ContractStatusRole } from "./entities/contract.entity";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { isQueryAffected } from "../helper/validation";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { StorageManager } from "../storage/storage.service";
-import { ContractRole, ContractStatusRole } from "../helper/enums/contractEnum";
 import { SearchContractDto } from "./dto/search-contract-dto";
 
 @Injectable()

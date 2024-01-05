@@ -1,19 +1,9 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    NotFoundException,
-    Delete,
-    Query,
-} from "@nestjs/common";
+import { Controller, Get, Post, Body, Param } from "@nestjs/common";
 
-import { ApiConsumes, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { RepairInvoiceService } from "./repairInvoice.service";
-import { FormDataRequest } from "nestjs-form-data";
-import { CreateItemRepairInvoiceDto } from "./dto/create-repairInvoice.dto";
+import { CreateItemRepairInvoiceDto } from "../itemRepairInvoice/dto/create-itemRepairInvoice.dto";
+
 @ApiTags("RepairInvoice")
 @Controller("repairInvoice")
 export class RepairInvoiceController {
@@ -32,7 +22,7 @@ export class RepairInvoiceController {
 
     @ApiOperation({ summary: "get invoice by task id" })
     @Get("/:task_id")
-    getByTaskId(@Param ("task_id") task_id:string) {
+    getByTaskId(@Param("task_id") task_id: string) {
         return this.repairInvoiceRepository.getInvoiceByTaskId(task_id);
     }
 
@@ -41,5 +31,4 @@ export class RepairInvoiceController {
     findAll() {
         return this.repairInvoiceRepository.findAll();
     }
-  
 }

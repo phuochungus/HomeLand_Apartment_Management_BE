@@ -8,7 +8,6 @@ import { ApiTags } from "@nestjs/swagger";
 @ApiTags("Service Package")
 @Module({
     imports: [TypeOrmModule.forFeature([ServicePackage]), IdGeneratorModule],
-
     controllers: [ServicePackageController],
     providers: [ServicePackageService],
     exports: [ServicePackageService],

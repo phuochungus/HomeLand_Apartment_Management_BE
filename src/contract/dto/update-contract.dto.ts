@@ -1,18 +1,21 @@
-import { ApiProperty, OmitType, PartialType } from "@nestjs/swagger";
-import { IsDateString, IsOptional, IsString } from "class-validator";
-import { CreateContractDto } from "./create-contract.dto";
-import { HasMimeType, IsFile, MaxFileSize, MemoryStoredFile } from "nestjs-form-data";
-import { commonImageMIMETypes } from "src/helper/constant";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsOptional } from "class-validator";
+import { MemoryStoredFile } from "nestjs-form-data";
+import { ContractRole } from "../entities/contract.entity";
 
-export class UpdateContractDto extends OmitType(
-    CreateContractDto,
-    ['previous_contract_id'] as const,
-) {
+export class UpdateContractDto {
+    apartment_id: string;
+
+    expire_at?: Date | undefined;
+
+    resident_id: string;
+
+    role: ContractRole;
+
     @ApiProperty({
         type: "file",
         required: false,
     })
-       
     @IsOptional()
     imageUpdate?: MemoryStoredFile;
 }

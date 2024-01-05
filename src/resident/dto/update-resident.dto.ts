@@ -1,12 +1,10 @@
-import { OmitType, PartialType } from "@nestjs/swagger";
-import { CreateResidentDto } from "./create-resident.dto";
+import { MemoryStoredFile } from "nestjs-form-data";
+import { Gender } from "../../helper/class/profile.entity";
 
-export class UpdateResidentDto extends PartialType(
-    OmitType(CreateResidentDto, [
-        "back_identify_card_photo",
-        "front_identify_card_photo",
-        "name",
-        "identify_number",
-        "date_of_birth",
-    ] as const),
-) {}
+export class UpdateResidentDto {
+    avatar_photo?: MemoryStoredFile | undefined;
+    email?: string | undefined;
+    gender?: Gender | undefined;
+    payment_info?: string | undefined;
+    phone_number?: string | undefined;
+}

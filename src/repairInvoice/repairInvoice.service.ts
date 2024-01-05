@@ -1,14 +1,13 @@
 import { RepairInvoice } from "src/repairInvoice/entities/repairInvoice.entity";
-import { Technician } from "../technician/entities/technician.entity";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { Injectable } from "@nestjs/common";
-import { DataSource, Repository } from "typeorm";
-import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
 import { Task } from "src/task/entities/task.entity";
 import { ItemRepairInvoice } from "src/itemRepairInvoice/entities/itemRepairInvoice.entity";
-import { CreateItemRepairInvoiceDto } from "./dto/create-repairInvoice.dto";
-import { isQueryAffected } from "src/helper/validation";
 import { Complain } from "src/complain/entities/complain.entity";
+import { CreateItemRepairInvoiceDto } from "../itemRepairInvoice/dto/create-itemRepairInvoice.dto";
+
 @Injectable()
 export class RepairInvoiceService {
     constructor(
@@ -18,8 +17,6 @@ export class RepairInvoiceService {
         private readonly taskRepository: Repository<Task>,
         @InjectRepository(ItemRepairInvoice)
         private readonly itemRepairInvoiceRepository: Repository<ItemRepairInvoice>,
-        @InjectRepository(Complain)
-        private readonly complainRepository: Repository<Complain>,
         private readonly idGenerate: IdGenerator,
     ) {}
     async create(items: CreateItemRepairInvoiceDto[], task_id: string) {
@@ -75,5 +72,4 @@ export class RepairInvoiceService {
         });
         return result;
     }
-    
 }

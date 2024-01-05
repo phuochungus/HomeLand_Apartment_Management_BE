@@ -8,6 +8,8 @@ export class CreateServiceDto extends PickType(Service, [
     "name",
     "description",
 ] as const) {
+    description?: string | undefined;
+    name: string;
     @ApiProperty({
         type: "file",
         required: false,

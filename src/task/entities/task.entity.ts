@@ -1,32 +1,25 @@
 import {
     Column,
     Entity,
-    OneToMany,
     PrimaryColumn,
-    DeleteDateColumn,
     JoinColumn,
-    ManyToMany,
     OneToOne,
     CreateDateColumn,
     ManyToOne,
 } from "typeorm";
-import { Floor } from "../../floor/entities/floor.entity";
-import { Apartment } from "../../apartment/entities/apartment.entity";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsNumberString, IsEnum } from "class-validator";
+import { IsEnum } from "class-validator";
 import { Manager } from "src/manager/entities/manager.entity";
-import { Equipment } from "../../equipment/entities/equipment.entity";
 import { Technician } from "src/technician/entities/technician.entity";
 import { Complain } from "src/complain/entities/complain.entity";
 import { RepairInvoice } from "src/repairInvoice/entities/repairInvoice.entity";
 import { Admin } from "src/admin/entities/admin.entity";
 
-
 export enum taskStatus {
     PENDING = "PENDING",
     PROCESSING = "PROCESSING",
     CANCEL = "CANCEL",
-    DONE = "DONE"
+    DONE = "DONE",
 }
 @Entity()
 export class Task {
@@ -43,11 +36,11 @@ export class Task {
 
     @ManyToOne(() => Technician, (technician) => technician.tasks)
     @JoinColumn()
-    assignee: Technician
+    assignee: Technician;
 
     @OneToOne(() => RepairInvoice, (repairInvoice) => repairInvoice.task, {
         cascade: true,
-        onDelete: "CASCADE"
+        onDelete: "CASCADE",
     })
     invoice: RepairInvoice;
 
@@ -57,11 +50,11 @@ export class Task {
     status: taskStatus;
 
     @OneToOne(() => Complain, (complain) => complain.task, {
-        onDelete:"CASCADE"
+        onDelete: "CASCADE",
     })
     @JoinColumn()
-    complain: Complain
+    complain: Complain;
 
     @CreateDateColumn()
-    created_at: Date
+    created_at: Date;
 }

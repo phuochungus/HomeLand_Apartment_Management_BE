@@ -1,11 +1,9 @@
-import { isArray } from "class-validator";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { CreateBuildingDto } from "./dto/create-building.dto";
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { DataSource, In, Repository, Like, createQueryBuilder } from "typeorm";
+import { Injectable } from "@nestjs/common";
+import { DataSource, Repository, Like } from "typeorm";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { StorageManager } from "../storage/storage.service";
-import { IRepository } from "../helper/interface/IRepository.interface";
 import { Building } from "./entities/building.entity";
 import { Floor } from "../floor/entities/floor.entity";
 import { UpdateBuildingDto } from "./dto/update-building.dto";
@@ -14,7 +12,7 @@ import { Manager } from "src/manager/entities/manager.entity";
 import { IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
 import { paginate } from "nestjs-typeorm-paginate/dist/paginate";
 import { IPaginationMeta } from "nestjs-typeorm-paginate/dist/interfaces";
-export abstract class BuildingService implements IRepository<Building> {
+export abstract class BuildingService {
     abstract findOne(id: string): Promise<Building | null>;
     abstract update(id: string, updateEntityDto: any): Promise<boolean>;
     abstract delete(id: string): Promise<boolean>;
@@ -74,14 +72,16 @@ export class TypeORMBuildingService extends BuildingService {
     }
     async findAll() {
         return await this.buildingRepository.find({
-            relations: ["managers", "floors", "floors.apartments"],withDeleted: true 
+            relations: ["managers", "floors", "floors.apartments"],
+            withDeleted: true,
         });
     }
 
     async findOne(id: string) {
         return await this.buildingRepository.findOne({
             where: { building_id: id },
-            relations: ["managers", "managers.account", "floors.apartments"],withDeleted: true 
+            relations: ["managers", "managers.account", "floors.apartments"],
+            withDeleted: true,
         });
     }
 

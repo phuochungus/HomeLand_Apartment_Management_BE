@@ -1,18 +1,15 @@
-import { Floor } from './../entities/floor.entity';
-import { ApiProperty, PickType } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 import { IsNumberString, IsOptional, IsString } from "class-validator";
 import { Transform } from "class-transformer";
-import { HasMimeType, IsFiles, MaxFileSize } from "nestjs-form-data";
-import { commonImageMIMETypes } from "../../helper/constant";
 
-export class CreateFloorDto extends PickType(Floor, [
-    "name",
-    "building_id"
+export class CreateFloorDto {
+    building_id: string;
 
-] as const) {
+    name: string;
+    
     @ApiProperty()
     @IsNumberString()
-    max_apartment: number
+    max_apartment: number;
 
     @ApiProperty({
         type: "string",

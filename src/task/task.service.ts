@@ -2,20 +2,16 @@ import { Technician } from "./../technician/entities/technician.entity";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { Injectable } from "@nestjs/common";
-import { DataSource, Repository } from "typeorm";
-import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
 import { Task, taskStatus } from "./entities/task.entity";
-import { Floor } from "../floor/entities/floor.entity";
-import { UpdateTaskDto } from "./dto/update-task.dto";
-import { isQueryAffected } from "../helper/validation";
 import { Manager } from "src/manager/entities/manager.entity";
-import { Resident } from "src/resident/entities/resident.entity";
 import {
     Complain,
     complainStatus,
 } from "src/complain/entities/complain.entity";
-import { RepairInvoice } from "src/repairInvoice/entities/repairInvoice.entity";
 import { Admin } from "src/admin/entities/admin.entity";
+
 @Injectable()
 export class TaskService {
     constructor(
@@ -29,10 +25,6 @@ export class TaskService {
         private readonly complainRepository: Repository<Complain>,
         @InjectRepository(Technician)
         private readonly technicianRepository: Repository<Technician>,
-        @InjectRepository(RepairInvoice)
-        private readonly repairInvoiceRepository: Repository<RepairInvoice>,
-        @InjectDataSource()
-        private readonly dataSource: DataSource,
         private readonly idGenerate: IdGenerator,
     ) {}
 
@@ -42,16 +34,15 @@ export class TaskService {
     ): Promise<Task | null> {
         try {
             const task_id = "T" + this.idGenerate.generateId();
-            let assigner:any;
-            if(createTaskDto.assigner_id.includes("MNG")) {
-                 assigner = (await this.managerRepository.findOne({
+            let assigner: any;
+            if (createTaskDto.assigner_id.includes("MNG")) {
+                assigner = (await this.managerRepository.findOne({
                     where: { id: createTaskDto.assigner_id },
                 })) as Manager;
-            }
-            else
-             assigner = (await this.adminRepository.findOne({
-                where: { id: createTaskDto.assigner_id },
-            })) as Admin;
+            } else
+                assigner = (await this.adminRepository.findOne({
+                    where: { id: createTaskDto.assigner_id },
+                })) as Admin;
             const complain = (await this.complainRepository.findOne({
                 where: { complain_id: createTaskDto.complain_id },
             })) as Complain;
@@ -60,26 +51,25 @@ export class TaskService {
                     id: assigneeId,
                 },
             })) as Technician;
-            
+
             const data = {
                 task_id,
-                complain,    
+                complain,
                 status: taskStatus.PROCESSING,
                 assignee,
             };
             let newData;
-            if(createTaskDto.assigner_id.includes("MNG")) {
-                newData = {...data, manager: assigner}
-            }
-            else newData = {...data, admin: assigner}
-            
+            if (createTaskDto.assigner_id.includes("MNG")) {
+                newData = { ...data, manager: assigner };
+            } else newData = { ...data, admin: assigner };
+
             const taskData = this.taskRepository.create(newData);
             await this.taskRepository.save(taskData);
             const result = await this.taskRepository.findOne({
                 where: {
                     task_id,
                 },
-                relations: ["assignee", "manager", "admin", "complain"]
+                relations: ["assignee", "manager", "admin", "complain"],
             });
             await this.complainRepository.update(createTaskDto.complain_id, {
                 status: complainStatus.RECEIVED,
@@ -130,17 +120,17 @@ export class TaskService {
             relations: {
                 assignee: true,
                 manager: {
-                    account : true
+                    account: true,
                 },
                 admin: {
-                    account : true
+                    account: true,
                 },
                 complain: {
-                    resident: true
-                }
-                ,invoice: true
-                
-            },withDeleted: true 
+                    resident: true,
+                },
+                invoice: true,
+            },
+            withDeleted: true,
         });
         return result;
     }

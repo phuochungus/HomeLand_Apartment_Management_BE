@@ -10,20 +10,24 @@ import {
 import { commonImageMIMETypes } from "../../helper/constant";
 import { Transform } from "class-transformer";
 import { Column } from "typeorm";
-import { Profile } from "src/helper/class/profile.entity";
+import { Gender, Profile } from "src/helper/class/profile.entity";
 
 export class CreateTechnicianDto extends PickType(Profile, [
     "name",
     "date_of_birth",
     "gender",
     "phone_number",
-    "identify_number"
+    "identify_number",
 ] as const) {
-
-    @ApiProperty({required: true})
+    date_of_birth: Date;
+    gender: Gender;
+    identify_number: string;
+    name: string;
+    phone_number: string;
+    @ApiProperty({ required: true })
     @IsString()
     @Column()
-    email: string
+    email: string;
 
     @ApiProperty({ type: "file", required: true })
     @IsFile()

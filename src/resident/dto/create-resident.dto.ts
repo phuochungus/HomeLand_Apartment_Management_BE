@@ -1,5 +1,4 @@
-import { ApiProperty, PickType } from "@nestjs/swagger";
-import { Resident } from "../entities/resident.entity";
+import { ApiProperty } from "@nestjs/swagger";
 import { IsOptional, IsString } from "class-validator";
 import {
     HasMimeType,
@@ -11,15 +10,19 @@ import {
 import { commonImageMIMETypes } from "../../helper/constant";
 import { Transform } from "class-transformer";
 import { Column } from "typeorm";
-import { Profile } from "../../helper/class/profile.entity";
+import { Gender } from "../../helper/class/profile.entity";
 
-export class CreateResidentDto extends PickType(Profile, [
-    "name",
-    "date_of_birth",
-    "gender",
-    "identify_number",
-    "phone_number",
-] as const) {
+export class CreateResidentDto {
+    date_of_birth: Date;
+
+    gender: Gender;
+
+    identify_number: string;
+
+    name: string;
+
+    phone_number: string;
+
     @ApiProperty({ required: false })
     @IsString()
     @Column()

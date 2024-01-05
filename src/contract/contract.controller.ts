@@ -6,11 +6,7 @@ import {
     Patch,
     Param,
     Delete,
-    Redirect,
     Query,
-    UseGuards,
-    UploadedFile,
-    ParseFilePipe,
     NotFoundException,
 } from "@nestjs/common";
 import { ContractService } from "./contract.service";
@@ -41,11 +37,11 @@ export class ContractController {
             "Page number: Page indexed from 1, each page contain 30 items, if null then return all.",
     })
     @Get()
-   async findAll(@Query("page") page: number) {
+    async findAll(@Query("page") page: number) {
         var data;
         if (Number.isNaN(page)) data = await this.contractService.findAll();
         else data = await this.contractService.findAll(page);
-        return { data, current_page: page, per_page: 30, total: data.length};
+        return { data, current_page: page, per_page: 30, total: data.length };
     }
 
     @Get("/:id")
@@ -75,8 +71,7 @@ export class ContractController {
     @ApiConsumes("multipart/form-data")
     @FormDataRequest()
     async searchResident(@Body() searchContractDto: SearchContractDto) {
-        const result = await this.contractService.search( searchContractDto);
+        const result = await this.contractService.search(searchContractDto);
         return result;
     }
-    
 }

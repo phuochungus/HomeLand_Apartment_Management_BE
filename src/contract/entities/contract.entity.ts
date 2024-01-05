@@ -7,18 +7,21 @@ import {
     ManyToOne,
     OneToOne,
     PrimaryColumn,
-    PrimaryGeneratedColumn,
-    TableInheritance,
 } from "typeorm";
 import { Apartment } from "../../apartment/entities/apartment.entity";
 import { Resident } from "../../resident/entities/resident.entity";
-import {
-    ContractRole,
-    ContractStatusRole,
-} from "../../helper/enums/contractEnum";
+
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum } from "class-validator";
 
+export enum ContractRole {
+    BUY = "buy",
+    RENT = "rent",
+}
+export enum ContractStatusRole {
+    ACTIVE = "active",
+    INACTIVE = "inactive",
+}
 
 @Entity()
 export class Contract {
@@ -42,7 +45,7 @@ export class Contract {
     resident: Resident;
     @Column({ nullable: true })
     resident_id: string;
-    
+
     @ManyToOne(() => Apartment, (apartment) => apartment.contracts)
     @JoinColumn({ name: "apartment_id" })
     apartment: Apartment;
@@ -75,7 +78,7 @@ export class Contract {
     @CreateDateColumn()
     created_at: Date;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     expire_at?: Date;
 
     @DeleteDateColumn()

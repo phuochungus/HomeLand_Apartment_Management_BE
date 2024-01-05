@@ -16,11 +16,11 @@ import { ApartmentService } from "../apartment/apartment.service";
 import { Resident } from "../resident/entities/resident.entity";
 import { Manager } from "../manager/entities/manager.entity";
 import { Technician } from "../technician/entities/technician.entity";
-import { ResidentRepository } from "../resident/resident.service";
-import { Contract } from "src/contract/entities/contract.entity";
-
-import { ContractRole, ContractStatusRole } from "../helper/enums/contractEnum";
-import { Service } from "../service/entities/service.entity";
+import {
+    Contract,
+    ContractRole,
+    ContractStatusRole,
+} from "src/contract/entities/contract.entity";
 import { ServicePackage } from "../service-package/entities/service-package.entity";
 import { Client } from "elasticsearch";
 import { BuildingService } from "../building/building.service";
@@ -35,6 +35,7 @@ import { Employee } from "src/employee/entities/employee.entity";
 import { Invoice } from "../invoice/entities/invoice.entity";
 import { ServicePackageService } from "../service-package/service-package.service";
 import { ServiceService } from "../service/service.service";
+import { ResidentServiceImp } from "../resident/resident.service";
 @Injectable()
 export class SeedService {
     constructor(
@@ -45,7 +46,7 @@ export class SeedService {
         private readonly hashService: HashService,
         private readonly avatarGenerator: AvatarGenerator,
         private readonly elasticsearchClient: Client,
-        private readonly residentService: ResidentRepository,
+        private readonly residentService: ResidentServiceImp,
         private readonly buildingService: BuildingService,
         private readonly apartmentService: ApartmentService,
         private readonly floorService: FloorService,
@@ -612,7 +613,6 @@ export class SeedService {
             },
             `Service${3}`,
         );
-        
     }
     async createDemoServicePackages() {
         let ServicePackageInfo: any[] = [];

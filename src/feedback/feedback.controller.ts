@@ -1,4 +1,3 @@
-import { Repository } from "typeorm";
 import {
     Controller,
     Get,
@@ -15,15 +14,12 @@ import { ApiConsumes, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { FormDataRequest } from "nestjs-form-data";
 import { CreateFeedbackDto } from "./dto/create-feedback.dto";
 import { FeedbackService } from "./feedback.service";
-import { id_ID } from "@faker-js/faker";
-import { Feedback } from "./entities/feedback.entity";
 import { UpdateFeedbackDto } from "./dto/update-feedback.dto";
-import { UpdateFloorDto } from "src/floor/dto/update-floor.dto";
 
 @ApiTags("Feedback")
 @Controller("Feedback")
 export class FeedbackController {
-    constructor(private readonly feedbackRepository: FeedbackService) { }
+    constructor(private readonly feedbackRepository: FeedbackService) {}
     @ApiOperation({ summary: "create floor" })
     @ApiConsumes("multipart/form-data")
     @Post()
@@ -55,7 +51,7 @@ export class FeedbackController {
     @Get(":id")
     async findOne(@Param("id") id: string) {
         const building = await this.feedbackRepository.findOne(id);
-    
+
         throw new NotFoundException("Feedback not found");
     }
     @ApiOperation({ summary: "edit feedback" })
@@ -66,10 +62,7 @@ export class FeedbackController {
         @Param("id") id: string,
         @Body() updateFloorDto: UpdateFeedbackDto,
     ) {
-        const result = await this.feedbackRepository.update(
-            id,
-            updateFloorDto,
-        );
+        const result = await this.feedbackRepository.update(id, updateFloorDto);
         if (result) return { msg: "Complain updated" };
         throw new NotFoundException("Complain not found");
     }
@@ -78,7 +71,6 @@ export class FeedbackController {
     async deleteFeedback(@Param("id") id: string) {
         return await this.feedbackRepository.delete(id);
     }
-   
 
     // @Delete(":id")
     // remove(@Param("id") id: string) {

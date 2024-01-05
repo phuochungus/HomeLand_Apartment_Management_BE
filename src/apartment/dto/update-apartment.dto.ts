@@ -2,21 +2,22 @@ import { ApiProperty, OmitType, PartialType } from "@nestjs/swagger";
 import { MemoryStoredFile } from "nestjs-form-data";
 import { IsOptional, Validate, isArray } from "class-validator";
 import { IsURLOrImageFile } from "../isURLOrImageFile";
-import { Apartment } from "../entities/apartment.entity";
+import { Apartment, ApartmentStatus } from "../entities/apartment.entity";
 import { Transform } from "class-transformer";
+import { Equipment } from "../../equipment/entities/equipment.entity";
 
-export class UpdateApartmentDto extends PartialType(
-    OmitType(Apartment, [
-        "apartment_id",
-        "imageURLs",
-        "floor",
-        "building",
-        "created_at",
-        "deleted_at",
-        "contracts",
-        "residents",
-    ] as const),
-) {
+export class UpdateApartmentDto {
+    name?: string | undefined;
+    building_id?: string | undefined;
+    description?: string | undefined;
+    equipments?: Equipment[] | undefined;
+    floor_id?: string | undefined;
+    length?: number | undefined;
+    number_of_bathroom?: number | undefined;
+    number_of_bedroom?: number | undefined;
+    rent?: number | undefined;
+    status?: ApartmentStatus | undefined;
+    width?: number | undefined;
     /**
      * This field cann't be fully tested via Swagger UI
      *

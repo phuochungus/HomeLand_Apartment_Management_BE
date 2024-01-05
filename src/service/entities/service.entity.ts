@@ -3,24 +3,11 @@ import {
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
-    JoinColumn,
-    JoinTable,
-    ManyToOne,
     OneToMany,
-    OneToOne,
     PrimaryColumn,
-    PrimaryGeneratedColumn,
-    TableInheritance,
 } from "typeorm";
-import { Apartment } from "../../apartment/entities/apartment.entity";
-import { Resident } from "../../resident/entities/resident.entity";
-import {
-    ContractRole,
-    ContractStatusRole,
-} from "../../helper/enums/contractEnum";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsOptional, IsString } from "class-validator";
-import { on } from "events";
+import { IsOptional, IsString } from "class-validator";
 import { ServicePackage } from "../../service-package/entities/service-package.entity";
 import { Feedback } from "src/feedback/entities/feedback.entity";
 @Entity()
@@ -52,7 +39,6 @@ export class Service {
     @OneToMany(() => ServicePackage, (service) => service.service, {
         nullable: true,
     })
-
     @OneToMany(() => ServicePackage, (feedback) => feedback.service)
     feedback: Feedback[];
 

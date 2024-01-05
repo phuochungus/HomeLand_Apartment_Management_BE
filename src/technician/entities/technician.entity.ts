@@ -5,16 +5,12 @@ import {
     OneToOne,
     DeleteDateColumn,
     CreateDateColumn,
-    ManyToOne,
-    ManyToMany,
-    OneToMany
+    OneToMany,
 } from "typeorm";
 import { PersonRole, Profile } from "../../helper/class/profile.entity";
 import { Account } from "../../account/entities/account.entity";
-import { JoinColumn, JoinTable } from "typeorm";
+import { JoinColumn } from "typeorm";
 import { Task } from "src/task/entities/task.entity";
-import { RepairInvoice } from "src/repairInvoice/entities/repairInvoice.entity";
-
 
 @Entity()
 export class Technician {

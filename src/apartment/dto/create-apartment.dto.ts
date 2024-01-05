@@ -1,5 +1,4 @@
-import { ApiProperty, PickType } from "@nestjs/swagger";
-import { Apartment } from "../entities/apartment.entity";
+import { ApiProperty } from "@nestjs/swagger";
 import { IsOptional, IsString } from "class-validator";
 import { Transform } from "class-transformer";
 import {
@@ -10,17 +9,17 @@ import {
 } from "nestjs-form-data";
 import { commonImageMIMETypes } from "../../helper/constant";
 
-export class CreateApartmentDto extends PickType(Apartment, [
-    "width",
-    "length",
-    "floor_id",
-    "building_id",
-    "description",
-    "number_of_bathroom",
-    "number_of_bedroom",
-    "rent",
-    "name",
-] as const) {
+export class CreateApartmentDto {
+    width: number;
+    length: number;
+    number_of_bedroom: number;
+    number_of_bathroom: number;
+    rent: number;
+    name: string;
+    description: string;
+    floor_id: string;
+    building_id: string;
+
     @ApiProperty({
         type: "file",
         required: true,

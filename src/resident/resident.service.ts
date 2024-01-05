@@ -1,12 +1,10 @@
 import { UpdateResidentDto } from "./dto/update-resident.dto";
 import { Resident } from "./entities/resident.entity";
-
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Like, Repository, TypeORMError } from "typeorm";
 import { StorageManager } from "../storage/storage.service";
 import { isQueryAffected } from "../helper/validation";
-import { IRepository } from "../helper/interface/IRepository.interface";
 import { AvatarGenerator } from "../avatar-generator/avatar-generator.service";
 import { MemoryStoredFile } from "nestjs-form-data";
 import { Profile } from "../helper/class/profile.entity";
@@ -20,10 +18,11 @@ import { paginate } from "nestjs-typeorm-paginate/dist/paginate";
 import { IPaginationMeta } from "nestjs-typeorm-paginate/dist/interfaces";
 import { Pagination } from "nestjs-typeorm-paginate/dist/pagination";
 import { Contract } from "src/contract/entities/contract.entity";
+
 /**
  * Person repository interface
  */
-export abstract class ResidentRepository implements IRepository<Resident> {
+export abstract class ResidentService {
     abstract findOne(id: string): Promise<Resident | null>;
     abstract update(id: string, updateEntityDto: any): Promise<boolean>;
     abstract delete(id: string): Promise<boolean>;
@@ -49,7 +48,7 @@ export abstract class ResidentRepository implements IRepository<Resident> {
 }
 
 @Injectable()
-export class ResidentService implements ResidentRepository {
+export class ResidentServiceImp implements ResidentService {
     constructor(
         @InjectRepository(Resident)
         private readonly residentRepository: Repository<Resident>,
@@ -294,8 +293,12 @@ export class ResidentService implements ResidentRepository {
                 .leftJoinAndSelect("resident.stay_at", "apartment")
                 .where("apartment.building_id = :buildingId", {
                     buildingId: buildingId,
-                }).orderBy('resident.created_at', 'DESC');
-        } else result.leftJoinAndSelect("resident.stay_at", "apartment").orderBy('resident.created_at', 'DESC');
+                })
+                .orderBy("resident.created_at", "DESC");
+        } else
+            result
+                .leftJoinAndSelect("resident.stay_at", "apartment")
+                .orderBy("resident.created_at", "DESC");
         return paginate<Resident>(result, options);
     }
 }

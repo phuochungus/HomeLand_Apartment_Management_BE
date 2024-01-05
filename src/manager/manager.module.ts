@@ -9,6 +9,7 @@ import { AuthModule } from "src/auth/auth.module";
 import { Manager } from "./entities/manager.entity";
 import { ManagerController } from "./manager.controller";
 import { ManagerService } from "./manager.service";
+
 @Global()
 @Module({
     imports: [

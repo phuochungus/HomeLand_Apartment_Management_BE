@@ -12,10 +12,12 @@ import { Account } from "src/account/entities/account.entity";
 import { HashService } from "src/hash/hash.service";
 import { Manager } from "./entities/manager.entity";
 import { CreateManagerDto } from "./dto/create-manager.dto";
-import { UpdateResult } from "typeorm/browser";
-import { IPaginationOptions } from "nestjs-typeorm-paginate";
-import { paginate } from "nestjs-typeorm-paginate/dist/paginate";
-import { IPaginationMeta } from "nestjs-typeorm-paginate/dist/interfaces";
+import {
+    IPaginationMeta,
+    IPaginationOptions,
+    paginate,
+} from "nestjs-typeorm-paginate";
+
 /**
  * Person repository interface
  */
@@ -158,28 +160,26 @@ export class ManagerService {
                     "/avatarURL." +
                     (avataPhoto.extension || "png"),
                 avataPhoto.mimetype || "image/png",
-               
             );
             profile.avatarURL = avatarURL;
-        } 
+        }
         try {
             await this.accountRepository.update(id, {
-                email
+                email,
             });
-        manager.profile = profile;
-        
-         await this.managerRepository.update(id,{
-            profile
-        } );
-        return await this.managerRepository.findOne({
-            where: {
-                id
-            },
-            relations: ["account", "building"],
-        })
-        }
-        catch(err) {
-            throw new Error('Count not update manager');
+            manager.profile = profile;
+
+            await this.managerRepository.update(id, {
+                profile,
+            });
+            return await this.managerRepository.findOne({
+                where: {
+                    id,
+                },
+                relations: ["account", "building"],
+            });
+        } catch (err) {
+            throw new Error("Count not update manager");
         }
     }
     findOne(id: string): Promise<Manager | null> {
@@ -189,7 +189,7 @@ export class ManagerService {
             },
             cache: true,
             relations: ["account", "building"],
-            withDeleted: true 
+            withDeleted: true,
         });
     }
     async delete(id: string) {
@@ -203,12 +203,15 @@ export class ManagerService {
     async findAll(): Promise<Manager[]> {
         const managers = await this.managerRepository.find({
             relations: ["account", "building"],
-            withDeleted: true 
+            withDeleted: true,
         });
         return managers;
     }
     async paginate(options: IPaginationOptions<IPaginationMeta>) {
-        const result = this.managerRepository.createQueryBuilder("manager").leftJoinAndSelect("manager.account", "account").leftJoinAndSelect("manager.building", "building")
-        return paginate<Manager>(result, options)
+        const result = this.managerRepository
+            .createQueryBuilder("manager")
+            .leftJoinAndSelect("manager.account", "account")
+            .leftJoinAndSelect("manager.building", "building");
+        return paginate<Manager>(result, options);
     }
 }

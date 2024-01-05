@@ -1,17 +1,13 @@
-import { Manager } from './entities/manager.entity';
+import { Manager } from "./entities/manager.entity";
 import {
     Controller,
     Post,
     Body,
-    UseGuards,
     Get,
     Param,
     Patch,
     Delete,
-    Req,
-    Put,
     Query,
-    ParseEnumPipe,
     DefaultValuePipe,
     ParseIntPipe,
 } from "@nestjs/common";
@@ -24,14 +20,12 @@ import {
 } from "@nestjs/swagger";
 
 import { FormDataRequest } from "nestjs-form-data";
-import { PersonRole } from "../helper/class/profile.entity";
-import { JWTAuthGuard } from "src/auth/guard/jwt-auth.guard";
-import { Auth } from "src/helper/decorator/auth.decorator";
-import { ManagerService } from './manager.service';
-import { CreateManagerDto } from './dto/create-manager.dto';
-import { UpdateManagerDto } from './dto/update-manager.dto';
+import { ManagerService } from "./manager.service";
+import { CreateManagerDto } from "./dto/create-manager.dto";
+import { UpdateManagerDto } from "./dto/update-manager.dto";
 import { Pagination } from "nestjs-typeorm-paginate/dist/pagination";
 import { IPaginationOptions } from "nestjs-typeorm-paginate/dist/interfaces";
+
 @ApiTags("Manager")
 // @UseGuards(JWTAuthGuard)
 // @ApiBearerAuth()
@@ -57,7 +51,6 @@ export class ManagerController {
     @Post()
     @FormDataRequest()
     async create(@Body() createManagerDto: CreateManagerDto) {
-      
         return await this.managerRepository.create(createManagerDto);
     }
     @Get("/search")
@@ -67,9 +60,7 @@ export class ManagerController {
     }
     @Delete("/:id")
     async softDelete(@Param("id") id: string) {
-    
         const result = await this.managerRepository.delete(id);
-        
     }
     /**
      *
@@ -86,7 +77,6 @@ export class ManagerController {
         @Param("id") id: string,
         @Body() updateManagerDto: UpdateManagerDto,
     ): Promise<Manager | null> {
-
         const manager = await this.managerRepository.update(
             id,
             updateManagerDto,
@@ -96,30 +86,28 @@ export class ManagerController {
 
     @ApiOperation({ summary: "get all manager" })
     @Get()
-    async findAll(){
+    async findAll() {
         return this.managerRepository.findAll();
     }
-    
-    @ApiOperation({summary: "pagination manager"})
+
+    @ApiOperation({ summary: "pagination manager" })
     @Get("/pagination")
     async paginationManager(
-            @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-            @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
-            limit: number = 1,
+        @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+        limit: number = 1,
     ): Promise<Pagination<Manager>> {
-            const options: IPaginationOptions = {
-                    limit,
-                    page
-            }
-        console.log(limit)
-            return this.managerRepository.paginate(options);
+        const options: IPaginationOptions = {
+            limit,
+            page,
+        };
+        console.log(limit);
+        return this.managerRepository.paginate(options);
     }
 
     @ApiOperation({ summary: "get manager by id" })
     @Get("/:id")
-    async findOne(
-        @Param("id") id: string,
-    ): Promise<Manager | null> {
+    async findOne(@Param("id") id: string): Promise<Manager | null> {
         const manager = await this.managerRepository.findOne(id);
         return manager;
     }

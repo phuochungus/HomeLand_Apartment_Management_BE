@@ -5,15 +5,89 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c9ccbab-d991-4420-8199-7193c78f46a8" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/account/account.controller.spec.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/account/account.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/account/account.controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/account/account.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/account/account.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/account/account.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/account/account.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/token/token.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/token/token.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/apartment/dto/create-apartment.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/apartment/dto/create-apartment.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/apartment/dto/update-apartment.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/apartment/dto/update-apartment.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/building/building.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/building/building.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/building/dto/create-building.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/building/dto/create-building.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/complain/dto/create-complain.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/complain/dto/create-complain.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/complain/dto/update-complain.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/complain/dto/update-complain.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/contract/contract.controller.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/contract/contract.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/contract/contract.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/contract/contract.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/contract/contract.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/contract/contract.service.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/contract/contract.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/contract/contract.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/contract/dto/create-contract.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/contract/dto/create-contract.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/contract/dto/search-contract-dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/contract/dto/search-contract-dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/contract/dto/update-contract.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/contract/dto/update-contract.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/contract/entities/contract.entity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/contract/entities/contract.entity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/employee/dto/create-employee.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/employee/dto/create-employee.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/employee/dto/update-employee.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/employee/dto/update-employee.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/employee/employee.controller.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/employee/employee.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/employee/employee.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/employee/employee.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/employee/employee.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/employee/employee.service.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/employee/employee.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/employee/employee.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/equipment/dto/create-equipment.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/equipment/dto/create-equipment.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/equipment/dto/update-equipment.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/equipment/dto/update-equipment.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/equipment/equipment.controller.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/equipment/equipment.service.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/feedback/dto/create-feedback.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/feedback/dto/create-feedback.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/feedback/dto/update-feedback.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/feedback/dto/update-feedback.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/feedback/entities/feedback.entity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/feedback/entities/feedback.entity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/feedback/feedback.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/feedback/feedback.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/feedback/feedback.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/feedback/feedback.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/feedback/feedback.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/feedback/feedback.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/floor/dto/create-floor.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/floor/dto/create-floor.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/floor/dto/update-floor.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/floor/dto/update-floor.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/floor/entities/floor.entity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/floor/entities/floor.entity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/floor/floor.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/floor/floor.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/floor/floor.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/floor/floor.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/floor/floor.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/floor/floor.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/helper/enums/contractEnum.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/helper/interface/IRepository.interface.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/invoice/dto/update-invoice.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/invoice/dto/update-invoice.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/invoice/invoice.controller.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/invoice/invoice.service.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/invoice/invoice.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/invoice/invoice.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/itemRepairInvoice/dto/create-itemRepairInvoice.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/itemRepairInvoice/dto/create-itemRepairInvoice.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/itemRepairInvoice/itemRepairInvoice.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/itemRepairInvoice/itemRepairInvoice.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/itemRepairInvoice/itemRepairInvoice.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/itemRepairInvoice/itemRepairInvoice.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/manager/manager.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/manager/manager.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/manager/manager.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/manager/manager.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/manager/manager.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/manager/manager.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repairInvoice/dto/create-repairInvoice.dto.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repairInvoice/entities/repairInvoice.entity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repairInvoice/entities/repairInvoice.entity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repairInvoice/repairInvoice.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repairInvoice/repairInvoice.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repairInvoice/repairInvoice.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repairInvoice/repairInvoice.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repairInvoice/repairInvoice.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repairInvoice/repairInvoice.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resident/dto/create-resident.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/resident/dto/create-resident.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resident/dto/update-resident.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/resident/dto/update-resident.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resident/resident.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/resident/resident.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resident/resident.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/resident/resident.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resident/resident.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/resident/resident.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/seed/seed.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/seed/seed.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service-package/dto/create-service-package.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service-package/dto/create-service-package.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service-package/dto/update-service-package.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service-package/dto/update-service-package.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service-package/service-package.controller.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service-package/service-package.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service-package/service-package.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/dto/create-service.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/dto/create-service.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/dto/update-service.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/dto/update-service.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/entities/service.entity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/entities/service.entity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/service.controller.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/service.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/service.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/service.service.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/task/dto/update-task.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/task/dto/update-task.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/task/entities/task.entity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/task/entities/task.entity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/task/task.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/task/task.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/task/task.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/task/task.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/technician/dto/create-technician.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/technician/dto/create-technician.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/technician/dto/update-technician.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/technician/dto/update-technician.dto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/technician/entities/technician.entity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/technician/entities/technician.entity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/technician/technician.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/technician/technician.controller.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vehicle/dto/create-vehicle.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vehicle/dto/create-vehicle.dto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vehicle/dto/update-vehicle.dto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vehicle/dto/update-vehicle.dto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vehicle/entities/vehicle.entity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vehicle/entities/vehicle.entity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vehicle/vehicle.controller.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vehicle/vehicle.service.spec.ts" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +112,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "docs/UML",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/HomeLand_Apartment_Management_BE",
@@ -70,7 +144,7 @@
       <workItem from="1704450123084" duration="260000" />
       <workItem from="1704450460286" duration="139000" />
       <workItem from="1704450638689" duration="54000" />
-      <workItem from="1704450797553" duration="2673000" />
+      <workItem from="1704450797553" duration="4832000" />
     </task>
     <servers />
   </component>

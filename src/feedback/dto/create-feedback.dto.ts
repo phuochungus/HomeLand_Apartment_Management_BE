@@ -1,21 +1,19 @@
-import { ApiProperty, PickType } from "@nestjs/swagger";
-import { Feedback } from "../entities/feedback.entity";
-import { IsOptional, IsString } from "class-validator";
-import { MemoryStoredFile } from "nestjs-form-data";
-import { Transform } from "class-transformer";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsString } from "class-validator";
 import { Column } from "typeorm";
 
-export class CreateFeedbackDto extends PickType(Feedback, [
-        "rating",
-        "comment",
-] as const) {
-        @ApiProperty()
-        @IsString()
-        @Column()
-        resident_id: string
+export class CreateFeedbackDto {
+    comment?: string | undefined;
 
-        @ApiProperty()
-        @IsString()
-        @Column()
-        service_id: string
+    rating: string;
+
+    @ApiProperty()
+    @IsString()
+    @Column()
+    resident_id: string;
+
+    @ApiProperty()
+    @IsString()
+    @Column()
+    service_id: string;
 }

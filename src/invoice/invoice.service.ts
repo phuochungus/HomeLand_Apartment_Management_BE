@@ -3,10 +3,9 @@ import { CreateInvoiceDto } from "./dto/create-invoice.dto";
 import { UpdateInvoiceDto } from "./dto/update-invoice.dto";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { Invoice } from "./entities/invoice.entity";
-import { DataSource, In, Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { ServicePackage } from "../service-package/entities/service-package.entity";
-import { forEach } from "lodash";
 
 @Injectable()
 export class InvoiceService {
@@ -16,8 +15,6 @@ export class InvoiceService {
         @InjectRepository(ServicePackage)
         private servicePackageRepository: Repository<ServicePackage>,
         private readonly idGenerate: IdGenerator,
-        @InjectDataSource()
-        private readonly dataSource: DataSource,
     ) {}
 
     async create(id: string, createInvoiceDto: CreateInvoiceDto) {
@@ -43,7 +40,7 @@ export class InvoiceService {
         return await this.invoiceRepository.find({
             relations: ["servicePackage", "buyer"],
             cache: true,
-            withDeleted: true // Get soft deleted invoices
+            withDeleted: true, // Get soft deleted invoices
         });
     }
     convertJsonToParams(jsonObject: any): string {
@@ -86,8 +83,6 @@ export class InvoiceService {
         var orderId = partnerCode + new Date().getTime();
         var requestId = orderId;
         var extraData = "";
-        var paymentCode =
-            "T8Qii53fAXyUftPV3m9ysyRhEanUs9KlOPfHgpMR0ON50U10Bh+vZdpJU7VY4z+Z2y77fJHkoDc69scwwzLuW5MzeUKTwPo3ZMaB29imm6YulqnWfTkgzqRaion+EuD7FN9wZ4aXE1+mRt0gHsU193y+yxtRgpmY7SDMU9hCKoQtYyHsfFR5FUAOAKMdw2fzQqpToei3rnaYvZuYaxolprm9+/+WIETnPUDlxCYOiw7vPeaaYQQH0BF0TxyU3zu36ODx980rJvPAgtJzH1gUrlxcSS1HQeQ9ZaVM1eOK/jl8KJm6ijOwErHGbgf/hVymUQG65rHU2MWz9U8QUjvDWA==";
         var orderGroupId = "";
         var autoCapture = true;
         var lang = "vi";
@@ -215,10 +210,10 @@ export class InvoiceService {
             },
             relations: ["servicePackage", "buyer"],
             cache: true,
-            withDeleted: true 
+            withDeleted: true,
         });
     }
-    
+
     async getAllInvoiceWithResidentId(
         residentId: string,
         serviceId: string | null,
@@ -251,11 +246,10 @@ export class InvoiceService {
                 return 0; // Equal, keep the order unchanged
             });
             return invoices;
-        }
-        else{
+        } else {
             const invoice = await this.invoiceRepository.find({
                 where: {
-                    buyer_id: residentId, 
+                    buyer_id: residentId,
                 },
                 relations: ["servicePackage", "buyer"],
                 cache: true,

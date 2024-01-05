@@ -9,9 +9,6 @@ export class ItemRepairInvoiceService {
     constructor(
         @InjectRepository(ItemRepairInvoice)
         private readonly itemRepairInvoiceRepository: Repository<ItemRepairInvoice>,
-        @InjectRepository(RepairInvoice)
-        private readonly repairInvoice: Repository<RepairInvoice>,
-        private readonly idGenerate: IdGenerator,
     ) {}
 
     async findAll() {

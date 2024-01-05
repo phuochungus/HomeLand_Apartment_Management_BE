@@ -1,18 +1,20 @@
-import { OmitType } from "@nestjs/swagger";
-import { Equipment } from "../entities/equipment.entity";
+import { EquipmentStatus } from "../entities/equipment.entity";
 import { IsImageFiles } from "../../helper/decorator/image-file.decorator";
 import { MemoryStoredFile } from "nestjs-form-data";
 
-export class CreateEquipmentDto extends OmitType(Equipment, [
-    "building",
-    "apartment",
-    "floor",
-    "imageURLs",
-    "id",
-    "created_at",
-    "deleted_at",
-    "checkFK",
-]) {
+export class CreateEquipmentDto {
+    apartment_id?: string | undefined;
+
+    building_id?: string | undefined;
+
+    description?: string | undefined;
+
+    floor_id?: string | undefined;
+
+    name: string;
+
+    status: EquipmentStatus;
+
     @IsImageFiles(true)
     images: MemoryStoredFile[];
 }

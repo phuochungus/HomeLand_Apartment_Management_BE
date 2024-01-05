@@ -2,11 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { ServiceService } from './service.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
-import { Auth } from '../helper/decorator/auth.decorator';
-import { PersonRole } from '../helper/class/profile.entity';
 import { ApiConsumes, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { FormDataRequest } from 'nestjs-form-data';
-import { SearchDto } from '../apartment/dto/search-apartment.dto';
 import { SearchServiceDto } from './dto/search-service';
 import { ReportServiceDto } from './dto/report-service-dto';
 

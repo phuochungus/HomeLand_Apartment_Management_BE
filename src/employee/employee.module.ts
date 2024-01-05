@@ -6,7 +6,7 @@ import { StorageModule } from "../storage/storage.module";
 import { HashModule } from "../hash/hash.module";
 import { AvatarGeneratorModule } from "../avatar-generator/avatar-generator.module";
 import { EmployeeController } from "./employee.controller";
-import { EmployeeRepository, EmployeeService } from "./employee.service";
+import { EmployeeService, EmployeeServiceImp } from "./employee.service";
 import { AuthModule } from "../auth/auth.module";
 
 @Global()
@@ -22,8 +22,8 @@ import { AuthModule } from "../auth/auth.module";
     controllers: [EmployeeController],
     providers: [
         {
-            provide: EmployeeRepository,
-            useClass: EmployeeService,
+            provide: EmployeeService,
+            useClass: EmployeeServiceImp,
         },
     ],
 })

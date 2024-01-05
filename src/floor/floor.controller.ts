@@ -1,4 +1,3 @@
-import { Repository } from "typeorm";
 import {
     Controller,
     Get,
@@ -18,14 +17,13 @@ import { FormDataRequest } from "nestjs-form-data";
 import { UpdateFloorDto } from "./dto/update-floor.dto";
 import { CreateFloorDto } from "./dto/create-floor.dto";
 import { FloorService } from "./floor.service";
-import { id_ID } from "@faker-js/faker";
 import { Floor } from "./entities/floor.entity";
 import { Pagination } from "nestjs-typeorm-paginate/dist/pagination";
 import { IPaginationOptions } from "nestjs-typeorm-paginate/dist/interfaces";
 @ApiTags("Floor")
 @Controller("floor")
 export class FloorController {
-    constructor(private readonly floorRepository: FloorService) { }
+    constructor(private readonly floorRepository: FloorService) {}
     @ApiOperation({ summary: "create floor" })
     @ApiConsumes("multipart/form-data")
     @Post()
@@ -58,18 +56,16 @@ export class FloorController {
     @Get("/pagination")
     async paginationFloor(
         @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-        @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number = 1,
+        @Query("limit", new DefaultValuePipe(10), ParseIntPipe)
+        limit: number = 1,
     ): Promise<Pagination<Floor>> {
         const options: IPaginationOptions = {
             limit,
             page,
-       
         };
 
         return this.floorRepository.paginate(options);
     }
-
-
 
     @Get(":id")
     async findOne(@Param("id") id: string) {
@@ -98,8 +94,4 @@ export class FloorController {
     async softDeleteFloor(@Param("id") id: string) {
         return await this.floorRepository.delete(id);
     }
-    // @Delete(":id")
-    // remove(@Param("id") id: string) {
-    //         return this.floorRepository.delete(id);
-    // }
 }
