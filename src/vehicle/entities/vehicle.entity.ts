@@ -3,7 +3,7 @@ import { Resident } from "../../resident/entities/resident.entity";
 import { IsEnum, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
-enum status {
+export enum Status {
     PENDING = "PENDING",
     APPROVED = "APPROVED",
     REJECTED = "REJECTED",
@@ -34,8 +34,8 @@ export class Vehicle {
     @Column({ name: "resident_id" })
     residentId: string;
 
-    @ApiProperty({ enum: status })
-    @IsEnum(status)
-    @Column({ enum: status, default: status.PENDING })
-    status: status;
+    @ApiProperty({ enum: Status })
+    @IsEnum(Status)
+    @Column({ enum: Status, default: Status.PENDING })
+    status: Status;
 }

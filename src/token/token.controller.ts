@@ -7,7 +7,6 @@ import { ApiForbiddenResponse, ApiResponse } from "@nestjs/swagger";
 @Controller("token")
 export class TokenController {
     constructor(private readonly authService: AuthService) {}
-
     @Auth()
     @Get("/validate")
     @ApiForbiddenResponse({
