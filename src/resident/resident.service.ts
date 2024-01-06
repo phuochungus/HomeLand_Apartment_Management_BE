@@ -42,13 +42,16 @@ export abstract class ResidentRepository implements IRepository<Resident> {
     ): Promise<Resident>;
     abstract findAll(): Promise<Resident[]>;
     abstract search(query: string): Promise<Resident[]>;
-    abstract paginate(options: IPaginationOptions, buildingId?: string):Promise<Pagination<Resident>>;
+    abstract paginate(
+        options: IPaginationOptions,
+        buildingId?: string,
+    ): Promise<Pagination<Resident>>;
 }
 
 @Injectable()
 export class ResidentService implements ResidentRepository {
     constructor(
-        @InjectRepository(Resident) 
+        @InjectRepository(Resident)
         private readonly residentRepository: Repository<Resident>,
         @InjectRepository(Account)
         private readonly accountRepository: Repository<Account>,
@@ -58,10 +61,7 @@ export class ResidentService implements ResidentRepository {
         private readonly hashService: HashService,
         private readonly idGenerate: IdGenerator,
         private readonly avatarGenerator: AvatarGenerator,
-    ) {
-        
-    
-    }
+    ) {}
     //get person by id
     //create person
 
@@ -137,7 +137,7 @@ export class ResidentService implements ResidentRepository {
             profile.front_identify_card_photo_URL = frontURL;
             profile.back_identify_card_photo_URL = backURL;
             resident.profile = profile;
-            const residentData =  await this.residentRepository.save(resident);
+            const residentData = await this.residentRepository.save(resident);
             //set account
             if (email) {
                 resident.account_id = resident.id;
@@ -145,10 +145,10 @@ export class ResidentService implements ResidentRepository {
                 account.owner_id = resident.account_id;
                 account.email = email;
                 account.password = this.hashService.hash(profile.phone_number);
-                account.resident = resident;    
+                account.resident = resident;
                 await this.accountRepository.save(account);
             }
-            return residentData
+            return residentData;
         } catch (error) {
             if (error instanceof TypeORMError) {
                 try {
@@ -172,6 +172,10 @@ export class ResidentService implements ResidentRepository {
             where: {
                 profile: { name: Like(`%${query}%`) },
             },
+            relations: {
+                stay_at: true,
+                account: true,
+            },
         });
 
         return result;
@@ -189,7 +193,6 @@ export class ResidentService implements ResidentRepository {
         const account = await this.accountRepository.findOne({
             where: { owner_id: id },
         });
-        
 
         resident.payment_info = payment_info;
         let profile = plainToInstance(Profile, rest);
@@ -206,7 +209,7 @@ export class ResidentService implements ResidentRepository {
             );
             profile.avatarURL = avatarURL;
         }
-        
+
         if (account !== null) {
             // account.email = email as string;
             // account.avatarURL = avatarURL;
@@ -246,14 +249,21 @@ export class ResidentService implements ResidentRepository {
     }
 
     async delete(id: string): Promise<boolean> {
-        const resident = await this.residentRepository.findOne({where: {
-            id
-        }, relations: {
-            contracts: true
-        }}) as Resident;
-        let contractIds = resident.contracts.map(contract => contract.contract_id);
+        const resident = (await this.residentRepository.findOne({
+            where: {
+                id,
+            },
+            relations: {
+                contracts: true,
+            },
+        })) as Resident;
+        let contractIds = resident.contracts.map(
+            (contract) => contract.contract_id,
+        );
         const result = await this.residentRepository.softDelete({ id });
-        await this.contractRepository.softDelete({contract_id: In(contractIds)})
+        await this.contractRepository.softDelete({
+            contract_id: In(contractIds),
+        });
         return isQueryAffected(result);
     }
 
@@ -269,16 +279,23 @@ export class ResidentService implements ResidentRepository {
     async findAll(): Promise<Resident[]> {
         const residents = await this.residentRepository.find({
             relations: ["account", "stay_at"],
+            withDeleted: true,
         });
         return residents;
     }
 
-    async paginate(options: IPaginationOptions<IPaginationMeta>, buildingId?: string ) {
+    async paginate(
+        options: IPaginationOptions<IPaginationMeta>,
+        buildingId?: string,
+    ) {
         const result = this.residentRepository.createQueryBuilder("resident");
-        if(buildingId) {
-            result.innerJoinAndSelect("resident.stay_at", "apartment").where('apartment.building_id = :buildingId', {buildingId: buildingId})
-        }
-        else result.innerJoinAndSelect("resident.stay_at", "apartment")
-        return paginate<Resident>(result, options)
+        if (buildingId) {
+            result
+                .leftJoinAndSelect("resident.stay_at", "apartment")
+                .where("apartment.building_id = :buildingId", {
+                    buildingId: buildingId,
+                }).orderBy('resident.created_at', 'DESC');
+        } else result.leftJoinAndSelect("resident.stay_at", "apartment").orderBy('resident.created_at', 'DESC');
+        return paginate<Resident>(result, options);
     }
 }

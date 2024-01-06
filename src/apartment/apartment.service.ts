@@ -1,5 +1,6 @@
 import {
     BadRequestException,
+    ConflictException,
     Injectable,
     NotFoundException,
 } from "@nestjs/common";
@@ -14,6 +15,7 @@ import { Resident } from "../resident/entities/resident.entity";
 import { MemoryStoredFile } from "nestjs-form-data";
 import { difference, isString } from "lodash";
 import { Client } from "elasticsearch";
+import { Floor } from "../floor/entities/floor.entity";
 
 /**
  * @classdesc Represent the service that manage the apartment
@@ -68,6 +70,8 @@ export class ApartmentServiceImp extends ApartmentService {
         private readonly apartmentRepository: Repository<Apartment>,
         @InjectRepository(Resident)
         private readonly residentRepository: Repository<Resident>,
+        @InjectRepository(Floor)
+        private readonly floorRepository: Repository<Floor>,
         @InjectDataSource()
         private readonly dataSource: DataSource,
         private readonly idGenerate: IdGenerator,
@@ -82,6 +86,7 @@ export class ApartmentServiceImp extends ApartmentService {
         id?: string,
     ): Promise<Apartment> {
         const { images, ...rest } = createApartmentDto;
+        await this.checkIfReachMaxApartment(createApartmentDto.floor_id);
         let apartment = this.apartmentRepository.create(rest);
         apartment.apartment_id = "APM" + this.idGenerate.generateId();
         if (id) apartment.apartment_id = id;
@@ -137,6 +142,19 @@ export class ApartmentServiceImp extends ApartmentService {
         }
     }
 
+    async checkIfReachMaxApartment(floor_id: string) {
+        const floor = await this.floorRepository.findOne({
+            where: { floor_id },
+            relations: ["apartments"],
+        });
+        if (!floor) throw new BadRequestException("Floor not found");
+        if (
+            floor.max_apartment &&
+            floor.apartments.length >= floor.max_apartment
+        )
+            throw new ConflictException("Floor reach max apartment");
+    }
+
     async findAll(page?: number) {
         if (page != undefined && page != null) {
             return await this.apartmentRepository.find({
@@ -145,16 +163,18 @@ export class ApartmentServiceImp extends ApartmentService {
                 relations: {
                     residents: true,
                 },
+                withDeleted: true,
             });
         }
 
-        return await this.apartmentRepository.find();
+        return await this.apartmentRepository.find({ withDeleted: true });
     }
 
     async findOne(id: string) {
         return await this.apartmentRepository.findOne({
             where: { apartment_id: id },
             relations: ["residents"],
+            withDeleted: true,
         });
     }
 
@@ -277,14 +297,14 @@ export class ApartmentServiceImp extends ApartmentService {
         from: number,
     ): Promise<Apartment[]> {
         let object = {};
-        object[field] = value;
+        object[field] = `*${value}*`;
         let result = await this.elasticSearchClient.search<Apartment>({
             index: "apartment",
             body: {
                 from: from,
                 size: 30,
                 query: {
-                    match: object,
+                    wildcard: object,
                 },
             },
         });

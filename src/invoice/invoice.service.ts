@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { CreateInvoiceDto } from "./dto/create-invoice.dto";
 import { UpdateInvoiceDto } from "./dto/update-invoice.dto";
-import { InjectRepository } from "@nestjs/typeorm";
+import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { Invoice } from "./entities/invoice.entity";
-import { Repository } from "typeorm";
+import { DataSource, In, Repository } from "typeorm";
 import { IdGenerator } from "../id-generator/id-generator.service";
 import { ServicePackage } from "../service-package/entities/service-package.entity";
 import { forEach } from "lodash";
@@ -16,6 +16,8 @@ export class InvoiceService {
         @InjectRepository(ServicePackage)
         private servicePackageRepository: Repository<ServicePackage>,
         private readonly idGenerate: IdGenerator,
+        @InjectDataSource()
+        private readonly dataSource: DataSource,
     ) {}
 
     async create(id: string, createInvoiceDto: CreateInvoiceDto) {
@@ -41,6 +43,7 @@ export class InvoiceService {
         return await this.invoiceRepository.find({
             relations: ["servicePackage", "buyer"],
             cache: true,
+            withDeleted: true // Get soft deleted invoices
         });
     }
     convertJsonToParams(jsonObject: any): string {
@@ -212,8 +215,10 @@ export class InvoiceService {
             },
             relations: ["servicePackage", "buyer"],
             cache: true,
+            withDeleted: true 
         });
     }
+    
     async getAllInvoiceWithResidentId(
         residentId: string,
         serviceId: string | null,

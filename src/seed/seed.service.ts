@@ -32,6 +32,9 @@ import {
 } from "../equipment/entities/equipment.entity";
 import { EquipmentService } from "../equipment/equipment.service";
 import { Employee } from "src/employee/entities/employee.entity";
+import { Invoice } from "../invoice/entities/invoice.entity";
+import { ServicePackageService } from "../service-package/service-package.service";
+import { ServiceService } from "../service/service.service";
 @Injectable()
 export class SeedService {
     constructor(
@@ -47,7 +50,9 @@ export class SeedService {
         private readonly apartmentService: ApartmentService,
         private readonly floorService: FloorService,
         private readonly equipmentService: EquipmentService,
-    ) {}
+        private readonly servicePackageService: ServicePackageService,
+        private readonly serviceService: ServiceService,
+    ) { }
 
     async dropDB() {
         try {
@@ -93,6 +98,18 @@ export class SeedService {
     private readonly backIdentity = {
         buffer: readFileSync(process.cwd() + "/src/seed/back.jpg"),
     } as MemoryStoredFile;
+    private readonly pool = {
+        buffer: readFileSync(process.cwd() + "/src/seed/pool.jpg"),
+    } as MemoryStoredFile;
+    private readonly gym = {
+        buffer: readFileSync(process.cwd() + "/src/seed/gym.jpg"),
+    } as MemoryStoredFile;
+    private readonly library = {
+        buffer: readFileSync(process.cwd() + "/src/seed/library.jpg"),
+    } as MemoryStoredFile;
+    private readonly parking = {
+        buffer: readFileSync(process.cwd() + "/src/seed/parking.jpg"),
+    } as MemoryStoredFile;
 
     private readonly images = [
         {
@@ -119,11 +136,12 @@ export class SeedService {
 
     async startSeeding() {
         await this.createDemoAdmin();
-        await this.createDemoManager();
         await this.createDemoTechnician();
         await this.createDemoAccountResident();
 
         this.buildings = await this.createDemoBuildings();
+        await this.createDemoManager();
+
         this.floors = await this.createDemoFloors(this.buildings);
         this.apartments = await this.createDemoApartments(this.floors);
         this.equipments = await this.createDemoEquipments(
@@ -136,6 +154,7 @@ export class SeedService {
         await this.createDemoServices();
         await this.createDemoServicePackages();
         await this.createDemoResidents();
+        await this.createDemoInvoices();
     }
 
     async createDemoEquipments(
@@ -212,13 +231,14 @@ export class SeedService {
     async createDemoBuildings(): Promise<Building[]> {
         let buildings: Building[] = [];
         for (let i = 0; i < this.NUMBER_OF_BUILDING; i++) {
-            buildings.push(
-                await this.buildingService.create({
-                    name: `Building ${i}`,
-                    address: faker.location.streetAddress(),
-                    max_floor: this.NUMBER_OF_FLOOR_PER_BUILDING,
-                }),
-            );
+            const buildingData: Building = await this.buildingService.create({
+                name: `Building ${i}`,
+                address: faker.location.streetAddress(),
+                max_floor: this.NUMBER_OF_FLOOR_PER_BUILDING,
+            });
+            this.createManagerOfBuilding(buildingData);
+
+            buildings.push(buildingData);
         }
 
         return buildings;
@@ -243,7 +263,7 @@ export class SeedService {
     async createDemoApartments(floors: Floor[]): Promise<Apartment[]> {
         let apartments: Apartment[] = [];
         for (let floor of floors) {
-            for (let i = 0; i < this.NUMBER_OF_APARTMENT_PER_FLOOR; i++) {
+            for (let i = 0; i < this.NUMBER_OF_APARTMENT_PER_FLOOR - 1; i++) {
                 apartments.push(
                     await this.apartmentService.create({
                         name: faker.person.lastName(),
@@ -340,8 +360,49 @@ export class SeedService {
             });
     }
 
+    async createManagerOfBuilding(building: Building) {
+        let id = "MNG" + this.idGenerator.generateId();
+        const manager = await this.dataSource.getRepository(Manager).save({
+            id: id,
+            profile: {
+                date_of_birth: faker.date.birthdate(),
+                name: faker.person.fullName(),
+                gender: Gender.MALE,
+                phone_number: faker.phone.number(),
+                front_identify_card_photo_URL: await this.storageManager.upload(
+                    this.frontIdentity.buffer,
+                    "manager/" + id + "/frontIdentifyPhoto.jpg",
+                    "image/jpeg",
+                ),
+                back_identify_card_photo_URL: await this.storageManager.upload(
+                    this.backIdentity.buffer,
+                    "manager/" + id + "/backIdentifyPhoto.jpg",
+                    "image/jpeg",
+                ),
+                identify_number: faker.string.numeric(12),
+                avatarURL: await this.storageManager.upload(
+                    await this.avatarGenerator.generateAvatar(id),
+                    "manager/" + id + "/avatar.svg",
+                    "image/svg+xml",
+                ),
+            },
+            account: {
+                owner_id: id,
+                email: faker.internet.email(),
+                password: this.hashService.hash("password"),
+            },
+            building: building,
+        });
+    }
     async createDemoManager() {
         let id = "MNG" + this.idGenerator.generateId();
+        const building = (await this.dataSource
+            .getRepository(Building)
+            .findOne({
+                where: {
+                    name: "Building 0",
+                },
+            })) as Building;
         const manager = await this.dataSource.getRepository(Manager).save({
             id: id,
             profile: {
@@ -371,6 +432,7 @@ export class SeedService {
                 email: "manager@gmail.com",
                 password: this.hashService.hash("password"),
             },
+            building: building,
         });
     }
 
@@ -411,10 +473,10 @@ export class SeedService {
             account:
                 index % 2 === 0
                     ? {
-                          owner_id: id,
-                          email: faker.internet.email(),
-                          password: this.hashService.hash("password"),
-                      }
+                        owner_id: id,
+                        email: faker.internet.email(),
+                        password: this.hashService.hash("password"),
+                    }
                     : undefined,
             stay_at: apartmentData,
         });
@@ -507,7 +569,7 @@ export class SeedService {
 
     async createDemoContract() {
         await this.createDemoApartment("APM1698502960091");
-        let contractId = "Contract" + this.idGenerator.generateId();
+        let contractId = "CT" + this.idGenerator.generateId();
         await this.dataSource.getRepository(Contract).save({
             contract_id: contractId,
             resident_id: "RESIDENT",
@@ -518,36 +580,138 @@ export class SeedService {
         });
     }
     async createDemoServices() {
-        let ServiceInfo: any[] = [];
-        for (let i = 0; i < this.NUMBER_OF_Service; i++) {
-            ServiceInfo.push({
-                service_id: `Service${i}`,
-                name: `Service ${i}`,
-                images: this.images,
-                description: `This is a demo service ${i}`,
-            });
-        }
-        await this.dataSource
-            .createQueryBuilder()
-            .insert()
-            .into(Service)
-            .values(ServiceInfo)
-            .execute();
-    }
+        await this.serviceService.create(
+            {
+                name: `Hồ bơi`,
+                images: [this.pool],
+                description: `This is pool service`,
+            },
+            `Service${0}`,
+        );
+        await this.serviceService.create(
+            {
+                name: `Gym`,
+                images: [this.gym],
+                description: `This is gym service`,
+            },
+            `Service${1}`,
+        );
+        await this.serviceService.create(
+            {
+                name: `Thư viện`,
+                images: [this.library],
+                description: `This is library service`,
+            },
+            `Service${2}`,
+        );
+        await this.serviceService.create(
+            {
+                name: `Bãi giữ xe`,
+                images: [this.parking],
+                description: `This is parking service`,
+            },
+            `Service${3}`,
+        );
 
+    }
     async createDemoServicePackages() {
         let ServicePackageInfo: any[] = [];
+        //pool
 
-        for (let i = 0; i < this.NUMBER_OF_Service; i++)
-            for (let j = 0; j < this.NUMBER_OF_ServicePackage_PER_SERVICE; j++)
-                ServicePackageInfo.push({
-                    servicePackage_id: `ServicePackage${i}-${j}`,
-                    service_id: `Service${i}`,
-                    name: `Service package ${i}.${j}`,
-                    expired_date: 30,
-                    per_unit_price: 50000,
-                });
-
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${0}-${0}`,
+            service_id: `Service${0}`,
+            name: `day`,
+            expired_date: 1,
+            per_unit_price: 50000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${0}-${1}`,
+            service_id: `Service${0}`,
+            name: `week`,
+            expired_date: 7,
+            per_unit_price: 300000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${0}-${2}`,
+            service_id: `Service${0}`,
+            name: `month`,
+            expired_date: 30,
+            per_unit_price: 1000000,
+        });
+        //gym
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${1}-${0}`,
+            service_id: `Service${1}`,
+            name: `day`,
+            expired_date: 1,
+            per_unit_price: 25000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${1}-${1}`,
+            service_id: `Service${1}`,
+            name: `week`,
+            expired_date: 7,
+            per_unit_price: 120000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${1}-${2}`,
+            service_id: `Service${1}`,
+            name: `month`,
+            expired_date: 30,
+            per_unit_price: 280000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${1}-${3}`,
+            service_id: `Service${1}`,
+            name: `quarter`,
+            expired_date: 120,
+            per_unit_price: 1000000,
+        });
+        //library
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${2}-${0}`,
+            service_id: `Service${2}`,
+            name: `day`,
+            expired_date: 1,
+            per_unit_price: 10000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${2}-${1}`,
+            service_id: `Service${2}`,
+            name: `week`,
+            expired_date: 7,
+            per_unit_price: 100000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${2}-${2}`,
+            service_id: `Service${2}`,
+            name: `month`,
+            expired_date: 30,
+            per_unit_price: 350000,
+        });
+        //parking
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${3}-${0}`,
+            service_id: `Service${3}`,
+            name: `day`,
+            expired_date: 1,
+            per_unit_price: 5000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${3}-${1}`,
+            service_id: `Service${3}`,
+            name: `week`,
+            expired_date: 7,
+            per_unit_price: 30000,
+        });
+        ServicePackageInfo.push({
+            servicePackage_id: `ServicePackage${3}-${2}`,
+            service_id: `Service${3}`,
+            name: `month`,
+            expired_date: 30,
+            per_unit_price: 70000,
+        });
         await this.dataSource
             .createQueryBuilder()
             .insert()
@@ -555,7 +719,30 @@ export class SeedService {
             .values(ServicePackageInfo)
             .execute();
     }
+    async createDemoInvoices() {
+        let InvoiceInfo: any[] = [];
+        let residents: Resident[] = await this.residentService.findAll();
+        let servicePackages: ServicePackage[] =
+            await this.servicePackageService.findAll();
 
+        for (let resident of residents) {
+            for (let servicePackage of servicePackages) {
+                InvoiceInfo.push({
+                    invoice_id: `Invoice${servicePackage.servicePackage_id}-${resident.id}`,
+                    buyer_id: resident.id,
+                    servicePackage_id: servicePackage.servicePackage_id,
+                    amount: 1,
+                    total: servicePackage.per_unit_price,
+                });
+            }
+        }
+        await this.dataSource
+            .createQueryBuilder()
+            .insert()
+            .into(Invoice)
+            .values(InvoiceInfo)
+            .execute();
+    }
     async createDemoResidents() {
         for (let apartment of this.apartments) {
             for (let i = 0; i < this.NUMBER_OF_RESIDENT; i++) {

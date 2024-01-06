@@ -16,7 +16,7 @@ import { Vehicle } from "../../vehicle/entities/vehicle.entity";
 import { Complain } from "src/complain/entities/complain.entity";
 import { Feedback } from "src/feedback/entities/feedback.entity";
 import { Invoice } from "../../invoice/entities/invoice.entity";
-
+import { RepairInvoice } from "src/repairInvoice/entities/repairInvoice.entity";
 @Entity()
 export class Resident {
     @PrimaryColumn()
@@ -47,6 +47,8 @@ export class Resident {
     @OneToMany(() => Invoice, (invoice) => invoice.buyer)
     invoices: Invoice[];
 
+    @OneToMany(() => RepairInvoice, (invoice) => invoice.buyer)
+    invoice: RepairInvoice[];
 
     @ManyToOne(() => Apartment, (apartment) => apartment.residents)
     @JoinColumn({ name: "stay_at_apartment_id" })

@@ -20,6 +20,9 @@ import {
 } from "../helper/validation";
 import { isString } from "class-validator";
 import { difference } from "lodash";
+import { Client } from "elasticsearch";
+import { SearchServiceDto } from "./dto/search-service";
+import { ReportServiceDto } from "./dto/report-service-dto";
 
 @Injectable()
 export class ServiceService {
@@ -30,6 +33,7 @@ export class ServiceService {
         private dataSource: DataSource,
         private storageManager: StorageManager,
         private readonly idGenerate: IdGenerator,
+        private readonly elasticSearchClient: Client,
     ) {}
     async create(createServiceDto: CreateServiceDto, id?: string) {
         const { images, ...rest } = createServiceDto;
@@ -89,6 +93,7 @@ export class ServiceService {
                 take: 30,
                 relations: ["servicePackages"],
                 cache: true,
+                withDeleted: true,
             });
         }
 
@@ -104,12 +109,50 @@ export class ServiceService {
                 service_id: id,
             },
             cache: true,
+            withDeleted: true,
             relations: ["servicePackages"],
         });
         if (service == null) throw new NotFoundException();
         return service;
     }
+    async reportService(reportServiceDto: ReportServiceDto) {
+        var sevices = await this.serviceRepository.find({
+            relations: ["servicePackages", "servicePackages.invoices"],
+            cache: true,
+        });
+        const result: { service_id: string; name: string; revenue: number }[] =
+            [];
+        for (const service of sevices) {
+            const revenue = await this.revenue(service, reportServiceDto);
+            result.push({
+                service_id: service.service_id,
+                name: service.name,
+                revenue: revenue,
+            });
+        }
+        return result;
+    }
+    async revenue(service: Service, reportServiceDto: ReportServiceDto) {
+        let revenue = 0;
 
+        service.servicePackages.forEach((element) => {
+            element.invoices.forEach((invoice) => {
+                if (
+                    (reportServiceDto != null &&
+                        reportServiceDto.startDate &&
+                        invoice.created_at <
+                            new Date(reportServiceDto.startDate)) ||
+                    (reportServiceDto != null &&
+                        reportServiceDto.endDate &&
+                        invoice.created_at > new Date(reportServiceDto.endDate))
+                ) {
+                    return;
+                }
+                revenue += invoice.total ?? 0;
+            });
+        });
+        return revenue;
+    }
     async update(id: string, updateServiceDto: UpdateServiceDto) {
         const { images, ...rest } = updateServiceDto;
         let uploadPaths: string[] = [];
@@ -170,5 +213,27 @@ export class ServiceService {
         return await this.serviceRepository.softDelete({
             service_id: id,
         });
+    }
+    async search(searchOptions: SearchServiceDto): Promise<Service[]> {
+        var result = await this.serviceRepository
+            .createQueryBuilder("service")
+            .getMany();
+
+        try {
+            if (searchOptions.searchText) {
+                result = await this.serviceRepository
+                    .createQueryBuilder("service")
+                    .where(
+                        "unaccent(Lower(service.name)) LIKE unaccent(:query)",
+                        {
+                            query: `%${searchOptions.searchText.toLocaleLowerCase()}%`,
+                        },
+                    )
+                    .getMany();
+            }
+        } catch (error) {
+            result = [];
+        }
+        return result;
     }
 }

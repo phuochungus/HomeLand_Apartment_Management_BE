@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsNumber, IsNumberString, IsString } from "class-validator";
 import { ItemRepairInvoice } from "src/itemRepairInvoice/entities/itemRepairInvoice.entity";
+import { Resident } from "src/resident/entities/resident.entity";
 import { Task } from "src/task/entities/task.entity";
 
 import {OneToOne, OneToMany, Column, CreateDateColumn, JoinColumn, ManyToOne, PrimaryColumn, Entity } from "typeorm";
@@ -20,6 +21,14 @@ export class RepairInvoice {
     })
     @JoinColumn()
     task?: Task;
+    
+    @IsString()
+    @ApiProperty({ example: "RESIDENT" })
+    @Column()
+    buyer_id: string;
+    @ManyToOne(() => Resident, (resident) => resident.invoice, {})
+    @JoinColumn({ name: "buyer_id", referencedColumnName: "id" })
+    buyer?: Resident;
     
     @OneToMany(() => ItemRepairInvoice, (itemRepairInvoice) => itemRepairInvoice.invoice)
     @JoinColumn()
