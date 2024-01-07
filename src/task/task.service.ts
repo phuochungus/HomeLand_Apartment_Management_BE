@@ -100,7 +100,17 @@ export class TaskService {
     async findOne(id: string) {
         return await this.taskRepository.findOne({
             where: { task_id: id },
-            relations: ["assignee", "manager", "admin", "complain"],
+            relations: {
+                assignee: true,
+                manager: true,
+                admin: true,
+                complain: {
+                    resident: true
+                },
+                invoice:{
+                    items: true 
+                }
+            }
         });
     }
 
