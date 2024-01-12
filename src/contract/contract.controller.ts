@@ -40,11 +40,16 @@ export class ContractController {
             "Page number: Page indexed from 1, each page contain 30 items, if null then return all.",
     })
     @Get()
-   async findAll(@Query("page") page: number) {
+    async findAll(@Query("page") page: number) {
         var data;
         if (Number.isNaN(page)) data = await this.contractService.findAll();
         else data = await this.contractService.findAll(page);
-        return { data, current_page: page, per_page: 30, total: data.length};
+        return { data, current_page: page, per_page: 30, total: data.length };
+    }
+    @Get("/resident/:residentId")
+    @Auth(PersonRole.RESIDENT)
+    getContractsOfResident(@Param("residentId") residentId: string) {
+        return this.contractService.getContractsOfResident(residentId);
     }
 
     @Get("/:id")
@@ -79,5 +84,4 @@ export class ContractController {
         const result = await this.contractService.search(query);
         return result;
     }
-    
 }

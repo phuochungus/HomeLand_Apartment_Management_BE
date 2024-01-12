@@ -121,5 +121,13 @@ export class ContractService {
         });
         return result;
     }
+    async getContractsOfResident(residentId: string) {
+        const result = await this.contractRepository.find({where:{
+            resident_id: residentId
+        }, relations : {
+            apartment: true
+        }})
+        return result;
+    }
     
 }
