@@ -20,6 +20,7 @@ import { Auth } from "../helper/decorator/auth.decorator";
 import { ApiConsumes, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { FormDataRequest } from "nestjs-form-data";
 import { PersonRole } from "../helper/class/profile.entity";
+import { SearchContractDto } from "./dto/search-contract-dto";
 @ApiTags("Contract")
 @Auth(PersonRole.ADMIN)
 @Controller("contract")
@@ -74,14 +75,12 @@ export class ContractController {
     remove(@Param("id") id: string) {
         return this.contractService.remove(id);
     }
-    @Get("/search")
-    async helloResident(@Query("query") query: string) {
-        const result = await this.contractService.search(query);
-        return result;
-    }
-    @Get("/search/byQuery")
-    async searchResident(@Query("query") query: string) {
-        const result = await this.contractService.search(query);
+
+    @Post("/search/byQuery")
+    @ApiConsumes("multipart/form-data")
+    @FormDataRequest()
+    async searchResident(@Body() searchContractDto: SearchContractDto) {
+        const result = await this.contractService.search( searchContractDto);
         return result;
     }
 }

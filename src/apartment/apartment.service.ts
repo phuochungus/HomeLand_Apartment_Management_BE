@@ -143,7 +143,10 @@ export class ApartmentServiceImp extends ApartmentService {
     }
 
     async checkIfReachMaxApartment(floor_id: string) {
-        const floor = await this.floorRepository.findOneBy({ floor_id });
+        const floor = await this.floorRepository.findOne({
+            where: { floor_id },
+            relations: ["apartments"],
+        });
         if (!floor) throw new BadRequestException("Floor not found");
         if (
             floor.max_apartment &&
@@ -294,14 +297,14 @@ export class ApartmentServiceImp extends ApartmentService {
         from: number,
     ): Promise<Apartment[]> {
         let object = {};
-        object[field] = value;
+        object[field] = `*${value}*`;
         let result = await this.elasticSearchClient.search<Apartment>({
             index: "apartment",
             body: {
                 from: from,
                 size: 30,
                 query: {
-                    match: object,
+                    wildcard: object,
                 },
             },
         });
