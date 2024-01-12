@@ -227,7 +227,10 @@ export class ResidentService implements ResidentRepository {
                 id,
             },
             cache: true,
-            relations: ["account"],
+            relations: {
+                account: true,
+                stay_at: true
+            },
         });
     }
 
