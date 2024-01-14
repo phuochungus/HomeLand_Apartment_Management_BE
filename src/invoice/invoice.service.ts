@@ -213,7 +213,7 @@ export class InvoiceService {
             where: {
                 invoice_id: id,
             },
-            relations: ["servicePackage", "buyer"],
+            relations: ["servicePackage", "buyer","servicePackage.service"],
             cache: true,
             withDeleted: true,
         });
