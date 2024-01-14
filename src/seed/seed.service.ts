@@ -35,6 +35,7 @@ import { Employee } from "src/employee/entities/employee.entity";
 import { Invoice } from "../invoice/entities/invoice.entity";
 import { ServicePackageService } from "../service-package/service-package.service";
 import { ServiceService } from "../service/service.service";
+import exp from "constants";
 @Injectable()
 export class SeedService {
     constructor(
@@ -612,7 +613,6 @@ export class SeedService {
             },
             `Service${3}`,
         );
-        
     }
     async createDemoServicePackages() {
         let ServicePackageInfo: any[] = [];
@@ -727,12 +727,20 @@ export class SeedService {
 
         for (let resident of residents) {
             for (let servicePackage of servicePackages) {
+                // Calculate the expiration date
+                const currentDate = new Date();
+                const expirationDate = new Date();
+                expirationDate.setDate(
+                    currentDate.getDate() + (servicePackage?.expired_date ?? 0),
+                );
+               
                 InvoiceInfo.push({
                     invoice_id: `Invoice${servicePackage.servicePackage_id}-${resident.id}`,
                     buyer_id: resident.id,
                     servicePackage_id: servicePackage.servicePackage_id,
                     amount: 1,
                     total: servicePackage.per_unit_price,
+                    expiredDate: expirationDate,
                 });
             }
         }

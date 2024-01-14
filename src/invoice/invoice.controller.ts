@@ -52,6 +52,18 @@ export class InvoiceController {
         }
         return this.invoiceService.findAll();
     }
+    @Auth(PersonRole.RESIDENT)
+    @Get("used/findAll")
+    async findAllUsed(
+        @User() user: AccountOwner | null,
+    ) {
+        if (user?.role === PersonRole.RESIDENT) {
+            return await this.invoiceService.getAllInvoiceUsedWithResidentId(
+                user.id,
+            );
+        }
+        return this.invoiceService.findAll();
+    }
 
     @Get(":id")
     findOne(@Param("id") id: string) {
