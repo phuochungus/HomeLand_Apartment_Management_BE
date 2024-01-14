@@ -13,6 +13,7 @@ import { FloorModule } from "../floor/floor.module";
 import { EquipmentModule } from "../equipment/equipment.module";
 import { ServicePackageModule } from "../service-package/service-package.module";
 import { ServiceModule } from "../service/service.module";
+import { InvoiceModule } from "../invoice/invoice.module";
 
 @Module({
     imports: [
@@ -27,7 +28,8 @@ import { ServiceModule } from "../service/service.module";
         FloorModule,
         EquipmentModule,
         ServicePackageModule,
-        ServiceModule
+        ServiceModule,
+        InvoiceModule
     ],
     controllers: [Seed],
     providers: [SeedService],
