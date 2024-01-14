@@ -36,6 +36,7 @@ import { Invoice } from "../invoice/entities/invoice.entity";
 import { ServicePackageService } from "../service-package/service-package.service";
 import { ServiceService } from "../service/service.service";
 import exp from "constants";
+import { InvoiceService } from "../invoice/invoice.service";
 @Injectable()
 export class SeedService {
     constructor(
@@ -53,6 +54,7 @@ export class SeedService {
         private readonly equipmentService: EquipmentService,
         private readonly servicePackageService: ServicePackageService,
         private readonly serviceService: ServiceService,
+        private readonly invoiceService: InvoiceService,
     ) {}
 
     async dropDB() {
@@ -733,23 +735,17 @@ export class SeedService {
                 expirationDate.setDate(
                     currentDate.getDate() + (servicePackage?.expired_date ?? 0),
                 );
-               
-                InvoiceInfo.push({
-                    invoice_id: `Invoice${servicePackage.servicePackage_id}-${resident.id}`,
-                    buyer_id: resident.id,
-                    servicePackage_id: servicePackage.servicePackage_id,
-                    amount: 1,
-                    total: servicePackage.per_unit_price,
-                    expiredDate: expirationDate,
-                });
+                await this.invoiceService.create(
+                    `Invoice${servicePackage.servicePackage_id}-${resident.id}`,
+                    {
+                        buyer_id: resident.id,
+                        servicePackage_id: servicePackage.servicePackage_id,
+                        amount: 1,
+                        total: servicePackage.per_unit_price,
+                    },
+                );
             }
         }
-        await this.dataSource
-            .createQueryBuilder()
-            .insert()
-            .into(Invoice)
-            .values(InvoiceInfo)
-            .execute();
     }
     async createDemoResidents() {
         for (let apartment of this.apartments) {
