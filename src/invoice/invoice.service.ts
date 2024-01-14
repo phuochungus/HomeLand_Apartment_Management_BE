@@ -43,7 +43,7 @@ export class InvoiceService {
         return await this.invoiceRepository.find({
             relations: ["servicePackage", "buyer"],
             cache: true,
-            withDeleted: true // Get soft deleted invoices
+            withDeleted: true, // Get soft deleted invoices
         });
     }
     convertJsonToParams(jsonObject: any): string {
@@ -215,10 +215,10 @@ export class InvoiceService {
             },
             relations: ["servicePackage", "buyer"],
             cache: true,
-            withDeleted: true 
+            withDeleted: true,
         });
     }
-    
+
     async getAllInvoiceWithResidentId(
         residentId: string,
         serviceId: string | null,
@@ -251,17 +251,47 @@ export class InvoiceService {
                 return 0; // Equal, keep the order unchanged
             });
             return invoices;
-        }
-        else{
+        } else {
             const invoice = await this.invoiceRepository.find({
                 where: {
-                    buyer_id: residentId, 
+                    buyer_id: residentId,
                 },
                 relations: ["servicePackage", "buyer"],
                 cache: true,
             });
             return invoice;
         }
+    }
+    async getAllInvoiceUsedWithResidentId(
+        residentId: string,
+    ): Promise<Invoice[]> {
+        var invoices: Invoice[] = [];
+        const invoice = await this.invoiceRepository.find({
+            where: {
+                buyer_id: residentId,
+            },
+            relations: ["servicePackage", "buyer", "servicePackage.service"],
+            cache: true,
+        });
+        for (const invoiceItem of invoice) {
+            if(invoiceItem){
+                if (invoiceItem.expired_at??(new Date()) >= (new Date())) {
+                    invoices.push(invoiceItem);
+                }
+            }
+        }
+        invoices.sort((invoice1, invoice2) => {
+            if (invoice1.created_at < invoice2.created_at) {
+                return -1; // Sort invoice1 before invoice2
+            }
+
+            if (invoice1.created_at > invoice2.created_at) {
+                return 1; // Sort invoice2 before invoice1
+            }
+
+            return 0; // Equal, keep the order unchanged
+        });
+        return invoices;
     }
 
     async update(id: string, updateInvoiceDto: UpdateInvoiceDto) {
