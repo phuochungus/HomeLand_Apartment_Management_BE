@@ -55,7 +55,7 @@ export class SeedService {
         private readonly servicePackageService: ServicePackageService,
         private readonly serviceService: ServiceService,
         private readonly invoiceService: InvoiceService,
-    ) {}
+    ) { }
 
     async dropDB() {
         try {
@@ -270,7 +270,7 @@ export class SeedService {
                 apartments.push(
                     await this.apartmentService.create({
                         name: faker.person.lastName(),
-                        images: this.images,
+                        images: faker.helpers.shuffle(this.images),
                         length: 20,
                         building_id: floor.building_id,
                         floor_id: floor.floor_id,
@@ -476,10 +476,10 @@ export class SeedService {
             account:
                 index % 2 === 0
                     ? {
-                          owner_id: id,
-                          email: faker.internet.email(),
-                          password: this.hashService.hash("password"),
-                      }
+                        owner_id: id,
+                        email: faker.internet.email(),
+                        password: this.hashService.hash("password"),
+                    }
                     : undefined,
             stay_at: apartmentData,
         });
