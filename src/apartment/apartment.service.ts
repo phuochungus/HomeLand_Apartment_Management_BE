@@ -99,8 +99,7 @@ export class ApartmentServiceImp extends ApartmentService {
                 createApartmentDto.images.map((image, index) =>
                     this.storageManager.upload(
                         image.buffer,
-                        `apartment/${apartment.apartment_id}/${
-                            index.toString() + Date.now()
+                        `apartment/${apartment.apartment_id}/${index.toString() + Date.now()
                         }`,
                         `image/${image.extension ?? "png"}`,
                     ),
@@ -108,6 +107,7 @@ export class ApartmentServiceImp extends ApartmentService {
             );
 
             if (!this.isPromiseFulfilledResultArray(uploadResults)) {
+                console.log(uploadResults)
                 throw new StorageError("Some image upload failed");
             }
 
@@ -201,9 +201,8 @@ export class ApartmentServiceImp extends ApartmentService {
                 const newImages = await Promise.allSettled(
                     images.map((element, index) => {
                         if (isString(element)) return element;
-                        const uploadPath = `apartment/${id}/${
-                            index + Date.now() + (element.extension || ".png")
-                        }`;
+                        const uploadPath = `apartment/${id}/${index + Date.now() + (element.extension || ".png")
+                            }`;
                         uploadPaths.push(uploadPath);
                         return this.storageManager.upload(
                             element.buffer,

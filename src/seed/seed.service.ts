@@ -1,5 +1,5 @@
-import { Injectable } from "@nestjs/common";
-import { readFileSync } from "fs";
+import { Injectable, OnModuleInit } from "@nestjs/common";
+import { readFileSync, readdirSync } from "fs";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 import { Floor } from "../floor/entities/floor.entity";
@@ -38,7 +38,7 @@ import { ServiceService } from "../service/service.service";
 import exp from "constants";
 import { InvoiceService } from "../invoice/invoice.service";
 @Injectable()
-export class SeedService {
+export class SeedService implements OnModuleInit {
     constructor(
         @InjectDataSource()
         private readonly dataSource: DataSource,
@@ -55,7 +55,7 @@ export class SeedService {
         private readonly servicePackageService: ServicePackageService,
         private readonly serviceService: ServiceService,
         private readonly invoiceService: InvoiceService,
-    ) {}
+    ) { }
 
     async dropDB() {
         try {
@@ -114,24 +114,17 @@ export class SeedService {
         buffer: readFileSync(process.cwd() + "/src/seed/parking.jpg"),
     } as MemoryStoredFile;
 
-    private readonly images = [
-        {
-            buffer: readFileSync(process.cwd() + "/src/seed/room.jpg"),
-        } as MemoryStoredFile,
-        {
-            buffer: readFileSync(process.cwd() + "/src/seed/room (2).jpg"),
-        } as MemoryStoredFile,
-        {
-            buffer: readFileSync(process.cwd() + "/src/seed/room (3).jpg"),
-        } as MemoryStoredFile,
-        {
-            buffer: readFileSync(process.cwd() + "/src/seed/room (4).jpg"),
-        } as MemoryStoredFile,
-        {
-            buffer: readFileSync(process.cwd() + "/src/seed/room (5).jpg"),
-        } as MemoryStoredFile,
-    ];
-
+    
+    onModuleInit() {
+        const files = readdirSync(process.cwd() + "/src/seed/images");
+        files.forEach((file) => {
+            this.apartment_img.push({
+                buffer: readFileSync(process.cwd() + "/src/seed/images/" + file),
+            } as MemoryStoredFile)
+        });
+    }
+    
+    private apartment_img: MemoryStoredFile[] = [];
     private buildings: Building[] = [];
     private floors: Floor[] = [];
     private apartments: Apartment[] = [];
@@ -270,7 +263,7 @@ export class SeedService {
                 apartments.push(
                     await this.apartmentService.create({
                         name: faker.person.lastName(),
-                        images: this.images,
+                        images: faker.helpers.shuffle(this.apartment_img),
                         length: 20,
                         building_id: floor.building_id,
                         floor_id: floor.floor_id,
@@ -476,10 +469,10 @@ export class SeedService {
             account:
                 index % 2 === 0
                     ? {
-                          owner_id: id,
-                          email: faker.internet.email(),
-                          password: this.hashService.hash("password"),
-                      }
+                        owner_id: id,
+                        email: faker.internet.email(),
+                        password: this.hashService.hash("password"),
+                    }
                     : undefined,
             stay_at: apartmentData,
         });
@@ -553,7 +546,7 @@ export class SeedService {
         await this.apartmentService.create(
             {
                 name: "St. Crytal",
-                images: this.images,
+                images: this.apartment_img,
                 length: 20,
                 building_id: this.floors[0].building_id,
                 floor_id: this.floors[0].floor_id,
